@@ -18,8 +18,8 @@ process TRINITY_POSTPROCESSING {
     """
     #!/usr/bin/env python
     import sys
-    with open ("${sample_id}_trinity_processed.fasta", "w") as trinity_processed:
-        with open ("${trinity_input}", "r") as trinity_input:
+    with open ("${trinity_input}", "r") as trinity_input:
+        with open ("${sample_id}_trinity_processed.fasta", "w") as trinity_processed:
             contig_cntr = 1
             for line in trinity_input:
                 if line[0] == ">":

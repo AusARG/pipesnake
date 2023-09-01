@@ -11,6 +11,7 @@ process TRINITY {
     
     output:
     tuple val(sample_id), path ("${sample_id}_trinity"), emit: trinity_dir
+    tuple val(fastq1), path ("${sample_id}_trinity/Trinity.fasta"), emit: trinity_fasta
     path "versions.yml", emit: versions
 
 
