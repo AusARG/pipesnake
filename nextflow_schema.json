@@ -1,8 +1,8 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema",
-    "$id": "https://raw.githubusercontent.com/ausarg/pipesnake/master/nextflow_schema.json",
-    "title": "ausarg/pipesnake pipeline parameters",
-    "description": "Create Tress",
+    "$id": "https://raw.githubusercontent.com/nf-core/ausargph/master/nextflow_schema.json",
+    "title": "nf-core/ausargph pipeline parameters",
+    "description": "testing",
     "type": "object",
     "definitions": {
         "input_output_options": {
@@ -16,14 +16,15 @@
                     "type": "string",
                     "format": "file-path",
                     "mimetype": "text/csv",
-                    "pattern": "^\\S+\\.csv$",
+                    "default": "/scratch/pawsey0862/ziadbkh/ausarg/ian_data_t2/Extra_Test_Samples/samples.csv",
                     "schema": "assets/schema_input.json",
                     "description": "Path to comma-separated file containing information about the samples in the experiment.",
-                    "help_text": "You will need to create a design file with information about the samples in your experiment before running the pipeline. Use this parameter to specify its location. It has to be a comma-separated file with 3 columns, and a header row.",
+                    "help_text": "You will need to create a design file with information about the samples in your experiment before running the pipeline. Use this parameter to specify its location. It has to be a comma-separated file with 3 columns, and a header row. See [usage docs](https://nf-co.re/ausargph/usage#samplesheet-input).",
                     "fa_icon": "fas fa-file-csv"
                 },
                 "outdir": {
                     "type": "string",
+                    "default":"/scratch/pawsey0862/ziadbkh/ausarg/output_pip/",
                     "format": "directory-path",
                     "description": "The output directory where the results will be saved. You have to use absolute paths to storage on Cloud infrastructure.",
                     "fa_icon": "fas fa-folder-open"
@@ -34,50 +35,55 @@
                     "fa_icon": "fas fa-envelope",
                     "help_text": "Set this parameter to your e-mail address to get a summary e-mail with details of the run sent to you when the workflow exits. If set in your user config file (`~/.nextflow/config`) then you don't need to specify this on the command line for every run.",
                     "pattern": "^([a-zA-Z0-9_\\-\\.]+)@([a-zA-Z0-9_\\-\\.]+)\\.([a-zA-Z]{2,5})$"
-                },
-                "multiqc_title": {
-                    "type": "string",
-                    "description": "MultiQC report title. Printed as page header, used for filename if not otherwise specified.",
-                    "fa_icon": "fas fa-file-signature"
                 }
             }
         },
         "reference_genome_options": {
-            "title": "Reference genome options",
+            "title": "Reference genome and Blat Database options",
             "type": "object",
             "fa_icon": "fas fa-dna",
-            "description": "Reference genome related files and options required for the workflow.",
+            "description": "Reference genome and and Blat Database related files and options required for the workflow.",
+            "required": ["reference_genome", "blat_db"],
             "properties": {
-                "genome": {
-                    "type": "string",
-                    "description": "Name of iGenomes reference.",
-                    "fa_icon": "fas fa-book",
-                    "help_text": "If using a reference genome configured in the pipeline using iGenomes, use this parameter to give the ID for the reference. This is then used to build the full paths for all required reference genome files e.g. `--genome GRCh38`. \n\nSee the [nf-core website docs](https://nf-co.re/usage/reference_genomes) for more details."
-                },
-                "fasta": {
+                "reference_genome": {
                     "type": "string",
                     "format": "file-path",
                     "mimetype": "text/plain",
+                    "default":"/scratch/pawsey0862/ziadbkh/ausarg/Squamate_AHE_UCE_genes_Pygopodidae.fasta",
                     "pattern": "^\\S+\\.fn?a(sta)?(\\.gz)?$",
                     "description": "Path to FASTA genome file.",
-                    "help_text": "This parameter is *mandatory* if `--genome` is not specified. If you don't have a BWA index available this will be generated for you automatically. Combine with `--save_reference` to save BWA index for future runs.",
-                    "fa_icon": "far fa-file-code"
+                    "help_text": "",
+                    "fa_icon": "fas fa-dna"
                 },
-                "igenomes_base": {
+                "blat_db": {
                     "type": "string",
-                    "format": "directory-path",
-                    "description": "Directory / URL base for iGenomes references.",
-                    "default": "s3://ngi-igenomes/igenomes",
-                    "fa_icon": "fas fa-cloud-download-alt",
-                    "hidden": true
+                    "default": "/scratch/pawsey0862/ziadbkh/ausarg/squamate_AHE_UCE_genes_unique.flipped.fasta",
+                    "format": "file-path",
+                    "description": "Path to the directory containing blat database",
+                    "help_text": "",
+                    "fa_icon": "fa fa-database"
                 },
-                "igenomes_ignore": {
+                "tree_method": {
+                    "type": "string",
+                    "description": "'raxml', 'iqtree'.",
+                    "help_text": "Choose the preferred tree estimation method for individual locus trees. All methods should provide qualitatively identical results. Suggested Usage: iqtree",
+                    "default": "iqtree",
+                    "fa_icon": "fas fa-question-circle",
+                    "enum": ["raxml", "iqtree"]
+                },
+                "trim_alignment": {
                     "type": "boolean",
-                    "description": "Do not load the iGenomes reference config.",
-                    "fa_icon": "fas fa-ban",
-                    "hidden": true,
-                    "help_text": "Do not load `igenomes.config` when running the pipeline. You may choose this option if you observe clashes between custom parameters and those supplied in `igenomes.config`."
+                    "description": ".",
+                    "default": false,
+                    "fa_icon": "fas fa-question-circle"
+                },
+                "batching_size": {
+                    "type": "integer",
+                    "description": ".",
+                    "default": 250,
+                    "fa_icon": "fas fa-question-circle"
                 }
+                
             }
         },
         "institutional_config_options": {
@@ -138,7 +144,6 @@
                 "max_cpus": {
                     "type": "integer",
                     "description": "Maximum number of CPUs that can be requested for any single job.",
-                    "default": 16,
                     "fa_icon": "fas fa-microchip",
                     "hidden": true,
                     "help_text": "Use to set an upper-limit for the CPU requirement for each process. Should be an integer e.g. `--max_cpus 1`"
@@ -146,7 +151,6 @@
                 "max_memory": {
                     "type": "string",
                     "description": "Maximum amount of memory that can be requested for any single job.",
-                    "default": "128.GB",
                     "fa_icon": "fas fa-memory",
                     "pattern": "^\\d+(\\.\\d+)?\\.?\\s*(K|M|G|T)?B$",
                     "hidden": true,
@@ -155,7 +159,6 @@
                 "max_time": {
                     "type": "string",
                     "description": "Maximum amount of time that can be requested for any single job.",
-                    "default": "240.h",
                     "fa_icon": "far fa-clock",
                     "pattern": "^(\\d+\\.?\\s*(s|m|h|day)\\s*)+$",
                     "hidden": true,
@@ -178,17 +181,8 @@
                 },
                 "version": {
                     "type": "boolean",
-                    "description": "Display version and exit.",
+                    "description": "Display the version of the pipeline.",
                     "fa_icon": "fas fa-question-circle",
-                    "hidden": true
-                },
-                "publish_dir_mode": {
-                    "type": "string",
-                    "default": "copy",
-                    "description": "Method used to save pipeline results to output directory.",
-                    "help_text": "The Nextflow `publishDir` option specifies which intermediate files should be saved to the output directory. This option tells the pipeline what method should be used to move these files. See [Nextflow docs](https://www.nextflow.io/docs/latest/process.html#publishdir) for details.",
-                    "fa_icon": "fas fa-copy",
-                    "enum": ["symlink", "rellink", "link", "copy", "copyNoFollow", "move"],
                     "hidden": true
                 },
                 "email_on_fail": {
@@ -204,44 +198,6 @@
                     "description": "Send plain-text email instead of HTML.",
                     "fa_icon": "fas fa-remove-format",
                     "hidden": true
-                },
-                "max_multiqc_email_size": {
-                    "type": "string",
-                    "description": "File size limit when attaching MultiQC reports to summary emails.",
-                    "pattern": "^\\d+(\\.\\d+)?\\.?\\s*(K|M|G|T)?B$",
-                    "default": "25.MB",
-                    "fa_icon": "fas fa-file-upload",
-                    "hidden": true
-                },
-                "monochrome_logs": {
-                    "type": "boolean",
-                    "description": "Do not use coloured log outputs.",
-                    "fa_icon": "fas fa-palette",
-                    "hidden": true
-                },
-                "hook_url": {
-                    "type": "string",
-                    "description": "Incoming hook URL for messaging service",
-                    "fa_icon": "fas fa-people-group",
-                    "help_text": "Incoming hook URL for messaging service. Currently, MS Teams and Slack are supported.",
-                    "hidden": true
-                },
-                "multiqc_config": {
-                    "type": "string",
-                    "description": "Custom config file to supply to MultiQC.",
-                    "fa_icon": "fas fa-cog",
-                    "hidden": true
-                },
-                "multiqc_logo": {
-                    "type": "string",
-                    "description": "Custom logo file to supply to MultiQC. File name must also be set in the MultiQC config file",
-                    "fa_icon": "fas fa-image",
-                    "hidden": true
-                },
-                "multiqc_methods_description": {
-                    "type": "string",
-                    "description": "Custom MultiQC yaml file containing HTML including a methods description.",
-                    "fa_icon": "fas fa-cog"
                 },
                 "tracedir": {
                     "type": "string",
@@ -263,9 +219,1843 @@
                     "description": "Show all params when using `--help`",
                     "hidden": true,
                     "help_text": "By default, parameters set as _hidden_ in the schema are not shown on the command line when a user runs with `--help`. Specifying this option will tell the pipeline to show all parameters."
+                },
+                "enable_conda": {
+                    "type": "boolean",
+                    "description": "Run this workflow with Conda. You can also use '-profile conda' instead of providing this parameter.",
+                    "hidden": true,
+                    "fa_icon": "fas fa-bacon"
+                },
+                "monochrome_logs": {
+                    "type": "boolean",
+                    "description": "",
+                    "hidden": false,
+                    "fa_icon": "fas fa-bacon"
+                },
+                "singularity_cache_dir": {
+                    "type": "string",
+                    "description": "The path to store singularity containers locally to be reused later",
+                    "hidden": false,
+                    "fa_icon": "fas fa-bacon"
+                }
+            }
+        },
+        "saved_output_options": {
+            "title": "Pipeline output options",
+            "type": "object",
+            "fa_icon": "fas fa-file-import",
+            "description": "Decide on what processes output to keep.",
+            "help_text": "",
+            "properties": {
+                "fastq_suffix": {
+                    "type": "string",
+                    "description": ".",
+                    "default": "fastq",
+                    "fa_icon": "fas fa-question-circle",
+                    "hidden": true
+                },
+                "publish_dir_mode": {
+                    "type": "string",
+                    "default": "copy",
+                    "description": "Method used to save pipeline results to output directory.",
+                    "help_text": "The Nextflow `publishDir` option specifies which intermediate files should be saved to the output directory. This option tells the pipeline what method should be used to move these files. See [Nextflow docs](https://www.nextflow.io/docs/latest/process.html#publishdir) for details.",
+                    "fa_icon": "fas fa-copy",
+                    "enum": [
+                        "symlink",
+                        "rellink",
+                        "link",
+                        "copy",
+                        "copyNoFollow",
+                        "move"
+                    ],
+                    "hidden": true
+                },
+                "phylogeny_make_alignments_keep_output": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "If enabled, the output of process 'phylogeny_make_alignments' will be saved in the output directory.",
+                    "help_text": "process output is a collection of raw alignments, where each file represents a single locus and contains unaligned sequence data for all recovered samples",
+                    "fa_icon": "fas fa-copy",
+                    "hidden": true
+                },
+                "trinity_postprocessing_keep_output": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "If enabled, the output of process 'trinity_postprocessing' will be saved in the output directory.",
+                    "help_text": "process output for each sample is a single fasta file containing all assembled contigs, as well as a directory with all Trinity output files (inchworm, jellyfish, read normalization files). Each sample directory can be very large (>3G), so we do not recommend retaining these files.",
+                    "fa_icon": "fas fa-copy",
+                    "hidden": true
+                },
+                "trimmomatic_clean_pe_keep_output": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "If enabled, the output of process 'trimmomatic_clean_pe' will be saved in the output directory.",
+                    "help_text": "process output for each sample are forward and reverse, paired and unpaired fq.gz files (4 total). These are the result of leading/trailing read trimming.",
+                    "fa_icon": "fas fa-copy",
+                    "hidden": true
+                },
+                "trimmomatic_clean_se_keep_output": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "If enabled, the output of process 'trimmomatic_clean_se' will be saved in the output directory.",
+                    "help_text": "process output for each sample is a single unpaired fq.gz file. This is the result of leading/trailing read trimming.",
+                    "fa_icon": "fas fa-copy",
+                    "hidden": true
+                },
+                "prepare_samplesheet_keep_output": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "If enabled, the output of process 'prepare_samplesheet' will be saved in the output directory.",
+                    "help_text": "",
+                    "fa_icon": "fas fa-copy",
+                    "hidden": true
+                },
+                "parse_blat_results_keep_output": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "If enabled, the output of process 'parse_blat_results' will be saved in the output directory.",
+                    "help_text": "",
+                    "fa_icon": "fas fa-copy",
+                    "hidden": true
+                },
+                "quality_2_assembly_keep_output": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "If enabled, the output of process 'quality_2_assembly' will be saved in the output directory.",
+                    "help_text": "process output for each sample is a csv file summarizing the target coverage (number of contigs, AHE, UCE, gene tallies)",
+                    "fa_icon": "fas fa-copy",
+                    "hidden": true
+                },
+                "samplesheet_check_keep_output": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "If enabled, the output of process 'samplesheet_check' will be saved in the output directory.",
+                    "help_text": "",
+                    "fa_icon": "fas fa-copy",
+                    "hidden": true
+                },
+                "bbmap_reformat2_keep_output": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "If enabled, the output of process 'bbmap_reformat2' will be saved in the output directory.",
+                    "help_text": "",
+                    "fa_icon": "fas fa-copy",
+                    "hidden": true
+                },
+                "prepare_adaptor_keep_output": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "If enabled, the output of process 'prepare_adaptor' will be saved in the output directory.",
+                    "help_text": "",
+                    "fa_icon": "fas fa-copy",
+                    "hidden": true
+                },
+                "bbmap_reformat_keep_output": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "If enabled, the output of process 'bbmap_reformat' will be saved in the output directory.",
+                    "help_text": "",
+                    "fa_icon": "fas fa-copy",
+                    "hidden": true
+                },
+                "convert_phyml_keep_output": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "If enabled, the output of process 'convert_phyml' will be saved in the output directory.",
+                    "help_text": "",
+                    "fa_icon": "fas fa-copy",
+                    "hidden": true
+                },
+                "preprocessing_keep_output": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "If enabled, the output of process 'preprocessing' will be saved in the output directory.",
+                    "help_text": "",
+                    "fa_icon": "fas fa-copy",
+                    "hidden": true
+                },
+                "bbmap_dedupe_keep_output": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "If enabled, the output of process 'bbmap_dedupe' will be saved in the output directory.",
+                    "help_text": "process output for each sample are a fq.gz file of deduplicated reads, and another fq.gz file of duplicates",
+                    "fa_icon": "fas fa-copy",
+                    "hidden": true
+                },
+                "bbmap_filter_keep_output": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "If enabled, the output of process 'bbmap_filter' will be saved in the output directory.",
+                    "help_text": "process output for each sample are forward and reverse reads that have been filtered against a set of phylogenetically informed targets",
+                    "fa_icon": "fas fa-copy",
+                    "hidden": true
+                },
+                "perl_cleanup_keep_output": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "If enabled, the output of process 'perl_cleanup' will be saved in the output directory.",
+                    "help_text": "",
+                    "fa_icon": "fas fa-copy",
+                    "hidden": true
+                },
+                "concatenate_keep_output": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "If enabled, the output of process 'concatenate' will be saved in the output directory.",
+                    "help_text": "",
+                    "fa_icon": "fas fa-copy",
+                    "hidden": true
+                },
+                "merge_trees_keep_output": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "If enabled, the output of process 'merge_trees' will be saved in the output directory.",
+                    "help_text": "",
+                    "fa_icon": "fas fa-copy",
+                    "hidden": true
+                },
+                "trimmomatic_keep_output": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "If enabled, the output of process 'trimmomatic' will be saved in the output directory.",
+                    "help_text": "",
+                    "fa_icon": "fas fa-copy",
+                    "hidden": true
+                },
+                "make_prg_keep_output": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "If enabled, the output of process 'make_prg' will be saved in the output directory.",
+                    "help_text": "process output for each sample is a single Pseudo-Reference-Genome fasta file holding the successfully assembled and annotated targets. These are worthile to retain.",
+                    "fa_icon": "fas fa-copy",
+                    "hidden": true
+                },
+                "gblocks_keep_output": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "If enabled, the output of process 'gblocks' will be saved in the output directory.",
+                    "help_text": "",
+                    "fa_icon": "fas fa-copy",
+                    "hidden": true
+                },
+                "testing_keep_output": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "If enabled, the output of process 'testing' will be saved in the output directory.",
+                    "help_text": "",
+                    "fa_icon": "fas fa-copy",
+                    "hidden": true
+                },
+                "trinity_keep_output": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "If enabled, the output of process 'trinity' will be saved in the output directory.",
+                    "help_text": "",
+                    "fa_icon": "fas fa-copy",
+                    "hidden": true
+                },
+                "iqtree_keep_output": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "If enabled, the output of process 'iqtree' will be saved in the output directory.",
+                    "help_text": "",
+                    "fa_icon": "fas fa-copy",
+                    "hidden": true
+                },
+                "aster_keep_output": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "If enabled, the output of process 'aster' will be saved in the output directory.",
+                    "help_text": "",
+                    "fa_icon": "fas fa-copy",
+                    "hidden": true
+                },
+                "macse_keep_output": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "If enabled, the output of process 'macse' will be saved in the output directory.",
+                    "help_text": "",
+                    "fa_icon": "fas fa-copy",
+                    "hidden": true
+                },
+                "mafft_keep_output": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "If enabled, the output of process 'mafft' will be saved in the output directory.",
+                    "help_text": "",
+                    "fa_icon": "fas fa-copy",
+                    "hidden": true
+                },
+                "raxml_keep_output": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "If enabled, the output of process 'raxml' will be saved in the output directory.",
+                    "help_text": "",
+                    "fa_icon": "fas fa-copy",
+                    "hidden": true
+                },
+                "blat_keep_output": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "If enabled, the output of process 'blat' will be saved in the output directory.",
+                    "help_text": "",
+                    "fa_icon": "fas fa-copy",
+                    "hidden": true
+                },
+                "pear_keep_output": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "If enabled, the output of process 'pear' will be saved in the output directory.",
+                    "help_text": "",
+                    "fa_icon": "fas fa-copy",
+                    "hidden": true
+                },
+                "sed_keep_output": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "If enabled, the output of process 'sed' will be saved in the output directory.",
+                    "help_text": "",
+                    "fa_icon": "fas fa-copy",
+                    "hidden": true
+                }
+            }
+        },
+        "phylogeny_make_alignments_options": {
+            "title": "phylogeny_make_alignments options",
+            "type": "object",
+            "fa_icon": "fa-solid fa-arrow-progress",
+            "description": "The configurations of the process phylogeny_make_alignments.",
+            "help_text": "",
+            "properties": {
+                "phylogeny_make_alignments_minsamp": {
+                    "type": "integer",
+                    "default": 4,
+                    "description": "Minimum number of samples to constitute an alignment",
+                    "help_text": "Some phylogeny building methods rely on a minimum number of samples in an alignment. To estimate bootstraps for a genetree or include a genetree in an ASTRAL analysis, the minimum number of samples is 4. Suggested Usage: 4",
+                    "fa_icon": "fa fa-cog",
+                    "hidden": true
+                },
+                "phylogeny_make_alignments_args": {
+                    "type": "string",
+                    "default": null,
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fa fa-cog",
+                    "hidden": true
+                },
+                "phylogeny_make_alignments_cpus": {
+                    "type": "integer",
+                    
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fas fa-microchip",
+                    "hidden": true
+                },
+                "phylogeny_make_alignments_memory": {
+                    "type": "string",
+                    
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fas fa-memory",
+                    "hidden": true
+                },
+                "phylogeny_make_alignments_walltime": {
+                    "type": "string",
+                    
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "far fa-clock",
+                    "hidden": true
+                }
+            }
+        },
+        "trinity_postprocessing_options": {
+            "title": "trinity_postprocessing options",
+            "type": "object",
+            "fa_icon": "fa-solid fa-arrow-progress",
+            "description": "The configurations of the process trinity_postprocessing.",
+            "help_text": "",
+            "properties": {
+                "trinity_postprocessing_args": {
+                    "type": "string",
+                    "default": null,
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fa fa-cog",
+                    "hidden": true
+                },
+                "trinity_postprocessing_cpus": {
+                    "type": "integer",
+                    
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fas fa-microchip",
+                    "hidden": true
+                },
+                "trinity_postprocessing_memory": {
+                    "type": "string",
+                    
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fas fa-memory",
+                    "hidden": true
+                },
+                "trinity_postprocessing_walltime": {
+                    "type": "string",
+                    
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "far fa-clock",
+                    "hidden": true
+                }
+            }
+        },
+        "trimmomatic_clean_pe_options": {
+            "title": "trimmomatic_clean_pe options",
+            "type": "object",
+            "fa_icon": "fa-solid fa-arrow-progress",
+            "description": "The configurations of the process trimmomatic_clean_pe.",
+            "help_text": "",
+            "properties": {
+                "trimmomatic_clean_pe_args": {
+                    "type": "string",
+                    "default": null,
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fa fa-cog",
+                    "hidden": true
+                },
+                "trimmomatic_clean_pe_cpus": {
+                    "type": "integer",
+                    
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fas fa-microchip",
+                    "hidden": true
+                },
+                "trimmomatic_clean_pe_memory": {
+                    "type": "string",
+                    
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fas fa-memory",
+                    "hidden": true
+                },
+                "trimmomatic_clean_pe_walltime": {
+                    "type": "string",
+                    
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "far fa-clock",
+                    "hidden": true
+                }
+            }
+        },
+        "trimmomatic_clean_se_options": {
+            "title": "trimmomatic_clean_se options",
+            "type": "object",
+            "fa_icon": "fa-solid fa-arrow-progress",
+            "description": "The configurations of the process trimmomatic_clean_se.",
+            "help_text": "",
+            "properties": {
+                "trimmomatic_clean_se_args": {
+                    "type": "string",
+                    "default": null,
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fa fa-cog",
+                    "hidden": true
+                },
+                "trimmomatic_clean_se_cpus": {
+                    "type": "integer",
+                    
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fas fa-microchip",
+                    "hidden": true
+                },
+                "trimmomatic_clean_se_memory": {
+                    "type": "string",
+                    
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fas fa-memory",
+                    "hidden": true
+                },
+                "trimmomatic_clean_se_walltime": {
+                    "type": "string",
+                    
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "far fa-clock",
+                    "hidden": true
+                }
+            }
+        },
+        "prepare_samplesheet_options": {
+            "title": "prepare_samplesheet options",
+            "type": "object",
+            "fa_icon": "fa-solid fa-arrow-progress",
+            "description": "The configurations of the process prepare_samplesheet.",
+            "help_text": "",
+            "properties": {
+                "prepare_samplesheet_args": {
+                    "type": "string",
+                    "default": null,
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fa fa-cog",
+                    "hidden": true
+                },
+                "prepare_samplesheet_cpus": {
+                    "type": "integer",
+                    
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fas fa-microchip",
+                    "hidden": true
+                },
+                "prepare_samplesheet_memory": {
+                    "type": "string",
+                    
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fas fa-memory",
+                    "hidden": true
+                },
+                "prepare_samplesheet_walltime": {
+                    "type": "string",
+                    
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "far fa-clock",
+                    "hidden": true
+                }
+            }
+        },
+        "parse_blat_results_options": {
+            "title": "parse_blat_results options",
+            "type": "object",
+            "fa_icon": "fa-solid fa-arrow-progress",
+            "description": "The configurations of the process parse_blat_results.",
+            "help_text": "",
+            "properties": {
+                "blat_parser_evalue": {
+                    "type": "number",
+                    "default": 1e-10,
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fa fa-cog",
+                    "hidden": true
+                },
+                "blat_parser_match": {
+                    "type": "integer",
+                    "default": 80,
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fa fa-cog",
+                    "hidden": true
+                },
+                "parse_blat_results_args": {
+                    "type": "string",
+                    "default": null,
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fa fa-cog",
+                    "hidden": true
+                },
+                "parse_blat_results_cpus": {
+                    "type": "integer",
+                    
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fas fa-microchip",
+                    "hidden": true
+                },
+                "parse_blat_results_memory": {
+                    "type": "string",
+                    
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fas fa-memory",
+                    "hidden": true
+                },
+                "parse_blat_results_walltime": {
+                    "type": "string",
+                    
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "far fa-clock",
+                    "hidden": true
+                }
+            }
+        },
+        "quality_2_assembly_options": {
+            "title": "quality_2_assembly options",
+            "type": "object",
+            "fa_icon": "fa-solid fa-arrow-progress",
+            "description": "The configurations of the process quality_2_assembly.",
+            "help_text": "",
+            "properties": {
+                "quality_2_assembly_args": {
+                    "type": "string",
+                    "default": null,
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fa fa-cog",
+                    "hidden": true
+                },
+                "quality_2_assembly_cpus": {
+                    "type": "integer",
+                    
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fas fa-microchip",
+                    "hidden": true
+                },
+                "quality_2_assembly_memory": {
+                    "type": "string",
+                    
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fas fa-memory",
+                    "hidden": true
+                },
+                "quality_2_assembly_walltime": {
+                    "type": "string",
+                    
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "far fa-clock",
+                    "hidden": true
+                }
+            }
+        },
+        "samplesheet_check_options": {
+            "title": "samplesheet_check options",
+            "type": "object",
+            "fa_icon": "fa-solid fa-arrow-progress",
+            "description": "The configurations of the process samplesheet_check.",
+            "help_text": "",
+            "properties": {
+                "samplesheet_check_args": {
+                    "type": "string",
+                    "default": null,
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fa fa-cog",
+                    "hidden": true
+                },
+                "samplesheet_check_cpus": {
+                    "type": "integer",
+                    
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fas fa-microchip",
+                    "hidden": true
+                },
+                "samplesheet_check_memory": {
+                    "type": "string",
+                    
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fas fa-memory",
+                    "hidden": true
+                },
+                "samplesheet_check_walltime": {
+                    "type": "string",
+                    
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "far fa-clock",
+                    "hidden": true
+                }
+            }
+        },
+        "bbmap_reformat2_options": {
+            "title": "bbmap_reformat2 options",
+            "type": "object",
+            "fa_icon": "fa-solid fa-arrow-progress",
+            "description": "The configurations of the process bbmap_reformat2.",
+            "help_text": "",
+            "properties": {
+                "bbmap_reformat2_args": {
+                    "type": "string",
+                    "default": null,
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fa fa-cog",
+                    "hidden": true
+                },
+                "bbmap_reformat2_cpus": {
+                    "type": "integer",
+                    
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fas fa-microchip",
+                    "hidden": true
+                },
+                "bbmap_reformat2_memory": {
+                    "type": "string",
+                    
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fas fa-memory",
+                    "hidden": true
+                },
+                "bbmap_reformat2_walltime": {
+                    "type": "string",
+                    
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "far fa-clock",
+                    "hidden": true
+                }
+            }
+        },
+        "prepare_adaptor_options": {
+            "title": "prepare_adaptor options",
+            "type": "object",
+            "fa_icon": "fa-solid fa-arrow-progress",
+            "description": "The configurations of the process prepare_adaptor.",
+            "help_text": "",
+            "properties": {
+                "prepare_adaptor_args": {
+                    "type": "string",
+                    "default": null,
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fa fa-cog",
+                    "hidden": true
+                },
+                "prepare_adaptor_cpus": {
+                    "type": "integer",
+                    
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fas fa-microchip",
+                    "hidden": true
+                },
+                "prepare_adaptor_memory": {
+                    "type": "string",
+                    
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fas fa-memory",
+                    "hidden": true
+                },
+                "prepare_adaptor_walltime": {
+                    "type": "string",
+                    
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "far fa-clock",
+                    "hidden": true
+                }
+            }
+        },
+        "bbmap_reformat_options": {
+            "title": "bbmap_reformat options",
+            "type": "object",
+            "fa_icon": "fa-solid fa-arrow-progress",
+            "description": "The configurations of the process bbmap_reformat.",
+            "help_text": "",
+            "properties": {
+                "bbmap_reformat_minconsecutivebases": {
+                    "type": "number",
+                    "default": 100.0,
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fa fa-cog",
+                    "hidden": true
+                },
+                "bbmap_reformat_dotdashxton": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fa fa-cog",
+                    "hidden": true
+                },
+                "bbmap_reformat_fastawrap": {
+                    "type": "number",
+                    "default": 32000.0,
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fa fa-cog",
+                    "hidden": true
+                },
+                "bbmap_reformat_args": {
+                    "type": "string",
+                    "default": null,
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fa fa-cog",
+                    "hidden": true
+                },
+                "bbmap_reformat_cpus": {
+                    "type": "integer",
+                    
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fas fa-microchip",
+                    "hidden": true
+                },
+                "bbmap_reformat_memory": {
+                    "type": "string",
+                    
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fas fa-memory",
+                    "hidden": true
+                },
+                "bbmap_reformat_walltime": {
+                    "type": "string",
+                    
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "far fa-clock",
+                    "hidden": true
+                }
+            }
+        },
+        "convert_phyml_options": {
+            "title": "convert_phyml options",
+            "type": "object",
+            "fa_icon": "fa-solid fa-arrow-progress",
+            "description": "The configurations of the process convert_phyml.",
+            "help_text": "",
+            "properties": {
+                "convert_phyml_args": {
+                    "type": "string",
+                    "default": null,
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fa fa-cog",
+                    "hidden": true
+                },
+                "convert_phyml_cpus": {
+                    "type": "integer",
+                    
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fas fa-microchip",
+                    "hidden": true
+                },
+                "convert_phyml_memory": {
+                    "type": "string",
+                    
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fas fa-memory",
+                    "hidden": true
+                },
+                "convert_phyml_walltime": {
+                    "type": "string",
+                    
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "far fa-clock",
+                    "hidden": true
+                }
+            }
+        },
+        "preprocessing_options": {
+            "title": "preprocessing options",
+            "type": "object",
+            "fa_icon": "fa-solid fa-arrow-progress",
+            "description": "The configurations of the process preprocessing.",
+            "help_text": "",
+            "properties": {
+                "preprocessing_args": {
+                    "type": "string",
+                    "default": null,
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fa fa-cog",
+                    "hidden": true
+                },
+                "preprocessing_cpus": {
+                    "type": "integer",
+                    
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fas fa-microchip",
+                    "hidden": true
+                },
+                "preprocessing_memory": {
+                    "type": "string",
+                    
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fas fa-memory",
+                    "hidden": true
+                },
+                "preprocessing_walltime": {
+                    "type": "string",
+                    
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "far fa-clock",
+                    "hidden": true
+                }
+            }
+        },
+        "bbmap_dedupe_options": {
+            "title": "bbmap_dedupe options",
+            "type": "object",
+            "fa_icon": "fa-solid fa-arrow-progress",
+            "description": "The configurations of the process bbmap_dedupe.",
+            "help_text": "",
+            "properties": {
+                "bbmap_dedupe_args": {
+                    "type": "string",
+                    "default": null,
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fa fa-cog",
+                    "hidden": true
+                },
+                "bbmap_dedupe_cpus": {
+                    "type": "integer",
+                    
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fas fa-microchip",
+                    "hidden": true
+                },
+                "bbmap_dedupe_memory": {
+                    "type": "string",
+                    
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fas fa-memory",
+                    "hidden": true
+                },
+                "bbmap_dedupe_walltime": {
+                    "type": "string",
+                    
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "far fa-clock",
+                    "hidden": true
+                }
+            }
+        },
+        "bbmap_filter_options": {
+            "title": "bbmap_filter options",
+            "type": "object",
+            "fa_icon": "fa-solid fa-arrow-progress",
+            "description": "The configurations of the process bbmap_filter.",
+            "help_text": "See the [bbmap guide](https://jgi.doe.gov/data-and-tools/software-tools/bbtools/bb-tools-user-guide/bbmap-guide/) for more information",
+            "properties": {
+                "disable_filter": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Disable bbmap filtration process. This speed up the performance.",
+                    "help_text": "",
+                    "fa_icon": "fa fa-cog",
+                    "hidden": true
+                },
+                "bbmap_filter_minid": {
+                    "type": "number",
+                    "default": 0.75,
+                    "description": "Minimum identity to reference sequence to retain a read",
+                    "help_text": "Discards reads that do not map to a reference target with at least the indicated identity score. This was designed to quickly filter off-target reads such as mtDNA. Suggested Usage: 0.75",
+                    "fa_icon": "fa fa-cog",
+                    "hidden": true
+                },
+                "bbmap_filter_mem": {
+                    "type": "integer",
+                    "default": 2,
+                    "description": "Specify memomry use for mapping/filtering (Gb)",
+                    "help_text": "",
+                    "fa_icon": "fa fa-cog",
+                    "hidden": true
+                },
+                "bbmap_filter_args": {
+                    "type": "string",
+                    "default": null,
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fa fa-cog",
+                    "hidden": true
+                },
+                "bbmap_filter_cpus": {
+                    "type": "integer",
+                    
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fas fa-microchip",
+                    "hidden": true
+                },
+                "bbmap_filter_memory": {
+                    "type": "string",
+                    
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fas fa-memory",
+                    "hidden": true
+                },
+                "bbmap_filter_walltime": {
+                    "type": "string",
+                    
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "far fa-clock",
+                    "hidden": true
+                }
+            }
+        },
+        "perl_cleanup_options": {
+            "title": "perl_cleanup options",
+            "type": "object",
+            "fa_icon": "fa-solid fa-arrow-progress",
+            "description": "The configurations of the process perl_cleanup.",
+            "help_text": "",
+            "properties": {
+                "perl_cleanup_args": {
+                    "type": "string",
+                    "default": null,
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fa fa-cog",
+                    "hidden": true
+                },
+                "perl_cleanup_cpus": {
+                    "type": "integer",
+                    
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fas fa-microchip",
+                    "hidden": true
+                },
+                "perl_cleanup_memory": {
+                    "type": "string",
+                    
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fas fa-memory",
+                    "hidden": true
+                },
+                "perl_cleanup_walltime": {
+                    "type": "string",
+                    
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "far fa-clock",
+                    "hidden": true
+                }
+            }
+        },
+        "concatenate_options": {
+            "title": "concatenate options",
+            "type": "object",
+            "fa_icon": "fa-solid fa-arrow-progress",
+            "description": "The configurations of the process concatenate.",
+            "help_text": "",
+            "properties": {
+                "concatenate_args": {
+                    "type": "string",
+                    "default": null,
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fa fa-cog",
+                    "hidden": true
+                },
+                "concatenate_cpus": {
+                    "type": "integer",
+                    
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fas fa-microchip",
+                    "hidden": true
+                },
+                "concatenate_memory": {
+                    "type": "string",
+                    
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fas fa-memory",
+                    "hidden": true
+                },
+                "concatenate_walltime": {
+                    "type": "string",
+                    
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "far fa-clock",
+                    "hidden": true
+                }
+            }
+        },
+        "merge_trees_options": {
+            "title": "merge_trees options",
+            "type": "object",
+            "fa_icon": "fa-solid fa-arrow-progress",
+            "description": "The configurations of the process merge_trees.",
+            "help_text": "",
+            "properties": {
+                "merge_trees_args": {
+                    "type": "string",
+                    "default": null,
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fa fa-cog",
+                    "hidden": true
+                },
+                "merge_trees_cpus": {
+                    "type": "integer",
+                    
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fas fa-microchip",
+                    "hidden": true
+                },
+                "merge_trees_memory": {
+                    "type": "string",
+                    
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fas fa-memory",
+                    "hidden": true
+                },
+                "merge_trees_walltime": {
+                    "type": "string",
+                    
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "far fa-clock",
+                    "hidden": true
+                }
+            }
+        },
+        "trimmomatic_options": {
+            "title": "trimmomatic options",
+            "type": "object",
+            "fa_icon": "fa-solid fa-arrow-progress",
+            "description": "The configurations of the process trimmomatic.",
+            "help_text": "See [Trimmomatic on Github](https://github.com/usadellab/Trimmomatic) for more information",
+            "properties": {
+                "trimmomatic_clean_minlength": {
+                    "type": "integer",
+                    "default": 36,
+                    "description": "Minimum read length to be retained after trimming",
+                    "help_text": "Discard reads shorter than this minimum threshold after adaptor/barcode trimming. Suggested Usage: 36",
+                    "fa_icon": "fa fa-cog",
+                    "hidden": true
+                },
+                "trimmomatic_clean_trail": {
+                    "type": "integer",
+                    "default": 3,
+                    "description": "Remove trailing bases below indicated quality",
+                    "help_text": "Discard trailing bases below this minimum quality threshold. Suggested Usage: 3",
+                    "fa_icon": "fa fa-cog",
+                    "hidden": true
+                },
+                "trimmomatic_clean_head": {
+                    "type": "integer",
+                    "default": 3,
+                    "description": "Remove leading bases below indicated quality",
+                    "help_text": "Discard leading bases below this minimum quality threshold.  Suggested Usage: 3",
+                    "fa_icon": "fa fa-cog",
+                    "hidden": true
+                },
+                "trimmomatic_clean_qual": {
+                    "type": "integer",
+                    "default": 15,
+                    "description": "Minimum quality score of 4-base sliding window",
+                    "help_text": "Cut the read when the 4-base sliding window quality score drops below this threshold.  Suggested Usage: 15",
+                    "fa_icon": "fa fa-cog",
+                    "hidden": true
+                },
+                "trimmomatic_args": {
+                    "type": "string",
+                    "default": null,
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fa fa-cog",
+                    "hidden": true
+                },
+                "trimmomatic_cpus": {
+                    "type": "integer",
+                    
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fas fa-microchip",
+                    "hidden": true
+                },
+                "trimmomatic_memory": {
+                    "type": "string",
+                    
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fas fa-memory",
+                    "hidden": true
+                },
+                "trimmomatic_walltime": {
+                    "type": "string",
+                    
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "far fa-clock",
+                    "hidden": true
+                }
+            }
+        },
+        "make_prg_options": {
+            "title": "make_prg options",
+            "type": "object",
+            "fa_icon": "fa-solid fa-arrow-progress",
+            "description": "The configurations of the process make_prg.",
+            "help_text": "",
+            "properties": {
+                "make_rgb_kept_tags": {
+                    "type": "string",
+                    "default": "easy_recip_match,complicated_recip_match",
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fa fa-cog",
+                    "hidden": true
+                },
+                "make_prg_args": {
+                    "type": "string",
+                    "default": null,
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fa fa-cog",
+                    "hidden": true
+                },
+                "make_prg_cpus": {
+                    "type": "integer",
+                    
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fas fa-microchip",
+                    "hidden": true
+                },
+                "make_prg_memory": {
+                    "type": "string",
+                    
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fas fa-memory",
+                    "hidden": true
+                },
+                "make_prg_walltime": {
+                    "type": "string",
+                    
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "far fa-clock",
+                    "hidden": true
+                }
+            }
+        },
+        "gblocks_options": {
+            "title": "gblocks options",
+            "type": "object",
+            "fa_icon": "fa-solid fa-arrow-progress",
+            "description": "The configurations of the process gblocks.",
+            "help_text": "See the [Gblocks Manual](https://home.cc.umanitoba.ca/~psgendb/doc/Castresana/Gblocks_documentation.html) for more information",
+            "properties": {
+                 "gblocks_b1": {
+                    "type": "number",
+                    "default": 0.5,
+                    "description": "Minimum number of sequences to be identified as a conserved site",
+                    "help_text": "This establishes the minimum threshold for identifying a conserved site. The value must be greater than half the number of sequences, e.g. min value is 0.5 and we'll round that up",
+                    "fa_icon": "fa fa-cog",
+                    "hidden": true
+                },
+                "gblocks_b2": {
+                    "type": "number",
+                    "default": 0.85,
+                    "description": "Minimum number of sequences to be identified as a flanking site",
+                    "help_text": "Flanking sites are assessed until they make a series of conserved positions at both flanks relative to the contiguous nonconserved sites. This value must be equal to or greater than the value of b1",
+                    "fa_icon": "fa fa-cog",
+                    "hidden": true
+                },
+                "gblocks_b3": {
+                    "type": "integer",
+                    "default": 8,
+                    "description": "Maximum number of contiguous nonconserved sites allowed",
+                    "help_text": "Stretches of contiguous nonconserved sites greater than b3 are rejected. Greater b3 values increase the selected number of positions",
+                    "fa_icon": "fa fa-cog",
+                    "hidden": true
+                },
+                "gblocks_b4": {
+                    "type": "number",
+                    "default": 10,
+                    "description": "Minimum length of a sequence block after gap cleaning",
+                    "help_text": "After gap cleaning, sequence blocks less than the indicated value are rejected",
+                    "fa_icon": "fa fa-cog",
+                    "hidden": true
+                },
+                "gblocks_args": {
+                    "type": "string",
+                    "default": null,
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fa fa-cog",
+                    "hidden": true
+                },
+                "gblocks_cpus": {
+                    "type": "integer",
+                    
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fas fa-microchip",
+                    "hidden": true
+                },
+                "gblocks_memory": {
+                    "type": "string",
+                    
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fas fa-memory",
+                    "hidden": true
+                },
+                "gblocks_walltime": {
+                    "type": "string",
+                    
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "far fa-clock",
+                    "hidden": true
+                }
+            }
+        },
+        "testing_options": {
+            "title": "testing options",
+            "type": "object",
+            "fa_icon": "fa-solid fa-arrow-progress",
+            "description": "The configurations of the process testing.",
+            "help_text": "",
+            "properties": {
+                "testing_args": {
+                    "type": "string",
+                    "default": null,
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fa fa-cog",
+                    "hidden": true
+                },
+                "testing_cpus": {
+                    "type": "integer",
+                    
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fas fa-microchip",
+                    "hidden": true
+                },
+                "testing_memory": {
+                    "type": "string",
+                    
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fas fa-memory",
+                    "hidden": true
+                },
+                "testing_walltime": {
+                    "type": "string",
+                    
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "far fa-clock",
+                    "hidden": true
+                }
+            }
+        },
+        "trinity_options": {
+            "title": "trinity options",
+            "type": "object",
+            "fa_icon": "fa-solid fa-arrow-progress",
+            "description": "The configurations of the process trinity.",
+            "help_text": "See the [Trinity Wiki](https://github.com/trinityrnaseq/trinityrnaseq/wiki) for more information",
+            "properties": {
+                "trinity_normalize_reads": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Normalize the read pool, discarding excess coverage",
+                    "help_text": "Depending on the sequencing effort, there may be excess reads (above desired coverage) that will slow down computation by requiring additional memory. New versions of trinity normalize reads do this by default, and it's highly recommended here.",
+                    "fa_icon": "fa fa-cog",
+                    "hidden": true
+                },
+                "trinity_processed_header": {
+                    "type": "string",
+                    "default": "contig",
+                    "description": "Prefix for a contig of assembled reads",
+                    "help_text": "Naming convention for assembled contigs. Suggested Usage: contig",
+                    "fa_icon": "fa fa-cog",
+                    "hidden": true
+                },
+                "trinity_args": {
+                    "type": "string",
+                    "default": null,
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fa fa-cog",
+                    "hidden": true
+                },
+                "trinity_cpus": {
+                    "type": "integer",
+                    
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fas fa-microchip",
+                    "hidden": true
+                },
+                "trinity_memory": {
+                    "type": "string",
+                    
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fas fa-memory",
+                    "hidden": true
+                },
+                "trinity_walltime": {
+                    "type": "string",
+                    
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "far fa-clock",
+                    "hidden": true
+                }
+            }
+        },
+        "iqtree_options": {
+            "title": "iqtree options",
+            "type": "object",
+            "fa_icon": "fa-solid fa-arrow-progress",
+            "description": "The configurations of the process iqtree.",
+            "help_text": "",
+            "properties": {
+                "iqtree_args": {
+                    "type": "string",
+                    "default": null,
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fa fa-cog",
+                    "hidden": true
+                },
+                "iqtree_cpus": {
+                    "type": "integer",
+                    
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fas fa-microchip",
+                    "hidden": true
+                },
+                "iqtree_memory": {
+                    "type": "string",
+                    
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fas fa-memory",
+                    "hidden": true
+                },
+                "iqtree_walltime": {
+                    "type": "string",
+                    
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "far fa-clock",
+                    "hidden": true
+                }
+            }
+        },
+        "aster_options": {
+            "title": "aster options",
+            "type": "object",
+            "fa_icon": "fa-solid fa-arrow-progress",
+            "description": "The configurations of the process aster.",
+            "help_text": "",
+            "properties": {
+                "aster_args": {
+                    "type": "string",
+                    "default": null,
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fa fa-cog",
+                    "hidden": true
+                },
+                "aster_cpus": {
+                    "type": "integer",
+                    
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fas fa-microchip",
+                    "hidden": true
+                },
+                "aster_memory": {
+                    "type": "string",
+                    
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fas fa-memory",
+                    "hidden": true
+                },
+                "aster_walltime": {
+                    "type": "string",
+                    
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "far fa-clock",
+                    "hidden": true
+                }
+            }
+        },
+        "macse_options": {
+            "title": "macse options",
+            "type": "object",
+            "fa_icon": "fa-solid fa-arrow-progress",
+            "description": "The configurations of the process macse.",
+            "help_text": "",
+            "properties": {
+                "macse_stop": {
+                    "type": "number",
+                    "default": 10.0,
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fa fa-cog",
+                    "hidden": true
+                },
+                "macse_program": {
+                    "type": "string",
+                    "default": "refineLemmon",
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fa fa-cog",
+                    "hidden": true
+                },
+                "macse_refine_alignment_optim": {
+                    "type": "number",
+                    "default": 1.0,
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fa fa-cog",
+                    "hidden": true
+                },
+                "macse_refine_alignment_local_realign_init": {
+                    "type": "number",
+                    "default": 0.1,
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fa fa-cog",
+                    "hidden": true
+                },
+                "macse_refine_alignment_local_realign_dec": {
+                    "type": "number",
+                    "default": 0.1,
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fa fa-cog",
+                    "hidden": true
+                },
+                "macse_refine_alignment_fs": {
+                    "type": "number",
+                    "default": 10.0,
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fa fa-cog",
+                    "hidden": true
+                },
+                "macse_args_refine": {
+                    "type": "string",
+                    "default": null,
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fa fa-cog",
+                    "hidden": true
+                },
+                "macse_args_refineLemmon": {
+                    "type": "string",
+                    "default": null,
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fa fa-cog",
+                    "hidden": true
+                },
+                "macse_args_export": {
+                    "type": "string",
+                    "default": null,
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fa fa-cog",
+                    "hidden": true
+                },
+                "macse_args_align": {
+                    "type": "string",
+                    "default": null,
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fa fa-cog",
+                    "hidden": true
+                },
+                "macse_cpus": {
+                    "type": "integer",
+                    
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fas fa-microchip",
+                    "hidden": true
+                },
+                "macse_memory": {
+                    "type": "string",
+                    
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fas fa-memory",
+                    "hidden": true
+                },
+                "macse_walltime": {
+                    "type": "string",
+                    
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "far fa-clock",
+                    "hidden": true
+                }
+            }
+        },
+        "mafft_options": {
+            "title": "mafft options",
+            "type": "object",
+            "fa_icon": "fa-solid fa-arrow-progress",
+            "description": "The configurations of the process mafft.",
+            "help_text": "See the [MAFFT Manual](https://mafft.cbrc.jp/alignment/software/manual/manual.html) for more information",
+            "properties": {
+                "mafft_maxiterate": {
+                    "type": "integer",
+                    "default": 1000,
+                    "description": "Number of cycles of iterative refinement",
+                    "help_text": "Iterative refinement helps to improve the alignment process, at the cost of additional time. 1000 iterations is sufficient for most exercises",
+                    "fa_icon": "fa fa-cog",
+                    "hidden": true
+                },
+                "mafft_args": {
+                    "type": "string",
+                    "default": null,
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fa fa-cog",
+                    "hidden": true
+                },
+                "mafft_cpus": {
+                    "type": "integer",
+                    
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fas fa-microchip",
+                    "hidden": true
+                },
+                "mafft_memory": {
+                    "type": "string",
+                    
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fas fa-memory",
+                    "hidden": true
+                },
+                "mafft_walltime": {
+                    "type": "string",
+                    
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "far fa-clock",
+                    "hidden": true
+                }
+            }
+        },
+        "raxml_options": {
+            "title": "raxml options",
+            "type": "object",
+            "fa_icon": "fa-solid fa-arrow-progress",
+            "description": "The configurations of the process raxml.",
+            "help_text": "",
+            "properties": {
+                "raxml_runs": {
+                    "type": "integer",
+                    "default": 100,
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fa fa-cog",
+                    "hidden": true
+                },
+                "raxml_args": {
+                    "type": "string",
+                    "default": null,
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fa fa-cog",
+                    "hidden": true
+                },
+                "raxml_cpus": {
+                    "type": "integer",
+                    
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fas fa-microchip",
+                    "hidden": true
+                },
+                "raxml_memory": {
+                    "type": "string",
+                    
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fas fa-memory",
+                    "hidden": true
+                },
+                "raxml_walltime": {
+                    "type": "string",
+                    
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "far fa-clock",
+                    "hidden": true
+                }
+            }
+        },
+        "blat_options": {
+            "title": "blat options",
+            "type": "object",
+            "fa_icon": "fa-solid fa-arrow-progress",
+            "description": "The configurations of the process blat.",
+            "help_text": "See the [blat User Guide](https://genome.ucsc.edu/goldenpath/help/blatSpec.html) for more information",
+            "properties": {
+                "blat_parser_match": {
+                    "type": "number",
+                    "default": 80.0,
+                    "description": "Minimum required percent (0-100) match between contig and target",
+                    "help_text": "Discards contig-to-target matches below minimum threshold provided. Values closer to 100 require greater similarity. Suggested Usage: 80",
+                    "fa_icon": "fa fa-cog",
+                    "hidden": true
+                },
+                "blat_parser_evalue": {
+                    "type": "number",
+                    "default": 1e-10,
+                    "description": "Minimum required e-value for match between contig and target",
+                    "help_text": "Discards contig-to-target matches greater than threshold provided. Values closer to 0 (smaller) require greater similarity. Suggested Usage: 1e-10",
+                    "fa_icon": "fa fa-cog",
+                    "hidden": true
+                },
+                "blat_args": {
+                    "type": "string",
+                    "default": null,
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fa fa-cog",
+                    "hidden": true
+                },
+                "blat_cpus": {
+                    "type": "integer",
+                    
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fas fa-microchip",
+                    "hidden": true
+                },
+                "blat_memory": {
+                    "type": "string",
+                    
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fas fa-memory",
+                    "hidden": true
+                },
+                "blat_walltime": {
+                    "type": "string",
+                    
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "far fa-clock",
+                    "hidden": true
+                }
+            }
+        },
+        "pear_options": {
+            "title": "pear options",
+            "type": "object",
+            "fa_icon": "fa-solid fa-arrow-progress",
+            "description": "The configurations of the process pear.",
+            "help_text": "See the [PEAR Manual](https://cme.h-its.org/exelixis/web/software/pear/doc.html) for more information",
+            "properties": {
+                "pear_args": {
+                    "type": "string",
+                    "default": null,
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fa fa-cog",
+                    "hidden": true
+                },
+                "pear_cpus": {
+                    "type": "integer",
+                    
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fas fa-microchip",
+                    "hidden": true
+                },
+                "pear_memory": {
+                    "type": "string",
+                    
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fas fa-memory",
+                    "hidden": true
+                },
+                "pear_walltime": {
+                    "type": "string",
+                    
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "far fa-clock",
+                    "hidden": true
+                }
+            }
+        },
+        "sed_options": {
+            "title": "sed options",
+            "type": "object",
+            "fa_icon": "fa-solid fa-arrow-progress",
+            "description": "The configurations of the process sed.",
+            "help_text": "",
+            "properties": {
+                "sed_args": {
+                    "type": "string",
+                    "default": null,
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fa fa-cog",
+                    "hidden": true
+                },
+                "sed_cpus": {
+                    "type": "integer",
+                    
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fas fa-microchip",
+                    "hidden": true
+                },
+                "sed_memory": {
+                    "type": "string",
+                    
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "fas fa-memory",
+                    "hidden": true
+                },
+                "sed_walltime": {
+                    "type": "string",
+                    
+                    "description": "",
+                    "help_text": "",
+                    "fa_icon": "far fa-clock",
+                    "hidden": true
                 }
             }
         }
+        
     },
     "allOf": [
         {
@@ -282,6 +2072,102 @@
         },
         {
             "$ref": "#/definitions/generic_options"
+        },
+        {
+            "$ref": "#/definitions/saved_output_options"
+        },
+        {
+        "$ref": "#/definitions/phylogeny_make_alignments_options"
+        },
+        {
+            "$ref": "#/definitions/trinity_postprocessing_options"
+        },
+        {
+            "$ref": "#/definitions/trimmomatic_clean_pe_options"
+        },
+        {
+            "$ref": "#/definitions/trimmomatic_clean_se_options"
+        },
+        {
+            "$ref": "#/definitions/prepare_samplesheet_options"
+        },
+        {
+            "$ref": "#/definitions/parse_blat_results_options"
+        },
+        {
+            "$ref": "#/definitions/quality_2_assembly_options"
+        },
+        {
+            "$ref": "#/definitions/samplesheet_check_options"
+        },
+        {
+            "$ref": "#/definitions/bbmap_reformat2_options"
+        },
+        {
+            "$ref": "#/definitions/prepare_adaptor_options"
+        },
+        {
+            "$ref": "#/definitions/bbmap_reformat_options"
+        },
+        {
+            "$ref": "#/definitions/convert_phyml_options"
+        },
+        {
+            "$ref": "#/definitions/preprocessing_options"
+        },
+        {
+            "$ref": "#/definitions/bbmap_dedupe_options"
+        },
+        {
+            "$ref": "#/definitions/bbmap_filter_options"
+        },
+        {
+            "$ref": "#/definitions/perl_cleanup_options"
+        },
+        {
+            "$ref": "#/definitions/concatenate_options"
+        },
+        {
+            "$ref": "#/definitions/merge_trees_options"
+        },
+        {
+            "$ref": "#/definitions/trimmomatic_options"
+        },
+        {
+            "$ref": "#/definitions/make_prg_options"
+        },
+        {
+            "$ref": "#/definitions/gblocks_options"
+        },
+        {
+            "$ref": "#/definitions/testing_options"
+        },
+        {
+            "$ref": "#/definitions/trinity_options"
+        },
+        {
+            "$ref": "#/definitions/iqtree_options"
+        },
+        {
+            "$ref": "#/definitions/aster_options"
+        },
+        {
+            "$ref": "#/definitions/macse_options"
+        },
+        {
+            "$ref": "#/definitions/mafft_options"
+        },
+        {
+            "$ref": "#/definitions/raxml_options"
+        },
+        {
+            "$ref": "#/definitions/blat_options"
+        },
+        {
+            "$ref": "#/definitions/pear_options"
+        },
+        {
+            "$ref": "#/definitions/sed_options"
         }
     ]
 }

@@ -1,5 +1,5 @@
-process SAMPLESHEET_CHECK {
-    tag "$samplesheet"
+process SED {
+    tag "$fasta"
 
     conda "conda-forge::python=3.8.3"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
@@ -7,21 +7,21 @@ process SAMPLESHEET_CHECK {
         'quay.io/biocontainers/python:3.8.3' }"
 
     input:
-    path samplesheet
-
+    val (fasta_ls)
+    
     output:
-    path '*.csv'       , emit: csv
+    path("*.sed.fasta"), emit: seded
     path "versions.yml", emit: versions
 
-    script: // This script is bundled with the pipeline, in nf-core/ausargph/bin/
+    script:
     """
-    check_samplesheet.py \
-        $samplesheet \
-        samplesheet.valid.csv
-
+    for fasta in ${fasta_ls.join(' ')}; do
+        file_base_name="\$(basename -s fasta "\$fasta")"
+        sed -r 's/\s+//g'  \${fasta} | sed -r 's/_R_//g' > \${file_base_name}.sed.fasta  ${task.ext.args}
+    done
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        python: \$(python --version | sed 's/Python //g')
+        sed: \$(sed --version | sed -n '1 p' | sed 's/sed (GNU sed) //g')
     END_VERSIONS
     """
 }

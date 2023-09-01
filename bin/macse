@@ -1,0 +1,21 @@
+#!/bin/bash
+
+# Get the directory of the script
+SCRIPT_DIR=$(dirname "$0")
+
+# Define the path to the JAR file
+jar_file="$SCRIPT_DIR/macse_v2.07.jar"
+echo "JAR file '$jar_file' not found."
+    
+# Check if the JAR file exists
+if [ ! -f "$jar_file" ]; then
+    exit 1
+fi
+
+if [ $# -lt 1 ]; then
+    echo "Usage: $0 <arg1> <arg2> ..."
+    exit 1
+fi
+
+# Run the JAR file with the provided arguments
+java -jar "$jar_file" "$@"

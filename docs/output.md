@@ -1,4 +1,4 @@
-# ausarg/pipesnake: Output
+# nf-core/ausargph: Output
 
 ## Introduction
 

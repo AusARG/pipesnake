@@ -1,5 +1,5 @@
-process SAMPLESHEET_CHECK {
-    tag "$samplesheet"
+process QUALITY_2_ASSEMBLY {
+    tag "$sample_id"
 
     conda "conda-forge::python=3.8.3"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
@@ -7,18 +7,23 @@ process SAMPLESHEET_CHECK {
         'quay.io/biocontainers/python:3.8.3' }"
 
     input:
-    path samplesheet
-
+    tuple val(sample_id), path(sample_fasta), path(rgp_file), val(lineage)
+    
+    
     output:
-    path '*.csv'       , emit: csv
+    tuple val(sample_id), path("${sample_id}_assemblyquality.csv"), emit: quality
     path "versions.yml", emit: versions
 
-    script: // This script is bundled with the pipeline, in nf-core/ausargph/bin/
+    script:
+    
     """
-    check_samplesheet.py \
-        $samplesheet \
-        samplesheet.valid.csv
-
+    quality_2_assembly.py \
+        --lineage ${lineage} \
+        --prg-file ${rgp_file} \
+        --sample-fasta ${sample_fasta} \
+        --output-dir ./ \
+        --sample ${sample_id} ${task.ext.args}
+    
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         python: \$(python --version | sed 's/Python //g')

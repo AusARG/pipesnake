@@ -1,4 +1,4 @@
-process SAMPLESHEET_CHECK {
+process PREPROCESSING {
     tag "$samplesheet"
 
     conda "conda-forge::python=3.8.3"
@@ -17,7 +17,7 @@ process SAMPLESHEET_CHECK {
     """
     check_samplesheet.py \
         $samplesheet \
-        samplesheet.valid.csv
+        samplesheet.valid.csv ${task.ext.args}
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

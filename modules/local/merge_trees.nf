@@ -1,5 +1,5 @@
-process SAMPLESHEET_CHECK {
-    tag "$samplesheet"
+process MERGE_TREES {
+    tag "Merging all trees"
 
     conda "conda-forge::python=3.8.3"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
@@ -7,21 +7,24 @@ process SAMPLESHEET_CHECK {
         'quay.io/biocontainers/python:3.8.3' }"
 
     input:
-    path samplesheet
-
+    val(tree_list)
+    
     output:
-    path '*.csv'       , emit: csv
+    path("AllLoci.trees"), emit: merged_trees
     path "versions.yml", emit: versions
 
-    script: // This script is bundled with the pipeline, in nf-core/ausargph/bin/
+    script:
+    
     """
-    check_samplesheet.py \
-        $samplesheet \
-        samplesheet.valid.csv
+    for tree in ${tree_list.join(' ')}; do
+        cat \$tree >> AllLoci.trees       
+    done
 
-    cat <<-END_VERSIONS > versions.yml
+
+
     "${task.process}":
-        python: \$(python --version | sed 's/Python //g')
+        cat: \$(cat -V | sed -n '1 p' | sed 's/gzip //g')
+        gzip: \$(gzip --version | sed -n '1 p' | sed 's/gzip //g')
     END_VERSIONS
     """
 }

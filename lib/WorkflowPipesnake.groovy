@@ -10,11 +10,21 @@ class WorkflowPipesnake {
     // Check and validate parameters
     //
     public static void initialise(params, log) {
-        genomeExistsError(params, log)
+        //genomeExistsError(params, log)
 
 
-        if (!params.fasta) {
-            log.error "Genome fasta file not specified with e.g. '--fasta genome.fa' or via a detectable config file."
+        if (!params.blat_db) {
+            log.error "Blat Database fasta file is not specified with e.g. '--blast_db blatdb.fasta' or via a detectable config file."
+            System.exit(1)
+        }
+
+        if (!params.reference_genome) {
+            log.error "Reference Genome file is not specified with e.g. '--reference_genome rf.fasta' or via a detectable config file."
+            System.exit(1)
+        }
+
+        if (!params.input) {
+            log.error "Input directory containing fastq files is not specified with e.g. '--input all-samples/' or via a detectable config file."
             System.exit(1)
         }
     }

@@ -22,7 +22,7 @@ class WorkflowMain {
     // Generate help string
     //
     public static String help(workflow, params, log) {
-        def command = "nextflow run ${workflow.manifest.name} --input samplesheet.csv --genome GRCh37 -profile docker"
+        def command = "nextflow run ${workflow.manifest.name} --input ./input_dir/ --meta samplesheet.csv --outDir ./ouput_dir/ --blat_db ./blat_db.fasta --reference_genome ./ref_genome.fasta -profile test"
         def help_string = ''
         help_string += NfcoreTemplate.logo(workflow, params.monochrome_logs)
         help_string += NfcoreSchema.paramsHelp(workflow, params, command)
@@ -81,7 +81,7 @@ class WorkflowMain {
 
         // Check input has been provided
         if (!params.input) {
-            log.error "Please provide an input samplesheet to the pipeline e.g. '--input samplesheet.csv'"
+            log.error "Please provide an input directory with fastq files to the pipeline e.g. '--input ./samples/'"
             System.exit(1)
         }
     }
