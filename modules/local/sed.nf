@@ -1,5 +1,5 @@
 process SED {
-    tag "$fasta"
+    tag "batch of file"
 
     conda "conda-forge::python=3.8.3"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
@@ -16,7 +16,7 @@ process SED {
     script:
     """
     for fasta in ${fasta_ls.join(' ')}; do
-        file_base_name="\$(basename -s fasta "\$fasta")"
+        file_base_name="\$(basename "\$fasta")"
         sed -r 's/\s+//g'  \${fasta} | sed -r 's/_R_//g' > \${file_base_name}.sed.fasta  ${task.ext.args}
     done
     cat <<-END_VERSIONS > versions.yml
