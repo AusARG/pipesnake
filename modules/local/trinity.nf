@@ -10,8 +10,8 @@ process TRINITY {
     tuple val(sample_id), val(fastq1), val(fastq2)
     
     output:
-    tuple val(sample_id), path ("${sample_id}"), emit: trinity_dir
-    tuple val(sample_id), path ("${sample_id}.Trinity.fasta"), emit: trinity_fasta
+    tuple val(sample_id), path ("${sample_id}_trinity"), emit: trinity_dir
+    tuple val(sample_id), path ("${sample_id}_trinity.Trinity.fasta"), emit: trinity_fasta
     path "versions.yml", emit: versions
 
 
@@ -22,7 +22,7 @@ process TRINITY {
         --left ${fastq1} \
         --right ${fastq2} \
         --CPU ${task.cpus} \
-        --output ${sample_id} \
+        --output ${sample_id}_trinity \
         ${task.ext.args}
         
     cat <<-END_VERSIONS > versions.yml
