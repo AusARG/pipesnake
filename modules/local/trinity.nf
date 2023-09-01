@@ -1,17 +1,17 @@
 process TRINITY {
     tag "$sample_id"
 
-    conda "bioconda::trinity=2.9.1"
+    conda "bioconda::trinity=2.13.2"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/trinity:2.9.1--h8b12597_1':
-        'biocontainers/trinity:2.9.1--h8b12597_1' }"
+        'https://depot.galaxyproject.org/singularity/trinity:2.13.2--h00214ad_1':
+        'biocontainers/trinity:2.13.2--h00214ad_1' }"
         
     input:
     tuple val(sample_id), val(fastq1), val(fastq2)
     
     output:
-    tuple val(sample_id), path ("${sample_id}_trinity"), emit: trinity_dir
-    tuple val(fastq1), path ("${sample_id}_trinity/Trinity.fasta"), emit: trinity_fasta
+    tuple val(sample_id), path ("${sample_id}"), emit: trinity_dir
+    tuple val(sample_id), path ("${sample_id}.Trinity.fasta"), emit: trinity_fasta
     path "versions.yml", emit: versions
 
 
@@ -22,7 +22,7 @@ process TRINITY {
         --left ${fastq1} \
         --right ${fastq2} \
         --CPU ${task.cpus} \
-        --output ${sample_id}_trinity \
+        --output ${sample_id} \
         ${task.ext.args}
         
     cat <<-END_VERSIONS > versions.yml

@@ -273,7 +273,7 @@ workflow PIPESNAKE {
     TRINITY_POSTPROCESSING(
         TRINITY
         .out
-        .trinity_dir.map{it -> [it[0], "${it[1]}/Trinity.fasta"]}
+        .trinity_fasta
     )
     
     BLAT(
