@@ -21,7 +21,7 @@ process MERGE_TREES {
     done
 
 
-
+    cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         cat: \$(cat -V | sed -n '1 p' | sed 's/gzip //g')
         gzip: \$(gzip --version | sed -n '1 p' | sed 's/gzip //g')
