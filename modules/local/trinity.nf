@@ -1,10 +1,11 @@
 process TRINITY {
     tag "$sample_id"
 
-    conda "bioconda::trinity=2.13.2"
+    //conda "bioconda::trinity=2.13.2"
+    conda "bioconda::trinity=2.9.1"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/trinity:2.13.2--h00214ad_1':
-        'biocontainers/trinity:2.13.2--h00214ad_1' }"
+        'https://depot.galaxyproject.org/singularity/trinity:2.15.1--hff880f7_1':
+        'biocontainers/trinity:2.15.1--hff880f7_1' }"
         
     input:
     tuple val(sample_id), val(fastq1), val(fastq2)
