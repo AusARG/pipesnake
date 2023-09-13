@@ -23,7 +23,7 @@ process TRINITY_POSTPROCESSING {
             contig_cntr = 1
             for line in trinity_input:
                 if line[0] == ">":
-                    line = ">${sample_id}_${params.trinity_processed_header}{}\\n".format(contig_cntr)
+                    line = ">${sample_id}_${task.ext.trinity_header}{}\\n".format(contig_cntr)
                     contig_cntr += 1
                 trinity_processed.write(line)
     

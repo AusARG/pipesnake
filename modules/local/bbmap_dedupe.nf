@@ -21,8 +21,15 @@ process BBMAP_DEDUPE {
     fastq_r2 = fastq[1]
     input = "in=${fastq_r1} in2=${fastq_r2}"
     
+    def avail_mem = 3072
+    if (!task.memory) {
+        log.info '[dedupe] Available memory not known - defaulting to 3GB. Specify process memory requirements to change this.'
+    } else {
+        avail_mem = (task.memory.mega*0.8).intValue()
+    }
+
     """
-    dedupe.sh ${input}  out=${sample_id}_deduped.${task.ext.fastq_suffix}.gz outd=${sample_id}_duplicates.${task.ext.fastq_suffix}.gz ${task.ext.args} threads=${task.cpus} 
+    dedupe.sh -Xmx${avail_mem}M ${input}  out=${sample_id}_deduped.${task.ext.fastq_suffix}.gz outd=${sample_id}_duplicates.${task.ext.fastq_suffix}.gz ${task.ext.args} threads=${task.cpus} 
     
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

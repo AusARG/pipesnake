@@ -15,8 +15,15 @@ process BBMAP_REFORMAT {
 
     script:
     
+    def avail_mem = 3072
+    if (!task.memory) {
+        log.info '[reformat] Available memory not known - defaulting to 3GB. Specify process memory requirements to change this.'
+    } else {
+        avail_mem = (task.memory.mega*0.8).intValue()
+    }
+
     """
-    reformat.sh in=${fastq} \
+    reformat.sh -Xmx${avail_mem}M threads=${task.cpus} in=${fastq} \
         out1=${sample_id}_R1_reformated.${params.fastq_suffix}.gz \
         out2=${sample_id}_R2_reformated.${params.fastq_suffix}.gz \
         ${task.ext.args}

@@ -23,12 +23,19 @@ tag "$sample_id"
     //-Xmx{task.memory}g
     input = "in=${fastq_r1} in2=${fastq_r2}"
     
+    def avail_mem = 3072
+    if (!task.memory) {
+        log.info '[bbmap] Available memory not known - defaulting to 3GB. Specify process memory requirements to change this.'
+    } else {
+        avail_mem = (task.memory.mega*0.8).intValue()
+    }
+
     """
-    bbmap.sh in1=${fastq_r1} in2=${fastq_r2} \
+    bbmap.sh -Xmx${avail_mem}M in1=${fastq_r1} in2=${fastq_r2} \
         ref=${reference_genome} \
         outm1=${sample_id}_R1_bbmap.${params.fastq_suffix}.gz \
         outm2=${sample_id}_R2_bbmap.${params.fastq_suffix}.gz \
-        -Xmx${task.memory.toGiga()}g ${task.ext.args} threads=${task.cpus}
+        ${task.ext.args} threads=${task.cpus}
 						
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

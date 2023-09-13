@@ -1,7 +1,7 @@
 process BLAT {
     tag "$sample_id"
 
-    conda "bioconda::blat=36"
+    conda "bioconda::blat=36-0"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/blat:36--0' :
         'quay.io/biocontainers/blat:36--0' }"
