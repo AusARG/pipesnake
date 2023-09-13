@@ -17,10 +17,6 @@ tag "$sample_id"
 
     script:
     
-    //input = meta.single_end ? "in=${fastq}" : "in=${fastq[0]} in2=${fastq[1]}"
-    //fastq_r1 = fastq[0]
-    //fastq_r2 = fastq[1]
-    //-Xmx{task.memory}g
     input = "in=${fastq_r1} in2=${fastq_r2}"
     
     def avail_mem = 3072
