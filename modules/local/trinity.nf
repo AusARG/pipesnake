@@ -10,7 +10,7 @@ process TRINITY {
     tuple val(sample_id), val(fastq1), val(fastq2)
     
     output:
-    tuple val(sample_id), path ("${sample_id}_trinity"), emit: trinity_dir
+    tuple val(sample_id), path ("${sample_id}_trinity.tar.gz"), emit: trinity_dir
     tuple val(sample_id), path ("${sample_id}_trinity.Trinity.fasta"), emit: trinity_fasta
     path "versions.yml", emit: versions
 
@@ -25,7 +25,8 @@ process TRINITY {
         --output ${sample_id}_trinity \
         ${task.ext.args}
     
-    tar czf ${sample_id}_trinity.tar.gz ${sample_id}_trinity && rm -rf ${sample_id}_trinity
+    tar czf ${sample_id}_trinity.tar.gz ${sample_id}_trinity 
+    rm -rf ${sample_id}_trinity
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
