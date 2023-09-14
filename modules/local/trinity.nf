@@ -24,7 +24,9 @@ process TRINITY {
         --CPU ${task.cpus} \
         --output ${sample_id}_trinity \
         ${task.ext.args}
-        
+    
+    tar czf ${sample_id}_trinity.tar.gz ${sample_id}_trinity && rm -rf ${sample_id}_trinity
+
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         Trinity: \$(Trinity --version | sed -n '1 p' | sed 's/Trinity version: //g')
