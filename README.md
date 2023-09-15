@@ -36,11 +36,9 @@ The [***Aus***tralian ***A***mphibian and ***R***eptile ***G***enomics](https://
 2. Present QC for raw reads ([`MultiQC`](http://multiqc.info/))
 -->
 
-The pipeline works from raw sequence data (generally stored as **.fastq.gz**) through to a first-pass species tree. Below are the general steps with associated tools indicated (in brackets).  
-1. *Read Cleaning*:   
-   + FWD/REV read concatenation (`bash`), deduplication ([`BBMap`](https://jgi.doe.gov/data-and-tools/software-tools/bbtools/bb-tools-user-guide/bbmap-guide/)), adapter/barcode removal ([`Trimmomatic`](https://github.com/usadellab/Trimmomatic)), pairing ([`PEAR`](https://cme.h-its.org/exelixis/web/software/pear/doc.html)), and filtering ([`BBMap`](https://jgi.doe.gov/data-and-tools/software-tools/bbtools/bb-tools-user-guide/bbmap-guide/)).
-2. *Assembly*:   
-   + read assembly to contigs ([`Trinity`](https://github.com/trinityrnaseq/trinityrnaseq/wiki)).
+The pipeline works from raw sequence data (generally stored as **.fastq.gz**) through to a first-pass species tree. Each step produces a number of output files and directories which can be returned to by either the user or the pipeline. Below are the general steps with associated tools indicated (in brackets). 
+1. *Read Cleaning*: FWD/REV read concatenation (`bash`), deduplication ([`BBMap`](https://jgi.doe.gov/data-and-tools/software-tools/bbtools/bb-tools-user-guide/bbmap-guide/)), adapter/barcode removal ([`Trimmomatic`](https://github.com/usadellab/Trimmomatic)), pairing ([`PEAR`](https://cme.h-its.org/exelixis/web/software/pear/doc.html)), and *optional* filtering ([`BBMap`](https://jgi.doe.gov/data-and-tools/software-tools/bbtools/bb-tools-user-guide/bbmap-guide/)).
+2. *Assembly*: read assembly to contigs ([`Trinity`](https://github.com/trinityrnaseq/trinityrnaseq/wiki)).
 3. *Isolating Targets*:  
    + match contigs to targets ([`blat`](https://genome.ucsc.edu/cgi-bin/hgBlat)), and make pseudo-reference genomes (`python`).
 4. *Alignment*:   
@@ -48,7 +46,6 @@ The pipeline works from raw sequence data (generally stored as **.fastq.gz**) th
 5. *Tree Building*:   
    + gene tree estimation ([`RAxML`](https://cme.h-its.org/exelixis/web/software/raxml/) or [`IQTREE`](http://www.iqtree.org/)), and species tree estimation ([`ASTRAL`](https://github.com/chaoszhang/ASTER)).  
 
-The above steps produce a series of output files and directories including alignments, gene trees, and a species tree.
 
 ## Quick Start
 
@@ -102,11 +99,8 @@ The above steps produce a series of output files and directories including align
    nextflow run ausarg/pipesnake --input samplesheet.csv --outdir <OUTDIR> --blat_db <BLATDB> --fasta <REFERNCE_GENOME> -profile <docker/singularity/podman/shifter/charliecloud/conda/institute>
    ```
 
-## Detailed Summary
 
-
-
-## Documentation and Detailed Summary
+## Documentation + Detailed Summary
 
 The ausarg/pipesnake pipeline comes with documentation about the pipeline [usage](), [parameters]() and [output]().
 
@@ -120,7 +114,7 @@ We thank the following people for their extensive assistance in the development 
 
 <!-- TODO nf-core: If applicable, make list of people who have also contributed -->
 
-## Contributions and Support
+## Contributions + Support
 
 If you would like to contribute to this pipeline, please see the [contributing guidelines](.github/CONTRIBUTING.md).
 
