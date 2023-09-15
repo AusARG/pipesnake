@@ -18,7 +18,8 @@ The pipeline is built using [Nextflow](https://www.nextflow.io), a workflow tool
 
 <!-- TODO ausarg: Add full-sized test dataset and amend the paragraph below if applicable -->
 
-\  
+&nbsp;
+&nbsp;
 
 ## Project Background
 
@@ -28,7 +29,8 @@ The pipeline is built using [Nextflow](https://www.nextflow.io), a workflow tool
 
 The [***Aus***tralian ***A***mphibian and ***R***eptile ***G***enomics](https://ausargenomics.com/) (*AusARG*) initiative is a national collaborative project aiming to facilitate the development of genomics resources for Australia's unique amphibian and reptile fauna. This `Nextflow` pipeline has been developed as part of the *AusARG Phylogenomics Working Group* with the goal of collecting a consistent set of phylogenomic data for all of Australia's frogs and reptiles.
 
-\  
+&nbsp;
+&nbsp;
 
 ## Pipeline Summary
 
@@ -46,7 +48,8 @@ The pipeline works from raw sequence data (generally stored as **.fastq.gz**) th
 5. *Tree Building*: gene tree estimation ([`RAxML`](https://cme.h-its.org/exelixis/web/software/raxml/) or [`IQTREE`](http://www.iqtree.org/)), and species tree estimation ([`ASTRAL`](https://github.com/chaoszhang/ASTER)).  
 
 
-\  
+&nbsp;
+&nbsp;
 
 ## Quick Start
 
@@ -54,7 +57,8 @@ The pipeline works from raw sequence data (generally stored as **.fastq.gz**) th
 
 Follow our [quick start](https://github.com/AusARG/pipesnake/quick_start) guide to get up and running (slithering?).
 
-\  
+&nbsp;
+&nbsp;
 
 
 ## Documentation + Detailed Summary
@@ -63,7 +67,8 @@ The ausarg/pipesnake pipeline comes with documentation about the pipeline [usage
 
 A more detailed summary of the workflow can be found in the [documentation](https://github.com/AusARG/pipesnake/documentation). 
 
-\  
+&nbsp;
+&nbsp; 
 
 ## Credits
 
@@ -73,7 +78,8 @@ We thank the following people for their extensive assistance in the development 
 
 <!-- TODO nf-core: If applicable, make list of people who have also contributed -->
 
-\  
+&nbsp;
+&nbsp; 
 
 ## Contributions + Support
 
@@ -81,7 +87,8 @@ If you would like to contribute to this pipeline, please see the [contributing g
 
 For further information or help, don't hesitate to get in touch.
 
-\  
+&nbsp;
+&nbsp;
 
 ## Citations
 
