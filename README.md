@@ -18,6 +18,7 @@ The pipeline is built using [Nextflow](https://www.nextflow.io), a workflow tool
 
 <!-- TODO ausarg: Add full-sized test dataset and amend the paragraph below if applicable -->
 
+\  
 
 ## Project Background
 
@@ -27,6 +28,7 @@ The pipeline is built using [Nextflow](https://www.nextflow.io), a workflow tool
 
 The [***Aus***tralian ***A***mphibian and ***R***eptile ***G***enomics](https://ausargenomics.com/) (*AusARG*) initiative is a national collaborative project aiming to facilitate the development of genomics resources for Australia's unique amphibian and reptile fauna. This `Nextflow` pipeline has been developed as part of the *AusARG Phylogenomics Working Group* with the goal of collecting a consistent set of phylogenomic data for all of Australia's frogs and reptiles.
 
+\  
 
 ## Pipeline Summary
 
@@ -44,11 +46,15 @@ The pipeline works from raw sequence data (generally stored as **.fastq.gz**) th
 5. *Tree Building*: gene tree estimation ([`RAxML`](https://cme.h-its.org/exelixis/web/software/raxml/) or [`IQTREE`](http://www.iqtree.org/)), and species tree estimation ([`ASTRAL`](https://github.com/chaoszhang/ASTER)).  
 
 
+\  
+
 ## Quick Start
 
 *pipesnake* relies on [`Nextflow`](https://www.nextflow.io/docs/latest/getstarted.html#installation) but the remaining dependencies are packaged within [`Docker`](https://docs.docker.com/engine/installation/), [`Singularity`](https://www.sylabs.io/guides/3.0/user-guide/), or [`Conda`](https://conda.io/miniconda.html) containers. 
 
 Follow our [quick start](https://github.com/AusARG/pipesnake/quick_start) guide to get up and running (slithering?).
+
+\  
 
 
 ## Documentation + Detailed Summary
@@ -56,6 +62,8 @@ Follow our [quick start](https://github.com/AusARG/pipesnake/quick_start) guide 
 The ausarg/pipesnake pipeline comes with documentation about the pipeline [usage](), [parameters]() and [output]().
 
 A more detailed summary of the workflow can be found in the [documentation](https://github.com/AusARG/pipesnake/documentation). 
+
+\  
 
 ## Credits
 
@@ -65,11 +73,15 @@ We thank the following people for their extensive assistance in the development 
 
 <!-- TODO nf-core: If applicable, make list of people who have also contributed -->
 
+\  
+
 ## Contributions + Support
 
 If you would like to contribute to this pipeline, please see the [contributing guidelines](.github/CONTRIBUTING.md).
 
 For further information or help, don't hesitate to get in touch.
+
+\  
 
 ## Citations
 
