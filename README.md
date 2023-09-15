@@ -32,7 +32,18 @@ The [***Aus***tralian ***A***mphibian and ***R***eptile ***G***enomics](https://
 &nbsp;
 &nbsp;
 
+## Quick Start
+
+*pipesnake* relies on [`Nextflow`](https://www.nextflow.io/docs/latest/getstarted.html#installation) but the remaining infrastructured is packaged within [`Docker`](https://docs.docker.com/engine/installation/), [`Singularity`](https://www.sylabs.io/guides/3.0/user-guide/), or [`Conda`](https://conda.io/miniconda.html) containers. Pick your poison.
+
+Follow our [quick start](https://github.com/AusARG/pipesnake/tree/main/quick_start) guide to get up and running (slithering?).
+
+&nbsp;
+&nbsp;
+
 ## Pipeline Summary
+
+<img src="docs/images/pipesnake_TwoHeaded.png" width=50% height=50%>
 
 <!-- TODO ausarg: Fill in short bullet-pointed list of the default steps in the pipeline
 
@@ -47,32 +58,22 @@ The pipeline works from raw sequence data (generally stored as **.fastq.gz**) th
 4. *Alignment*: sequence gathering (`bash`), alignment ([`mafft`](https://mafft.cbrc.jp/alignment/software/)), and *optional* trimming ([`Gblocks`](https://home.cc.umanitoba.ca/~psgendb/doc/Castresana/Gblocks_documentation.html)).
 5. *Tree Building*: gene tree estimation ([`RAxML`](https://cme.h-its.org/exelixis/web/software/raxml/) or [`IQTREE`](http://www.iqtree.org/)), and species tree estimation ([`ASTRAL`](https://github.com/chaoszhang/ASTER)).  
 
-
-&nbsp;
-&nbsp;
-
-## Quick Start
-
-*pipesnake* relies on [`Nextflow`](https://www.nextflow.io/docs/latest/getstarted.html#installation) but the remaining dependencies are packaged within [`Docker`](https://docs.docker.com/engine/installation/), [`Singularity`](https://www.sylabs.io/guides/3.0/user-guide/), or [`Conda`](https://conda.io/miniconda.html) containers. 
-
-Follow our [quick start](https://github.com/AusARG/pipesnake/quick_start) guide to get up and running (slithering?).
-
 &nbsp;
 &nbsp;
 
 
 ## Documentation + Detailed Summary
 
-The ausarg/pipesnake pipeline comes with documentation about the pipeline [usage](), [parameters]() and [output]().
+The *ausarg/pipesnake* pipeline comes with documentation about the pipeline [usage](), [parameters]() and [output]().
 
-A more detailed summary of the workflow can be found in the [documentation](https://github.com/AusARG/pipesnake/documentation). 
+A more detailed summary of the workflow can be found in the [documentation](https://github.com/AusARG/pipesnake/tree/main/documentation). 
 
 &nbsp;
 &nbsp; 
 
 ## Credits
 
-ausarg/pipesnake is implemented in Nextflow by Ziad Al-Bkhetan utisiling an initial version written in Python by Sonal Singhal and Ian Brennan.
+*ausarg/pipesnake* is implemented in Nextflow by Ziad Al-Bkhetan utisiling an initial version written in Python by Sonal Singhal and Ian Brennan.
 
 We thank the following people for their extensive assistance in the development of this pipeline:
 
