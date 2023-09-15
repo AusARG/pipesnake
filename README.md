@@ -10,6 +10,7 @@
 ## Introduction
 
 <!-- TODO ausarg: Write a 1-2 sentence summary of what data the pipeline is for and what it does -->
+<img src="docs/img/pipesnake_Logo.png" width=50% height=50%>
 
 **ausarg/pipesnake** is a bioinformatics best-practice analysis pipeline for building a first-pass species tree from raw data.
 
