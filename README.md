@@ -21,19 +21,10 @@ The pipeline is built using [Nextflow](https://www.nextflow.io), a workflow tool
 &nbsp;
 &nbsp;
 
-## Project Background
-
-<!-- brief background on the AusARG program and phylgenomics initiative -->
-
-<img src="docs/images/AusARG_logo_transparent.png" width=25% height=25%>
-
-The [***Aus***tralian ***A***mphibian and ***R***eptile ***G***enomics](https://ausargenomics.com/) (*AusARG*) initiative is a national collaborative project aiming to facilitate the development of genomics resources for Australia's unique amphibian and reptile fauna. This `Nextflow` pipeline has been developed as part of the *AusARG Phylogenomics Working Group* with the goal of collecting a consistent set of phylogenomic data for all of Australia's frogs and reptiles.
-
-&nbsp;
-&nbsp;
 
 ## Quick Start
 
+If you're here, you probably already know what you're looking for, so let's get started.  
 *pipesnake* relies on [`Nextflow`](https://www.nextflow.io/docs/latest/getstarted.html#installation) but the remaining infrastructured is packaged within [`Docker`](https://docs.docker.com/engine/installation/), [`Singularity`](https://www.sylabs.io/guides/3.0/user-guide/), or [`Conda`](https://conda.io/miniconda.html) containers. Pick your poison.
 
 Follow our [quick start](https://github.com/AusARG/pipesnake/tree/main/quick_start) guide to get up and running (slithering?).
@@ -70,6 +61,18 @@ A more detailed summary of the workflow can be found in the [documentation](http
 
 &nbsp;
 &nbsp; 
+
+
+## Motivation + Project Background
+
+<!-- brief background on the AusARG program and phylgenomics initiative -->
+
+<img src="docs/images/AusARG_logo_transparent.png" width=25% height=25%>
+
+We developed *pipesnake* as part of the [***Aus***tralian ***A***mphibian and ***R***eptile ***G***enomics](https://ausargenomics.com/) (*AusARG*) initiative.  **AusARG** is a national collaborative project aiming to facilitate the development of genomics resources for Australia's unique amphibian and reptile fauna. This pipeline was developed specifically as part of the *AusARG Phylogenomics Working Group* with the goal of collecting a consistent set of phylogenomic data for all of Australia's frogs and reptiles, under similar assembly, alignment, and tree estimation procedures. *pipesnake*, however, is applicable to much broader phylogenomic questions, and is appropriate for processing exon-capture or transcriptomic data, so long as the input is second-generation (short-read) data. 
+
+&nbsp;
+&nbsp;
 
 ## Credits
 
