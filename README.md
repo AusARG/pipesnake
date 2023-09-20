@@ -26,8 +26,6 @@ All of *pipesnake*'s documentation is covered in this lovingly crafted [wiki](ht
 
 Antsy? Follow our [Quick Start](https://github.com/AusARG/pipesnake/wiki/2.-Quick-Start) guide to get up and running (slithering?).
 
-Having trouble? [Open an issue](https://github.com/AusARG/pipesnake/issues) or try [contacting us directly](mailto:ian.brennan@anu.edu.au).
-
 &nbsp;
 &nbsp;
 
@@ -46,12 +44,20 @@ A more detailed summary of the workflow can be found in the [documentation](http
 
 If you would like to contribute to this pipeline, please see the [contributing guidelines](.github/CONTRIBUTING.md).
 
-For further information or help, don't hesitate to get in touch.
+For further information or help, don't hesitate to get in touch. Having trouble? [Open an issue](https://github.com/AusARG/pipesnake/issues) or try [contacting us directly](mailto:ian.brennan@anu.edu.au).
 
 &nbsp;
 &nbsp;
 
-## Citations
+## Citation
+
+If you use *pipesnake*, please consider citing it and its depenedencies.
+
+> *pipesnake: Generalized software for the assembly and analysis of phylogenomic datasets from conserved genomic loci*
+>
+> Name1, Name2, Name3
+>
+> A journal. Maybe bioRxiv.
 
 <!-- TODO nf-core: Add citation for pipeline after first release. Uncomment lines below and update Zenodo doi and badge at the top of this file. -->
 <!-- If you use  ausarg/pipesnake for your analysis, please cite it using the following doi: [10.5281/zenodo.XXXXXX](https://doi.org/10.5281/zenodo.XXXXXX) -->
