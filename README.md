@@ -30,7 +30,7 @@ Antsy? Follow our [Quick Start](https://github.com/AusARG/pipesnake/wiki/2.-Quic
 &nbsp;
 
 
-## Documentation + Detailed Summary
+# Documentation + Detailed Summary
 
 The *ausarg/pipesnake* pipeline comes with documentation about the pipeline [usage](), [parameters]() and [output]().
 
@@ -40,7 +40,7 @@ A more detailed summary of the workflow can be found in the [documentation](http
 &nbsp; 
 
 
-## Contributions + Support
+# Contributions + Support
 
 If you would like to contribute to this pipeline, please see the [contributing guidelines](.github/CONTRIBUTING.md).
 
@@ -49,7 +49,7 @@ For further information or help, don't hesitate to get in touch. Having trouble?
 &nbsp;
 &nbsp;
 
-## Citation
+# Citation
 
 If you use *pipesnake*, please consider citing it and its depenedencies.
 
