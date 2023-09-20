@@ -1,4 +1,3 @@
-# [ausarg/pipesnake]()
 [![Nextflow](https://img.shields.io/badge/nextflow%20DSL2-%E2%89%A523.04.1-23aa62.svg)](https://www.nextflow.io/)
 [![run with conda](http://img.shields.io/badge/run%20with-conda-3EB049?logo=anaconda)](https://docs.conda.io/en/latest/)
 [![run with docker](https://img.shields.io/badge/run%20with-docker-0db7ed?logo=docker)](https://www.docker.com/)
@@ -7,7 +6,7 @@
 [![Cite with Zenodo](http://img.shields.io/badge/DOI-10.5281/zenodo.XXXXXXX-1073c8)](https://doi.org/10.5281/zenodo.XXXXXXX)
 
 
-## Welcome
+# Welcome to [ausarg/pipesnake](https://github.com/AusARG/pipesnake)
 
 <!-- TODO ausarg: Write a 1-2 sentence summary of what data the pipeline is for and what it does -->
 <img src="docs/images/pipesnake_Logo.png" width=50% height=50%>
