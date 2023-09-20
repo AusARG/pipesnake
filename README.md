@@ -7,7 +7,7 @@
 [![Cite with Zenodo](http://img.shields.io/badge/DOI-10.5281/zenodo.XXXXXXX-1073c8)](https://doi.org/10.5281/zenodo.XXXXXXX)
 
 
-## Introduction
+## Welcome
 
 <!-- TODO ausarg: Write a 1-2 sentence summary of what data the pipeline is for and what it does -->
 <img src="docs/images/pipesnake_Logo.png" width=50% height=50%>
@@ -22,12 +22,11 @@ The pipeline is built using [Nextflow](https://www.nextflow.io), a workflow tool
 &nbsp;
 
 
-## Quick Start
+## Wiki + Quick Start
 
-If you're here, you probably already know what you're looking for, so let's get started.  
-*pipesnake* relies on [`Nextflow`](https://www.nextflow.io/docs/latest/getstarted.html#installation) but the remaining infrastructured is packaged within [`Docker`](https://docs.docker.com/engine/installation/), [`Singularity`](https://www.sylabs.io/guides/3.0/user-guide/), or [`Conda`](https://conda.io/miniconda.html) containers. Pick your poison.
+All of *pipesnake*'s documentation is covered in the pipeline's [wiki](https://github.com/AusARG/pipesnake/wiki). 
 
-Follow our [quick start](https://github.com/AusARG/pipesnake/tree/main/quick_start) guide to get up and running (slithering?).
+Follow our [Quick Start](https://github.com/AusARG/pipesnake/wiki/2.-Quick-Start) guide to get up and running (slithering?).
 
 &nbsp;
 &nbsp;
