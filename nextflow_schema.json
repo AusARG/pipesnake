@@ -51,16 +51,16 @@
                     "mimetype": "text/plain",
                     "default":"/scratch/pawsey0862/ziadbkh/ausarg/Squamate_AHE_UCE_genes_Pygopodidae.fasta",
                     "pattern": "^\\S+\\.fn?a(sta)?(\\.gz)?$",
-                    "description": "Path to FASTA genome file.",
-                    "help_text": "",
+                    "description": "Path to the filter sequences FASTA file.",
+                    "help_text": "The filtering sequences file is just another FASTA file of your focal loci, but from phylogenetically near samples (high similarity, e.g. intra-family). This is optional, but may be useful for speeding up the assembly step. These sequences are used as a reference to quickly (and loosely) map the raw reads against to exclude off-target sequences that would otherwise slow down the assembly. Locus names do not have to be unique and redundant targets from different taxa may improve filtration.",
                     "fa_icon": "fas fa-dna"
                 },
                 "blat_db": {
                     "type": "string",
                     "default": "/scratch/pawsey0862/ziadbkh/ausarg/squamate_AHE_UCE_genes_unique.flipped.fasta",
                     "format": "file-path",
-                    "description": "Path to the directory containing blat database",
-                    "help_text": "",
+                    "description": "Path to the target sequences FASTA file.",
+                    "help_text": "The target sequence file is simply a FASTA file of your focal loci. Locus names must be unique, and ideally the target sequence data is not too divergent from your samples (though BLAT is quite flexible). An example targets file is included in bin/SqCL_Targets.fasta, and is appropriate for use with SqCL projects.",
                     "fa_icon": "fa fa-database"
                 },
                 "tree_method": {
@@ -74,12 +74,14 @@
                 "trim_alignment": {
                     "type": "boolean",
                     "description": ".",
+                    "help_text": "if true, use GBLOCKS to trim initial MAFFT alignments. May proceed slowly. If false, proceed to phylogenetic estimation using initial MAFFT alignments",
                     "default": false,
                     "fa_icon": "fas fa-question-circle"
                 },
                 "batching_size": {
                     "type": "integer",
                     "description": ".",
+                    "help_text": "number of sample files that constitute a batch. Controls the number of output files generated which is sometimes limited on HPCs (1 million), see [here](https://groups.google.com/g/trinityrnaseq-users/c/w9S8UwL8uiU/m/KzdBydHp7RsJ)",
                     "default": 250,
                     "fa_icon": "fas fa-question-circle"
                 }
@@ -627,7 +629,7 @@
                 "trimmomatic_clean_pe_args": {
                     "type": "string",
                     "default": null,
-                    "description": "",
+                    "description": "optional arguments for Trimmomatic, [check the documentation](http://www.usadellab.org/cms/?page=trimmomatic)",
                     "help_text": "",
                     "fa_icon": "fa fa-cog",
                     "hidden": true
@@ -668,7 +670,7 @@
                 "trimmomatic_clean_se_args": {
                     "type": "string",
                     "default": null,
-                    "description": "",
+                    "description": "optional arguments for Trimmomatic, [check the documentation](http://www.usadellab.org/cms/?page=trimmomatic)",
                     "help_text": "",
                     "fa_icon": "fa fa-cog",
                     "hidden": true
@@ -750,8 +752,8 @@
                 "blat_parser_evalue": {
                     "type": "number",
                     "default": 1e-10,
-                    "description": "",
-                    "help_text": "",
+                    "description": "the E-value score for filtering BLAT hits",
+                    "help_text": "E-value scores designate the number of expected hits as a result of chance. Simply put, the lower the score, the fewer (but better) the matches. [See here](https://www.metagenomics.wiki/tools/blast/evalue) for a detailed explanation.",
                     "fa_icon": "fa fa-cog",
                     "hidden": true
                 },
@@ -1168,14 +1170,14 @@
                     "type": "number",
                     "default": 0.75,
                     "description": "Minimum identity to reference sequence to retain a read",
-                    "help_text": "Discards reads that do not map to a reference target with at least the indicated identity score. This was designed to quickly filter off-target reads such as mtDNA. Suggested Usage: 0.75",
+                    "help_text": "Discards reads that do not map to a reference target with at least the indicated identity score. This was designed to quickly filter off-target reads such as mtDNA. Suggested Usage: 0.75. It's important to note that application of the minid is more complicated than it looks. BBMAP also has an idfilter=X option which is more literal. Read the [BBMAP documentation](https://jgi.doe.gov/data-and-tools/software-tools/bbtools/bb-tools-user-guide/bbmap-guide/) and [this forum response by Brian Bushnell](https://www.biostars.org/p/376782/) for more nuance.",
                     "fa_icon": "fa fa-cog",
                     "hidden": true
                 },
                 "bbmap_filter_mem": {
                     "type": "integer",
                     "default": 2,
-                    "description": "Specify memomry use for mapping/filtering (Gb)",
+                    "description": "Specify memory use for mapping/filtering (Gb)",
                     "help_text": "",
                     "fa_icon": "fa fa-cog",
                     "hidden": true
@@ -1183,7 +1185,7 @@
                 "bbmap_filter_args": {
                     "type": "string",
                     "default": null,
-                    "description": "",
+                    "description": "optional BBMAP arguments.",
                     "help_text": "",
                     "fa_icon": "fa fa-cog",
                     "hidden": true
@@ -1599,8 +1601,8 @@
                 "trinity_args": {
                     "type": "string",
                     "default": null,
-                    "description": "",
-                    "help_text": "",
+                    "description": "optional arguments for Trinity",
+                    "help_text": "[check the wiki](https://github.com/trinityrnaseq/trinityrnaseq/wiki)",
                     "fa_icon": "fa fa-cog",
                     "hidden": true
                 },
