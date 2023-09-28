@@ -1,10 +1,11 @@
 process GBLOCKS {
-    tag "$fasta"
+    tag "${ fasta_ls.size() > 1 ? 'batch of ' + fasta_ls.size() + ' fasta files' : fasta_ls[0].getSimpleName()}"
+
 
     conda "bioconda::gblocks=0.91b"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/gblocks:0.91b--h9ee0642_2' :
-        'quay.io/biocontainers/gblocks:0.91b--h9ee0642_2' }"
+        'biocontainers/gblocks:0.91b--h9ee0642_2' }"
 
     input:
     val(fasta_ls)

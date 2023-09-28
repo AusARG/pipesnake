@@ -4,7 +4,7 @@ process MACSE {
     conda "bioconda::macse=2.07"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/macse:2.07--hdfd78af_0' :
-        'quay.io/biocontainers/macse:2.07--hdfd78af_0' }"
+        'biocontainers/macse:2.07--hdfd78af_0' }"
 
 
     input:

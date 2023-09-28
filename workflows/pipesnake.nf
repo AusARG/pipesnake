@@ -340,31 +340,29 @@ workflow PIPESNAKE {
         .flatten().buffer(size: params.batching_size, remainder: true)
     )
 
-
     if (params.trim_alignment){
         GBLOCKS(
-            MAFFT.out.aligned
+            MAFFT.out.aligned.map{if (params.batching_size == 1) [it] else it}
         )
         .trimmed_allignments
         .set{ch_alignment}
     } else{
-        ch_alignment = MAFFT.out.aligned
+        ch_alignment = MAFFT.out.aligned.map{if (params.batching_size == 1) [it] else it}
     }
     
+    SED( ch_alignment.map{if (params.batching_size == 1) [it] else it} )
 
-    SED( ch_alignment )
-
-    BBMAP_REFORMAT2(SED.out.seded)
+    BBMAP_REFORMAT2(SED.out.seded.map{if (params.batching_size == 1) [it] else it})
    
     if (params.tree_method == 'raxml'){
         RAXML(
-            BBMAP_REFORMAT2.out.reformated
+            BBMAP_REFORMAT2.out.reformated.map{if (params.batching_size == 1) [it] else it}
         )
         ch_all_trees = RAXML.out.tree_bipartitions.flatten().toSortedList()
 
     }else if (params.tree_method == 'iqtree'){
         IQTREE(
-            BBMAP_REFORMAT2.out.reformated
+            BBMAP_REFORMAT2.out.reformated.map{if (params.batching_size == 1) [it] else it}
         )
         ch_all_trees = IQTREE.out.contree.flatten().toSortedList()
     }

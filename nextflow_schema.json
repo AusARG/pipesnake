@@ -39,19 +39,27 @@
             }
         },
         "reference_genome_options": {
-            "title": "Reference genome and Blat Database options",
+            "title": "Reference genome, Blat Database and general options",
             "type": "object",
             "fa_icon": "fas fa-dna",
             "description": "Reference genome and and Blat Database related files and options required for the workflow.",
-            "required": ["reference_genome", "blat_db"],
+            "required": ["blat_db"],
             "properties": {
+                "disable_filter": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Disable bbmap filtration process. This speed up the performance. When enabled, the reference genome parameter is reqiured.",
+                    "help_text": "",
+                    "fa_icon": "fa fa-cog",
+                    "hidden": true
+                },
                 "reference_genome": {
                     "type": "string",
                     "format": "file-path",
                     "mimetype": "text/plain",
                     "default":"/scratch/pawsey0862/ziadbkh/ausarg/Squamate_AHE_UCE_genes_Pygopodidae.fasta",
                     "pattern": "^\\S+\\.fn?a(sta)?(\\.gz)?$",
-                    "description": "Path to FASTA genome file.",
+                    "description": "Path to FASTA genome file. This is reqiured when ",
                     "help_text": "",
                     "fa_icon": "fas fa-dna"
                 },
@@ -81,6 +89,12 @@
                     "type": "integer",
                     "description": ".",
                     "default": 250,
+                    "fa_icon": "fas fa-question-circle"
+                },
+                "trinity_scratch_tmp": {
+                    "type": "boolean",
+                    "description": "Trinity generates large number of intermediate files which can be an issue for some HPCs that limits the file number for each user. This option will make trinity writes to '/tmp` directory on the compute node then copy the compressed output directory (not the fasta) to the workdirectory to avoid this issue.",
+                    "default": false,
                     "fa_icon": "fas fa-question-circle"
                 }
                 
@@ -1156,14 +1170,6 @@
             "description": "The configurations of the process bbmap_filter.",
             "help_text": "See the [bbmap guide](https://jgi.doe.gov/data-and-tools/software-tools/bbtools/bb-tools-user-guide/bbmap-guide/) for more information",
             "properties": {
-                "disable_filter": {
-                    "type": "boolean",
-                    "default": true,
-                    "description": "Disable bbmap filtration process. This speed up the performance.",
-                    "help_text": "",
-                    "fa_icon": "fa fa-cog",
-                    "hidden": true
-                },
                 "bbmap_filter_minid": {
                     "type": "number",
                     "default": 0.75,

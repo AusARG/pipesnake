@@ -1,10 +1,10 @@
 process ASTER {
     tag "Final Tree"
 
-    //conda "bioconda::java-jdk=8.0.112"
+    conda "bioconda::aster=1.15"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/aster:1.15--h9f5acd7_0' :
-        'quay.io/biocontainers/aster:1.15--h9f5acd7_1' }"
+        'biocontainers/aster:1.15--h9f5acd7_1' }"
 
     input:
     path all_trees

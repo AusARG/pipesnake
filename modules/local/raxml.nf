@@ -1,10 +1,10 @@
 process RAXML {
-    tag "$fasta"
+    tag "${ fasta_ls.size() > 1 ? 'batch of ' + fasta_ls.size() + ' fasta files' : fasta_ls[0].getSimpleName()}"
 
     conda "bioconda::raxml=8.2.12"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/raxml:8.2.9--hec16e2b_5' :
-        'quay.io/biocontainers/raxml:8.2.9--h516909a_3' }"
+        'biocontainers/raxml:8.2.9--h516909a_3' }"
 
       
 

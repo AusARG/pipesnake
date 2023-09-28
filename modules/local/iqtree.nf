@@ -1,10 +1,11 @@
 process IQTREE {
-    tag "$fasta"
+    tag "${ fasta_ls.size() > 1 ? 'batch of ' + fasta_ls.size() + ' fasta files' : fasta_ls[0].getSimpleName()}"
 
-    conda "bioconda::iqtree=2.1.4_beta"
+
+    conda "bioconda::iqtree=2.2.5"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/iqtree:2.1.4_beta--hdcc8f71_0' :
-        'biocontainers/iqtree:2.1.4_beta--hdcc8f71_0' }"
+        'https://depot.galaxyproject.org/singularity/iqtree:2.2.5--h21ec9f0_0' :
+        'biocontainers/iqtree:2.2.5--h21ec9f0_0' }"
 
     input:
     val(fasta_ls)
@@ -29,7 +30,7 @@ process IQTREE {
         file_lines=\$(cat \$fasta | wc -l)
         if [ \$file_lines -gt 0 ]
         then
-            sp_cnt=\$(cat \$fasta | grep \\> | wc -l)
+            sp_cnt=\$(cat \$fasta | grep ">" | wc -l)
             if [ \$sp_cnt -lt 4 ]
             then
                 echo "\$fasta" >> fasta_few_specieis.txt
