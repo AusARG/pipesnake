@@ -11,7 +11,7 @@ process TRIMMOMATIC_CLEAN_SE {
     tuple val(sample_id), path(fastq)
     
     output:
-    tuple val(sample_id), path("*_unpaired_trimmed_cleaned_se.${params.fastq_suffix}.gz"), emit: trimmed_cleaned_se
+    tuple val(sample_id), path("*_unpaired_trimmed_cleaned_se.${task.ext.fastq_suffix}.gz"), emit: trimmed_cleaned_se
     path "versions.yml", emit: versions
 
 
@@ -21,7 +21,7 @@ process TRIMMOMATIC_CLEAN_SE {
     trimmomatic SE \
         -threads ${task.cpus} \
         ${fastq} \
-        ${sample_id}_unpaired_trimmed_cleaned_se.${params.fastq_suffix}.gz \
+        ${sample_id}_unpaired_trimmed_cleaned_se.${task.ext.fastq_suffix}.gz \
         ${task.ext.args}
 
     cat <<-END_VERSIONS > versions.yml

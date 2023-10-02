@@ -11,14 +11,14 @@ process CONCATENATE {
     val(name_suffix)
     
     output:
-    tuple val(sample_id), path("*_${name_suffix}.${params.fastq_suffix}.gz"), emit: concatenated
+    tuple val(sample_id), path("*_${name_suffix}.${task.ext.fastq_suffix}.gz"), emit: concatenated
     path "versions.yml", emit: versions
 
 
     script:
     
     """
-    zcat ${fastq.join(" ")} | gzip -c > ${sample_id}_${name_suffix}.${params.fastq_suffix}.gz
+    zcat ${fastq.join(" ")} | gzip -c > ${sample_id}_${name_suffix}.${task.ext.fastq_suffix}.gz
     
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

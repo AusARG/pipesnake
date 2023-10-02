@@ -214,7 +214,6 @@
                 "tracedir": {
                     "type": "string",
                     "description": "Directory to keep pipeline Nextflow logs and reports.",
-                    "default": "${params.outdir}/pipeline_info",
                     "fa_icon": "fas fa-cogs",
                     "hidden": true
                 },
@@ -546,17 +545,9 @@
             "description": "The configurations of the process phylogeny_make_alignments.",
             "help_text": "",
             "properties": {
-                "phylogeny_make_alignments_minsamp": {
-                    "type": "integer",
-                    "default": 4,
-                    "description": "Minimum number of samples to constitute an alignment",
-                    "help_text": "Some phylogeny building methods rely on a minimum number of samples in an alignment. To estimate bootstraps for a genetree or include a genetree in an ASTRAL analysis, the minimum number of samples is 4. Suggested Usage: 4",
-                    "fa_icon": "fa fa-cog",
-                    "hidden": true
-                },
                 "phylogeny_make_alignments_args": {
                     "type": "string",
-                    "default": "--minsamp ${params.phylogeny_make_alignments_minsamp}",
+                    "default": "--minsamp 4",
                     "description": "The arguments to be passed to process (phylogeny_make_alignments).",
                     "help_text": "",
                     "fa_icon": "fa fa-cog",
@@ -595,9 +586,16 @@
             "description": "The configurations of the process trinity_postprocessing.",
             "help_text": "",
             "properties": {
+                "trinity_processed_header": {
+                    "type": "string",
+                    "default": "contig",
+                    "description": "Prefix for a contig of assembled reads",
+                    "help_text": "Naming convention for assembled contigs. Suggested Usage: contig",
+                    "fa_icon": "fa fa-cog",
+                    "hidden": true
+                },
                 "trinity_postprocessing_args": {
                     "type": "string",
-                    "default": null,
                     "description": "",
                     "help_text": "",
                     "fa_icon": "fa fa-cog",
@@ -638,7 +636,7 @@
             "properties": {
                 "trimmomatic_clean_pe_args": {
                     "type": "string",
-                    "default": "-phred33 LEADING",
+                    "default": "-phred33 LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:36",
                     "description": "The arguments to be passed to process (trimmomatic_clean_pe).",
                     "help_text": "",
                     "fa_icon": "fa fa-cog",
@@ -679,7 +677,7 @@
             "properties": {
                 "trimmomatic_clean_se_args": {
                     "type": "string",
-                    "default": "-phred33 LEADING",
+                    "default": "-phred33 LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:36",
                     "description": "The arguments to be passed to process (trimmomatic_clean_se).",
                     "help_text": "",
                     "fa_icon": "fa fa-cog",
@@ -759,25 +757,9 @@
             "description": "The configurations of the process parse_blat_results.",
             "help_text": "",
             "properties": {
-                "blat_parser_evalue": {
-                    "type": "number",
-                    "default": 1e-10,
-                    "description": "the E-value score for filtering BLAT hits",
-                    "help_text": "E-value scores designate the number of expected hits as a result of chance. Simply put, the lower the score, the fewer (but better) the matches. [See here](https://www.metagenomics.wiki/tools/blast/evalue) for a detailed explanation.",
-                    "fa_icon": "fa fa-cog",
-                    "hidden": true
-                },
-                "blat_parser_match": {
-                    "type": "integer",
-                    "default": 80,
-                    "description": "",
-                    "help_text": "",
-                    "fa_icon": "fa fa-cog",
-                    "hidden": true
-                },
                 "parse_blat_results_args": {
                     "type": "string",
-                    "default": "--evalue ${params.blat_parser_evalue} --match ${params.blat_parser_match}",
+                    "default": "--evalue 1e-10 --match 80",
                     "description": "The arguments to be passed to process (parse_blat_results).",
                     "help_text": "",
                     "fa_icon": "fa fa-cog",
@@ -900,7 +882,7 @@
             "properties": {
                 "bbmap_reformat2_args": {
                     "type": "string",
-                    "default": "minconsecutivebases=${params.bbmap_reformat_minconsecutivebases} dotdashxton=${params.bbmap_reformat_dotdashxton} fastawrap=${params.bbmap_reformat_fastawrap}",
+                    "default": "minconsecutivebases=100 dotdashxton=true fastawrap=32000",
                     "description": "The arguments to be passed to process (bbmap_reformat2).",
                     "help_text": "",
                     "fa_icon": "fa fa-cog",
@@ -980,30 +962,6 @@
             "description": "The configurations of the process bbmap_reformat.",
             "help_text": "",
             "properties": {
-                "bbmap_reformat_minconsecutivebases": {
-                    "type": "number",
-                    "default": 100.0,
-                    "description": "Discard reads without at least this many consecutive called bases.",
-                    "help_text": "",
-                    "fa_icon": "fa fa-cog",
-                    "hidden": true
-                },
-                "bbmap_reformat_dotdashxton": {
-                    "type": "boolean",
-                    "default": true,
-                    "description": "Specifically convert . - and X to N (or X for amino acids)",
-                    "help_text": "",
-                    "fa_icon": "fa fa-cog",
-                    "hidden": true
-                },
-                "bbmap_reformat_fastawrap": {
-                    "type": "number",
-                    "default": 32000.0,
-                    "description": "number of characters to display per line before wrapping to next line",
-                    "help_text": "",
-                    "fa_icon": "fa fa-cog",
-                    "hidden": true
-                },
                 "bbmap_reformat_args": {
                     "type": "string",
                     "default": "",
@@ -1088,7 +1046,7 @@
             "properties": {
                 "preprocessing_args": {
                     "type": "string",
-                    "default": null,
+                    
                     "description": "",
                     "help_text": "",
                     "fa_icon": "fa fa-cog",
@@ -1129,7 +1087,7 @@
             "properties": {
                 "bbmap_dedupe_args": {
                     "type": "string",
-                    "default": null,
+                    
                     "description": "",
                     "help_text": "",
                     "fa_icon": "fa fa-cog",
@@ -1168,25 +1126,9 @@
             "description": "The configurations of the process bbmap_filter.",
             "help_text": "See the [bbmap guide](https://jgi.doe.gov/data-and-tools/software-tools/bbtools/bb-tools-user-guide/bbmap-guide/) for more information",
             "properties": {
-                "bbmap_filter_minid": {
-                    "type": "number",
-                    "default": 0.75,
-                    "description": "Minimum identity to reference sequence to retain a read",
-                    "help_text": "Discards reads that do not map to a reference target with at least the indicated identity score. This was designed to quickly filter off-target reads such as mtDNA. Suggested Usage: 0.75. It's important to note that application of the minid is more complicated than it looks. BBMAP also has an idfilter=X option which is more literal. Read the [BBMAP documentation](https://jgi.doe.gov/data-and-tools/software-tools/bbtools/bb-tools-user-guide/bbmap-guide/) and [this forum response by Brian Bushnell](https://www.biostars.org/p/376782/) for more nuance.",
-                    "fa_icon": "fa fa-cog",
-                    "hidden": true
-                },
-                "bbmap_filter_mem": {
-                    "type": "integer",
-                    "default": 2,
-                    "description": "Specify memory use for mapping/filtering (Gb)",
-                    "help_text": "",
-                    "fa_icon": "fa fa-cog",
-                    "hidden": true
-                },
                 "bbmap_filter_args": {
                     "type": "string",
-                    "default": "minid=${params.bbmap_filter_minid}",
+                    "default": "minid=0.75",
                     "description": "The arguments to be passed to process (bbmap_filter).",
                     "help_text": "",
                     "fa_icon": "fa fa-cog",
@@ -1421,17 +1363,9 @@
             "description": "The configurations of the process make_prg.",
             "help_text": "",
             "properties": {
-                "make_prg_kept_tags": {
-                    "type": "string",
-                    "default": "easy_recip_match,complicated_recip_match",
-                    "description": "one or more of the following options (separated by `,`): easy_recip_match, complicated_recip_match, ditched_no_recip_match, ditched_no_match, andditched_too_many_matches",
-                    "help_text": "1- easy_recip_match: 1-to-1 unique match between contig and targeted locus. 2- complicated_recip_match: 1-to-1 non-unique match, in which one targeted locus matches to multiple contigs. 3- ditched_no_recip_match: a case in which the contig matches to the targeted locus, but it isn't the best match. 4- ditched_no_match: a case in which the contig matches to the targeted locus, but the locus doesn't match to the contig. 5- ditched_too_many_matches: a case in which one contig has multiple good matches to multiple targeted loci",
-                    "fa_icon": "fa fa-cog",
-                    "hidden": true
-                },
                 "make_prg_args": {
                     "type": "string",
-                    "default": "--kept-tags ${params.make_rgb_kept_tags}",
+                    "default": "--kept-tags easy_recip_match,complicated_recip_match",
                     "description": "The arguments to be passed to process (make_prg).",
                     "help_text": "",
                     "fa_icon": "fa fa-cog",
@@ -1486,25 +1420,9 @@
                     "fa_icon": "fa fa-cog",
                     "hidden": true
                 },
-                "gblocks_b3": {
-                    "type": "integer",
-                    "default": 8,
-                    "description": "Maximum number of contiguous nonconserved sites allowed",
-                    "help_text": "Stretches of contiguous nonconserved sites greater than b3 are rejected. Greater b3 values increase the selected number of positions",
-                    "fa_icon": "fa fa-cog",
-                    "hidden": true
-                },
-                "gblocks_b4": {
-                    "type": "number",
-                    "default": 10,
-                    "description": "Minimum length of a sequence block after gap cleaning",
-                    "help_text": "After gap cleaning, sequence blocks less than the indicated value are rejected",
-                    "fa_icon": "fa fa-cog",
-                    "hidden": true
-                },
                 "gblocks_args": {
                     "type": "string",
-                    "default": "-t=DNA -b3=${params.gblocks_b3} -b4=${params.gblocks_b4} -b5=h -p=n",
+                    "default": "-t=DNA -b3=8 -b4=10 -b5=h -p=n",
                     "description": "The arguments to be passed to process (gblocks).",
                     "help_text": "",
                     "fa_icon": "fa fa-cog",
@@ -1545,7 +1463,7 @@
             "properties": {
                 "testing_args": {
                     "type": "string",
-                    "default": null,
+                    
                     "description": "",
                     "help_text": "",
                     "fa_icon": "fa fa-cog",
@@ -1592,17 +1510,9 @@
                     "fa_icon": "fa fa-cog",
                     "hidden": true
                 },
-                "trinity_processed_header": {
-                    "type": "string",
-                    "default": "contig",
-                    "description": "Prefix for a contig of assembled reads",
-                    "help_text": "Naming convention for assembled contigs. Suggested Usage: contig",
-                    "fa_icon": "fa fa-cog",
-                    "hidden": true
-                },
                 "trinity_args": {
                     "type": "string",
-                    "default": "--seqType fq --NO_SEQTK",
+                    "default": "--seqType fq --NO_SEQTK --normalize_reads",
                     "description": "The arguments to be passed to process (trinity).",
                     "help_text": "[check the wiki](https://github.com/trinityrnaseq/trinityrnaseq/wiki)",
                     "fa_icon": "fa fa-cog",
@@ -1723,17 +1633,9 @@
             "description": "The configurations of the process mafft.",
             "help_text": "See the [MAFFT Manual](https://mafft.cbrc.jp/alignment/software/manual/manual.html) for more information",
             "properties": {
-                "mafft_maxiterate": {
-                    "type": "integer",
-                    "default": 1000,
-                    "description": "Number of cycles of iterative refinement",
-                    "help_text": "Iterative refinement helps to improve the alignment process, at the cost of additional time. 1000 iterations is sufficient for most exercises",
-                    "fa_icon": "fa fa-cog",
-                    "hidden": true
-                },
                 "mafft_args": {
                     "type": "string",
-                    "default": "--maxiterate ${params.mafft_maxiterate} --globalpair --adjustdirection --quiet",
+                    "default": "--maxiterate 1000 --globalpair --adjustdirection --quiet",
                     "description": "The arguments to be passed to process (mafft).",
                     "help_text": "",
                     "fa_icon": "fa fa-cog",

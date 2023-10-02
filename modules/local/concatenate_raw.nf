@@ -11,15 +11,15 @@ process CONCATENATE_RAW {
         val(name_suffix)
 
     output:
-        tuple val(sample_id), path("*_${name_suffix}_R1.${params.fastq_suffix}.gz"), path("*_${name_suffix}_R2.${params.fastq_suffix}.gz"), emit: concatenated
+        tuple val(sample_id), path("*_${name_suffix}_R1.${task.ext.fastq_suffix}.gz"), path("*_${name_suffix}_R2.${task.ext.fastq_suffix}.gz"), emit: concatenated
         path "versions.yml", emit: versions
 
 
     script:
     
     """
-    zcat ${fastq1.join(" ")} | gzip -c > ${sample_id}_${name_suffix}_R1.${params.fastq_suffix}.gz
-    zcat ${fastq2.join(" ")} | gzip -c > ${sample_id}_${name_suffix}_R2.${params.fastq_suffix}.gz
+    zcat ${fastq1.join(" ")} | gzip -c > ${sample_id}_${name_suffix}_R1.${task.ext.fastq_suffix}.gz
+    zcat ${fastq2.join(" ")} | gzip -c > ${sample_id}_${name_suffix}_R2.${task.ext.fastq_suffix}.gz
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         zcat: \$(zcat -V | sed -n '1 p' | sed 's/gzip //g')

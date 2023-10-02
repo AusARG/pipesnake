@@ -10,8 +10,8 @@ process TRIMMOMATIC {
     tuple val(sample_id), val(fastq1), val(fastq2), path(adaptor)
     
     output:
-    tuple val(sample_id), path("*_R1_paired_trimmed.${params.fastq_suffix}.gz"), path ("*_R2_paired_trimmed.${params.fastq_suffix}.gz"), emit: trimmed_paired
-    tuple val(sample_id), path ("*_R1_unpaired_trimmed.${params.fastq_suffix}.gz"), path ("*_R2_unpaired_trimmed.${params.fastq_suffix}.gz"), emit: trimmed_unpaired
+    tuple val(sample_id), path("*_R1_paired_trimmed.${task.ext.fastq_suffix}.gz"), path ("*_R2_paired_trimmed.${task.ext.fastq_suffix}.gz"), emit: trimmed_paired
+    tuple val(sample_id), path ("*_R1_unpaired_trimmed.${task.ext.fastq_suffix}.gz"), path ("*_R2_unpaired_trimmed.${task.ext.fastq_suffix}.gz"), emit: trimmed_unpaired
     path "versions.yml", emit: versions
 
 
@@ -22,10 +22,10 @@ process TRIMMOMATIC {
         -threads ${task.cpus} \
         ${fastq1} \
         ${fastq2} \
-        ${sample_id}_R1_paired_trimmed.${params.fastq_suffix}.gz \
-        ${sample_id}_R1_unpaired_trimmed.${params.fastq_suffix}.gz \
-        ${sample_id}_R2_paired_trimmed.${params.fastq_suffix}.gz \
-        ${sample_id}_R2_unpaired_trimmed.${params.fastq_suffix}.gz \
+        ${sample_id}_R1_paired_trimmed.${task.ext.fastq_suffix}.gz \
+        ${sample_id}_R1_unpaired_trimmed.${task.ext.fastq_suffix}.gz \
+        ${sample_id}_R2_paired_trimmed.${task.ext.fastq_suffix}.gz \
+        ${sample_id}_R2_unpaired_trimmed.${task.ext.fastq_suffix}.gz \
         ILLUMINACLIP:${adaptor}:2:30:10 \
         ${task.ext.args} 
     

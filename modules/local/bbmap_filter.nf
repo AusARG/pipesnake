@@ -11,8 +11,8 @@ tag "$sample_id"
     path (reference_genome)
     output:
     tuple val(sample_id), 
-            path ("${sample_id}_R1_bbmap.${params.fastq_suffix}.gz"), 
-            path ("${sample_id}_R2_bbmap.${params.fastq_suffix}.gz") , emit: prepared_reads
+            path ("${sample_id}_R1_bbmap.${task.ext.fastq_suffix}.gz"), 
+            path ("${sample_id}_R2_bbmap.${task.ext.fastq_suffix}.gz") , emit: prepared_reads
     path "versions.yml", emit: versions
 
     script:
@@ -29,8 +29,8 @@ tag "$sample_id"
     """
     bbmap.sh -Xmx${avail_mem}M in1=${fastq_r1} in2=${fastq_r2} \
         ref=${reference_genome} \
-        outm1=${sample_id}_R1_bbmap.${params.fastq_suffix}.gz \
-        outm2=${sample_id}_R2_bbmap.${params.fastq_suffix}.gz \
+        outm1=${sample_id}_R1_bbmap.${task.ext.fastq_suffix}.gz \
+        outm2=${sample_id}_R2_bbmap.${task.ext.fastq_suffix}.gz \
         ${task.ext.args} threads=${task.cpus}
 						
     cat <<-END_VERSIONS > versions.yml

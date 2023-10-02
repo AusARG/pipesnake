@@ -10,9 +10,9 @@ process PEAR {
     tuple val(sample_id), path(fastq_r1), path (fastq_r2)
     
     output:
-    tuple val(sample_id), path("*.unassembled.forward.${params.fastq_suffix}.gz"), path ("*.unassembled.reverse.${params.fastq_suffix}.gz"), emit: unmerged
-    tuple val(sample_id), path ("*.assembled.${params.fastq_suffix}.gz"), emit: merged
-    tuple val(sample_id), path ("*.discarded.${params.fastq_suffix}.gz"), emit: discarded
+    tuple val(sample_id), path("*.unassembled.forward.${task.ext.fastq_suffix}.gz"), path ("*.unassembled.reverse.${task.ext.fastq_suffix}.gz"), emit: unmerged
+    tuple val(sample_id), path ("*.assembled.${task.ext.fastq_suffix}.gz"), emit: merged
+    tuple val(sample_id), path ("*.discarded.${task.ext.fastq_suffix}.gz"), emit: discarded
 
     path "versions.yml", emit: versions
 
