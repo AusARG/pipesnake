@@ -22,7 +22,7 @@ The pipeline is built using [Nextflow](https://www.nextflow.io), a workflow tool
 
 # Wiki + Quick Start
 
-All of *pipesnake*'s documentation is covered in this lovingly crafted [Wiki](https://github.com/AusARG/pipesnake/wiki). 
+All of `pipesnake`'s documentation is covered in this lovingly crafted [Wiki](https://github.com/AusARG/pipesnake/wiki). 
 
 Antsy? Follow our [Quick Start](https://github.com/AusARG/pipesnake/wiki/2.-Quick-Start) guide to get up and running (slithering?).
 
@@ -32,7 +32,7 @@ Antsy? Follow our [Quick Start](https://github.com/AusARG/pipesnake/wiki/2.-Quic
 
 # [Documentation](docs/) + Detailed Summary
 
-The *ausarg/pipesnake* pipeline comes with documentation about the pipeline [usage](docs/usage.md), [parameters](docs/usage.md) and [output]().
+`pipesnake` comes with documentation about the pipeline [usage](docs/usage.md), [parameters](docs/usage.md) and [output]().
 
 A detailed summary of the workflow---including tools used---can be found in the [Wiki](https://github.com/AusARG/pipesnake/wiki/1.-Pipeline-Summary). 
 
@@ -51,7 +51,7 @@ For further information or help, don't hesitate to get in touch. Having trouble?
 
 # Citation
 
-If you use *pipesnake*, please consider citing it and its depenedencies.
+If you use `pipesnake`, please consider citing it and its depenedencies.
 
 > *pipesnake: Generalized software for the assembly and analysis of phylogenomic datasets from conserved genomic loci*
 >
