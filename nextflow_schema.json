@@ -983,7 +983,7 @@
                 "bbmap_reformat_minconsecutivebases": {
                     "type": "number",
                     "default": 100.0,
-                    "description": "",
+                    "description": "Discard reads without at least this many consecutive called bases.",
                     "help_text": "",
                     "fa_icon": "fa fa-cog",
                     "hidden": true
@@ -991,7 +991,7 @@
                 "bbmap_reformat_dotdashxton": {
                     "type": "boolean",
                     "default": true,
-                    "description": "",
+                    "description": "Specifically convert . - and X to N (or X for amino acids)",
                     "help_text": "",
                     "fa_icon": "fa fa-cog",
                     "hidden": true
@@ -999,7 +999,7 @@
                 "bbmap_reformat_fastawrap": {
                     "type": "number",
                     "default": 32000.0,
-                    "description": "",
+                    "description": "number of characters to display per line before wrapping to next line",
                     "help_text": "",
                     "fa_icon": "fa fa-cog",
                     "hidden": true
@@ -1421,11 +1421,11 @@
             "description": "The configurations of the process make_prg.",
             "help_text": "",
             "properties": {
-                "make_rgb_kept_tags": {
+                "make_prg_kept_tags": {
                     "type": "string",
                     "default": "easy_recip_match,complicated_recip_match",
-                    "description": "",
-                    "help_text": "",
+                    "description": "one or more of the following options (separated by `,`): easy_recip_match, complicated_recip_match, ditched_no_recip_match, ditched_no_match, andditched_too_many_matches",
+                    "help_text": "1- easy_recip_match: 1-to-1 unique match between contig and targeted locus. 2- complicated_recip_match: 1-to-1 non-unique match, in which one targeted locus matches to multiple contigs. 3- ditched_no_recip_match: a case in which the contig matches to the targeted locus, but it isn't the best match. 4- ditched_no_match: a case in which the contig matches to the targeted locus, but the locus doesn't match to the contig. 5- ditched_too_many_matches: a case in which one contig has multiple good matches to multiple targeted loci",
                     "fa_icon": "fa fa-cog",
                     "hidden": true
                 },
@@ -1709,119 +1709,6 @@
                 "aster_walltime": {
                     "type": "string",
                     "description": "The requested walltime for the process (aster).",
-                    "help_text": "",
-                    "fa_icon": "far fa-clock",
-                    "hidden": true,
-                    "default": "12.h"
-                }
-            }
-        },
-        "macse_options": {
-            "title": "macse options",
-            "type": "object",
-            "fa_icon": "fa-solid fa-arrow-progress",
-            "description": "The configurations of the process macse.",
-            "help_text": "",
-            "properties": {
-                "macse_stop": {
-                    "type": "number",
-                    "default": 10.0,
-                    "description": "",
-                    "help_text": "",
-                    "fa_icon": "fa fa-cog",
-                    "hidden": true
-                },
-                "macse_program": {
-                    "type": "string",
-                    "default": "refineLemmon",
-                    "description": "",
-                    "help_text": "",
-                    "fa_icon": "fa fa-cog",
-                    "hidden": true
-                },
-                "macse_refine_alignment_optim": {
-                    "type": "number",
-                    "default": 1.0,
-                    "description": "",
-                    "help_text": "",
-                    "fa_icon": "fa fa-cog",
-                    "hidden": true
-                },
-                "macse_refine_alignment_local_realign_init": {
-                    "type": "number",
-                    "default": 0.1,
-                    "description": "",
-                    "help_text": "",
-                    "fa_icon": "fa fa-cog",
-                    "hidden": true
-                },
-                "macse_refine_alignment_local_realign_dec": {
-                    "type": "number",
-                    "default": 0.1,
-                    "description": "",
-                    "help_text": "",
-                    "fa_icon": "fa fa-cog",
-                    "hidden": true
-                },
-                "macse_refine_alignment_fs": {
-                    "type": "number",
-                    "default": 10.0,
-                    "description": "",
-                    "help_text": "",
-                    "fa_icon": "fa fa-cog",
-                    "hidden": true
-                },
-                "macse_args_refine": {
-                    "type": "string",
-                    "default": "-stop ${params.macse_stop} -prog refineAlignment",
-                    "description": "The arguments to be passed to process (macse_args_r).",
-                    "help_text": "",
-                    "fa_icon": "fa fa-cog",
-                    "hidden": true
-                },
-                "macse_args_refineLemmon": {
-                    "type": "string",
-                    "default": "-prog refineAlignment -optim ${params.macse_refine_alignment_optim} -local_realign_init ${params.macse_refine_alignment_local_realign_init} -local_realign_dec ${params.macse_refine_alignment_local_realign_dec} -fs ${params.macse_refine_alignment_fs}",
-                    "description": "The arguments to be passed to process (macse_args_refineL).",
-                    "help_text": "",
-                    "fa_icon": "fa fa-cog",
-                    "hidden": true
-                },
-                "macse_args_export": {
-                    "type": "string",
-                    "default": "-prog exportAlignment -stop ${params.macse_stop}",
-                    "description": "The arguments to be passed to process (macse_args_e).",
-                    "help_text": "",
-                    "fa_icon": "fa fa-cog",
-                    "hidden": true
-                },
-                "macse_args_align": {
-                    "type": "string",
-                    "default": "-prog alignSequences -stop_lr ${params.macse_stop}",
-                    "description": "The arguments to be passed to process (macse_args_).",
-                    "help_text": "",
-                    "fa_icon": "fa fa-cog",
-                    "hidden": true
-                },
-                "macse_cpus": {
-                    "type": "integer",
-                    "description": "The number of requested CPUs for the process (macse).",
-                    "help_text": "",
-                    "fa_icon": "fas fa-microchip",
-                    "hidden": true,
-                    "default": 1
-                },
-                "macse_memory": {
-                    "type": "string",
-                    "description": "The requested memory for the process (macse).",
-                    "help_text": "",
-                    "fa_icon": "fas fa-memory",
-                    "hidden": true,
-                    "default": "8.GB"
-                },
-                "macse_walltime": {
-                    "type": "string",
-                    "description": "The requested walltime for the process (macse).",
                     "help_text": "",
                     "fa_icon": "far fa-clock",
                     "hidden": true,
@@ -2160,9 +2047,6 @@
         },
         {
             "$ref": "#/definitions/aster_options"
-        },
-        {
-            "$ref": "#/definitions/macse_options"
         },
         {
             "$ref": "#/definitions/mafft_options"

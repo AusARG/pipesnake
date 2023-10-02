@@ -22,6 +22,9 @@ process RAXML {
     script:
     //locus = fasta.getBaseName().split('.')[0]
     
+
+    def raxml_runs = task.ext.raxml_runs ?: 100  
+
     """
      for fasta in ${fasta_ls.join(' ')}; do
         file_lines=\$(cat \$fasta | wc -l)
@@ -36,7 +39,7 @@ process RAXML {
                 rand1=\$[ ( \$RANDOM % 1000 )  + 1 ]
                 rand2=\$[ ( \$RANDOM % 1000 )  + 1 ]
                 
-                raxmlHPC -x \$rand1 -# ${params.raxml_runs} -p \$rand2  ${task.ext.args} \${locus} -s \${fasta}
+                raxmlHPC -x \$rand1 -# $raxml_runs -T ${task.cpus} -p \$rand2  ${task.ext.args} \${locus} -s \${fasta}
                 
             fi
         else
