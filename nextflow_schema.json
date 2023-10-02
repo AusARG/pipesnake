@@ -16,7 +16,6 @@
                     "type": "string",
                     "format": "file-path",
                     "mimetype": "text/csv",
-                    "default": "/scratch/pawsey0862/ziadbkh/ausarg/ian_data_t2/Extra_Test_Samples/samples.csv",
                     "schema": "assets/schema_input.json",
                     "description": "Path to comma-separated file containing information about the samples in the experiment.",
                     "help_text": "You will need to create a design file with information about the samples in your experiment before running the pipeline. Use this parameter to specify its location. It has to be a comma-separated file with 3 columns, and a header row. See [usage docs](https://nf-co.re/ausargph/usage#samplesheet-input).",
@@ -24,7 +23,6 @@
                 },
                 "outdir": {
                     "type": "string",
-                    "default":"/scratch/pawsey0862/ziadbkh/ausarg/output_pip/",
                     "format": "directory-path",
                     "description": "The output directory where the results will be saved. You have to use absolute paths to storage on Cloud infrastructure.",
                     "fa_icon": "fas fa-folder-open"
@@ -57,44 +55,44 @@
                     "type": "string",
                     "format": "file-path",
                     "mimetype": "text/plain",
-                    "default":"/scratch/pawsey0862/ziadbkh/ausarg/Squamate_AHE_UCE_genes_Pygopodidae.fasta",
                     "pattern": "^\\S+\\.fn?a(sta)?(\\.gz)?$",
-                    "description": "Path to FASTA genome file. This is reqiured when ",
-                    "help_text": "",
+                    "description": "Path to the filter sequences FASTA file.",
+                    "help_text": "The filtering sequences file is just another FASTA file of your focal loci, but from phylogenetically near samples (high similarity, e.g. intra-family). This is optional, but may be useful for speeding up the assembly step. These sequences are used as a reference to quickly (and loosely) map the raw reads against to exclude off-target sequences that would otherwise slow down the assembly. Locus names do not have to be unique and redundant targets from different taxa may improve filtration.",
                     "fa_icon": "fas fa-dna"
                 },
                 "blat_db": {
                     "type": "string",
-                    "default": "/scratch/pawsey0862/ziadbkh/ausarg/squamate_AHE_UCE_genes_unique.flipped.fasta",
                     "format": "file-path",
-                    "description": "Path to the directory containing blat database",
-                    "help_text": "",
+                    "description": "Path to the target sequences FASTA file.",
+                    "help_text": "The target sequence file is simply a FASTA file of your focal loci. Locus names must be unique, and ideally the target sequence data is not too divergent from your samples (though BLAT is quite flexible). An example targets file is included in bin/SqCL_Targets.fasta, and is appropriate for use with SqCL projects.",
                     "fa_icon": "fa fa-database"
                 },
                 "tree_method": {
                     "type": "string",
-                    "description": "'raxml', 'iqtree'.",
+                    "description": "the supported options are: 'iqtree' or 'raxml'.",
                     "help_text": "Choose the preferred tree estimation method for individual locus trees. All methods should provide qualitatively identical results. Suggested Usage: iqtree",
                     "default": "iqtree",
                     "fa_icon": "fas fa-question-circle",
-                    "enum": ["raxml", "iqtree"]
+                    "enum": ["iqtree", "raxml"]
                 },
                 "trim_alignment": {
                     "type": "boolean",
-                    "description": ".",
+                    "description": "Trim initial MAFFT alignments.",
+                    "help_text": "if true, use GBLOCKS to trim initial MAFFT alignments. May proceed slowly. If false, proceed to phylogenetic estimation using initial MAFFT alignments",
                     "default": false,
                     "fa_icon": "fas fa-question-circle"
                 },
                 "batching_size": {
                     "type": "integer",
-                    "description": ".",
+                    "description": "Number of alignment files to be processed sequentially in batches to avoide submitting large number of jobs when using HPCs.",
+                    "help_text": "Number of sample files that constitute a batch. Controls the number of output files generated which is sometimes limited on HPCs (1 million), see [here](https://groups.google.com/g/trinityrnaseq-users/c/w9S8UwL8uiU/m/KzdBydHp7RsJ). This helps to avoid generating large number of files as well as to reduce the number of the submitted jobs to an HPC.",
                     "default": 250,
                     "fa_icon": "fas fa-question-circle"
                 },
                 "trinity_scratch_tmp": {
                     "type": "boolean",
-                    "description": "Trinity generates large number of intermediate files which can be an issue for some HPCs that limits the file number for each user. This option will make trinity writes to '/tmp` directory on the compute node then copy the compressed output directory (not the fasta) to the workdirectory to avoid this issue.",
-                    "default": false,
+                    "description": "Trinity generates large number of intermediate files which can be an issue for some HPCs that limits the file number for each user. This option will make trinity writes to `/tmp` directory on the compute node then copy the compressed output directory (not the fasta) to the workdirectory to avoid this issue.",
+                    "default": true,
                     "fa_icon": "fas fa-question-circle"
                 }
                 
@@ -558,35 +556,35 @@
                 },
                 "phylogeny_make_alignments_args": {
                     "type": "string",
-                    "default": null,
-                    "description": "",
+                    "default": "--minsamp ${params.phylogeny_make_alignments_minsamp}",
+                    "description": "The arguments to be passed to process (phylogeny_make_alignments).",
                     "help_text": "",
                     "fa_icon": "fa fa-cog",
                     "hidden": true
                 },
                 "phylogeny_make_alignments_cpus": {
                     "type": "integer",
-                    
-                    "description": "",
+                    "description": "The number of requested CPUs for the process (phylogeny_make_alignments).",
                     "help_text": "",
                     "fa_icon": "fas fa-microchip",
-                    "hidden": true
+                    "hidden": true,
+                    "default": 1
                 },
                 "phylogeny_make_alignments_memory": {
                     "type": "string",
-                    
-                    "description": "",
+                    "description": "The requested memory for the process (phylogeny_make_alignments).",
                     "help_text": "",
                     "fa_icon": "fas fa-memory",
-                    "hidden": true
+                    "hidden": true,
+                    "default": "4.GB"
                 },
                 "phylogeny_make_alignments_walltime": {
                     "type": "string",
-                    
-                    "description": "",
+                    "description": "The requested walltime for the process (phylogeny_make_alignments).",
                     "help_text": "",
                     "fa_icon": "far fa-clock",
-                    "hidden": true
+                    "hidden": true,
+                    "default": "4.h"
                 }
             }
         },
@@ -607,27 +605,27 @@
                 },
                 "trinity_postprocessing_cpus": {
                     "type": "integer",
-                    
-                    "description": "",
+                    "description": "The number of requested CPUs for the process (trinity_postprocessing).",
                     "help_text": "",
                     "fa_icon": "fas fa-microchip",
-                    "hidden": true
+                    "hidden": true,
+                    "default": 1
                 },
                 "trinity_postprocessing_memory": {
                     "type": "string",
-                    
-                    "description": "",
+                    "description": "The requested memory for the process (trinity_postprocessing).",
                     "help_text": "",
                     "fa_icon": "fas fa-memory",
-                    "hidden": true
+                    "hidden": true,
+                    "default": "4.GB"
                 },
                 "trinity_postprocessing_walltime": {
                     "type": "string",
-                    
-                    "description": "",
+                    "description": "The requested walltime for the process (trinity_postprocessing).",
                     "help_text": "",
                     "fa_icon": "far fa-clock",
-                    "hidden": true
+                    "hidden": true,
+                    "default": "4.h"
                 }
             }
         },
@@ -640,35 +638,35 @@
             "properties": {
                 "trimmomatic_clean_pe_args": {
                     "type": "string",
-                    "default": null,
-                    "description": "",
+                    "default": "-phred33 LEADING",
+                    "description": "The arguments to be passed to process (trimmomatic_clean_pe).",
                     "help_text": "",
                     "fa_icon": "fa fa-cog",
                     "hidden": true
                 },
                 "trimmomatic_clean_pe_cpus": {
                     "type": "integer",
-                    
-                    "description": "",
+                    "description": "The number of requested CPUs for the process (trimmomatic_clean_pe).",
                     "help_text": "",
                     "fa_icon": "fas fa-microchip",
-                    "hidden": true
+                    "hidden": true,
+                    "default": 1
                 },
                 "trimmomatic_clean_pe_memory": {
                     "type": "string",
-                    
-                    "description": "",
+                    "description": "The requested memory for the process (trimmomatic_clean_pe).",
                     "help_text": "",
                     "fa_icon": "fas fa-memory",
-                    "hidden": true
+                    "hidden": true,
+                    "default": "4.GB"
                 },
                 "trimmomatic_clean_pe_walltime": {
                     "type": "string",
-                    
-                    "description": "",
+                    "description": "The requested walltime for the process (trimmomatic_clean_pe).",
                     "help_text": "",
                     "fa_icon": "far fa-clock",
-                    "hidden": true
+                    "hidden": true,
+                    "default": "4.h"
                 }
             }
         },
@@ -681,35 +679,35 @@
             "properties": {
                 "trimmomatic_clean_se_args": {
                     "type": "string",
-                    "default": null,
-                    "description": "",
+                    "default": "-phred33 LEADING",
+                    "description": "The arguments to be passed to process (trimmomatic_clean_se).",
                     "help_text": "",
                     "fa_icon": "fa fa-cog",
                     "hidden": true
                 },
                 "trimmomatic_clean_se_cpus": {
                     "type": "integer",
-                    
-                    "description": "",
+                    "description": "The number of requested CPUs for the process (trimmomatic_clean_se).",
                     "help_text": "",
                     "fa_icon": "fas fa-microchip",
-                    "hidden": true
+                    "hidden": true,
+                    "default": 1
                 },
                 "trimmomatic_clean_se_memory": {
                     "type": "string",
-                    
-                    "description": "",
+                    "description": "The requested memory for the process (trimmomatic_clean_se).",
                     "help_text": "",
                     "fa_icon": "fas fa-memory",
-                    "hidden": true
+                    "hidden": true,
+                    "default": "4.GB"
                 },
                 "trimmomatic_clean_se_walltime": {
                     "type": "string",
-                    
-                    "description": "",
+                    "description": "The requested walltime for the process (trimmomatic_clean_se).",
                     "help_text": "",
                     "fa_icon": "far fa-clock",
-                    "hidden": true
+                    "hidden": true,
+                    "default": "4.h"
                 }
             }
         },
@@ -722,35 +720,35 @@
             "properties": {
                 "prepare_samplesheet_args": {
                     "type": "string",
-                    "default": null,
-                    "description": "",
+                    "default": "",
+                    "description": "The arguments to be passed to process (prepare_samplesheet).",
                     "help_text": "",
                     "fa_icon": "fa fa-cog",
                     "hidden": true
                 },
                 "prepare_samplesheet_cpus": {
                     "type": "integer",
-                    
-                    "description": "",
+                    "description": "The number of requested CPUs for the process (prepare_samplesheet).",
                     "help_text": "",
                     "fa_icon": "fas fa-microchip",
-                    "hidden": true
+                    "hidden": true,
+                    "default": 1
                 },
                 "prepare_samplesheet_memory": {
                     "type": "string",
-                    
-                    "description": "",
+                    "description": "The requested memory for the process (prepare_samplesheet).",
                     "help_text": "",
                     "fa_icon": "fas fa-memory",
-                    "hidden": true
+                    "hidden": true,
+                    "default": "8.GB"
                 },
                 "prepare_samplesheet_walltime": {
                     "type": "string",
-                    
-                    "description": "",
+                    "description": "The requested walltime for the process (prepare_samplesheet).",
                     "help_text": "",
                     "fa_icon": "far fa-clock",
-                    "hidden": true
+                    "hidden": true,
+                    "default": "12.h"
                 }
             }
         },
@@ -764,8 +762,8 @@
                 "blat_parser_evalue": {
                     "type": "number",
                     "default": 1e-10,
-                    "description": "",
-                    "help_text": "",
+                    "description": "the E-value score for filtering BLAT hits",
+                    "help_text": "E-value scores designate the number of expected hits as a result of chance. Simply put, the lower the score, the fewer (but better) the matches. [See here](https://www.metagenomics.wiki/tools/blast/evalue) for a detailed explanation.",
                     "fa_icon": "fa fa-cog",
                     "hidden": true
                 },
@@ -779,35 +777,35 @@
                 },
                 "parse_blat_results_args": {
                     "type": "string",
-                    "default": null,
-                    "description": "",
+                    "default": "--evalue ${params.blat_parser_evalue} --match ${params.blat_parser_match}",
+                    "description": "The arguments to be passed to process (parse_blat_results).",
                     "help_text": "",
                     "fa_icon": "fa fa-cog",
                     "hidden": true
                 },
                 "parse_blat_results_cpus": {
                     "type": "integer",
-                    
-                    "description": "",
+                    "description": "The number of requested CPUs for the process (parse_blat_results).",
                     "help_text": "",
                     "fa_icon": "fas fa-microchip",
-                    "hidden": true
+                    "hidden": true,
+                    "default": 1
                 },
                 "parse_blat_results_memory": {
                     "type": "string",
-                    
-                    "description": "",
+                    "description": "The requested memory for the process (parse_blat_results).",
                     "help_text": "",
                     "fa_icon": "fas fa-memory",
-                    "hidden": true
+                    "hidden": true,
+                    "default": "8.GB"
                 },
                 "parse_blat_results_walltime": {
                     "type": "string",
-                    
-                    "description": "",
+                    "description": "The requested walltime for the process (parse_blat_results).",
                     "help_text": "",
                     "fa_icon": "far fa-clock",
-                    "hidden": true
+                    "hidden": true,
+                    "default": "12.h"
                 }
             }
         },
@@ -820,35 +818,35 @@
             "properties": {
                 "quality_2_assembly_args": {
                     "type": "string",
-                    "default": null,
-                    "description": "",
+                    "default": "",
+                    "description": "The arguments to be passed to process (quality_2_assembly).",
                     "help_text": "",
                     "fa_icon": "fa fa-cog",
                     "hidden": true
                 },
                 "quality_2_assembly_cpus": {
                     "type": "integer",
-                    
-                    "description": "",
+                    "description": "The number of requested CPUs for the process (quality_2_assembly).",
                     "help_text": "",
                     "fa_icon": "fas fa-microchip",
-                    "hidden": true
+                    "hidden": true,
+                    "default": 1
                 },
                 "quality_2_assembly_memory": {
                     "type": "string",
-                    
-                    "description": "",
+                    "description": "The requested memory for the process (quality_2_assembly).",
                     "help_text": "",
                     "fa_icon": "fas fa-memory",
-                    "hidden": true
+                    "hidden": true,
+                    "default": "8.GB"
                 },
                 "quality_2_assembly_walltime": {
                     "type": "string",
-                    
-                    "description": "",
+                    "description": "The requested walltime for the process (quality_2_assembly).",
                     "help_text": "",
                     "fa_icon": "far fa-clock",
-                    "hidden": true
+                    "hidden": true,
+                    "default": "12.h"
                 }
             }
         },
@@ -861,35 +859,35 @@
             "properties": {
                 "samplesheet_check_args": {
                     "type": "string",
-                    "default": null,
-                    "description": "",
+                    "default": "",
+                    "description": "The arguments to be passed to process (samplesheet_check).",
                     "help_text": "",
                     "fa_icon": "fa fa-cog",
                     "hidden": true
                 },
                 "samplesheet_check_cpus": {
                     "type": "integer",
-                    
-                    "description": "",
+                    "description": "The number of requested CPUs for the process (samplesheet_check).",
                     "help_text": "",
                     "fa_icon": "fas fa-microchip",
-                    "hidden": true
+                    "hidden": true,
+                    "default": 1
                 },
                 "samplesheet_check_memory": {
                     "type": "string",
-                    
-                    "description": "",
+                    "description": "The requested memory for the process (samplesheet_check).",
                     "help_text": "",
                     "fa_icon": "fas fa-memory",
-                    "hidden": true
+                    "hidden": true,
+                    "default": "8.GB"
                 },
                 "samplesheet_check_walltime": {
                     "type": "string",
-                    
-                    "description": "",
+                    "description": "The requested walltime for the process (samplesheet_check).",
                     "help_text": "",
                     "fa_icon": "far fa-clock",
-                    "hidden": true
+                    "hidden": true,
+                    "default": "12.h"
                 }
             }
         },
@@ -902,35 +900,35 @@
             "properties": {
                 "bbmap_reformat2_args": {
                     "type": "string",
-                    "default": null,
-                    "description": "",
+                    "default": "minconsecutivebases=${params.bbmap_reformat_minconsecutivebases} dotdashxton=${params.bbmap_reformat_dotdashxton} fastawrap=${params.bbmap_reformat_fastawrap}",
+                    "description": "The arguments to be passed to process (bbmap_reformat2).",
                     "help_text": "",
                     "fa_icon": "fa fa-cog",
                     "hidden": true
                 },
                 "bbmap_reformat2_cpus": {
                     "type": "integer",
-                    
-                    "description": "",
+                    "description": "The number of requested CPUs for the process (bbmap_reformat2).",
                     "help_text": "",
                     "fa_icon": "fas fa-microchip",
-                    "hidden": true
+                    "hidden": true,
+                    "default": 1
                 },
                 "bbmap_reformat2_memory": {
                     "type": "string",
-                    
-                    "description": "",
+                    "description": "The requested memory for the process (bbmap_reformat2).",
                     "help_text": "",
                     "fa_icon": "fas fa-memory",
-                    "hidden": true
+                    "hidden": true,
+                    "default": "8.GB"
                 },
                 "bbmap_reformat2_walltime": {
                     "type": "string",
-                    
-                    "description": "",
+                    "description": "The requested walltime for the process (bbmap_reformat2).",
                     "help_text": "",
                     "fa_icon": "far fa-clock",
-                    "hidden": true
+                    "hidden": true,
+                    "default": "12.h"
                 }
             }
         },
@@ -943,35 +941,35 @@
             "properties": {
                 "prepare_adaptor_args": {
                     "type": "string",
-                    "default": null,
-                    "description": "",
+                    "default": "",
+                    "description": "The arguments to be passed to process (prepare_adaptor).",
                     "help_text": "",
                     "fa_icon": "fa fa-cog",
                     "hidden": true
                 },
                 "prepare_adaptor_cpus": {
                     "type": "integer",
-                    
-                    "description": "",
+                    "description": "The number of requested CPUs for the process (prepare_adaptor).",
                     "help_text": "",
                     "fa_icon": "fas fa-microchip",
-                    "hidden": true
+                    "hidden": true,
+                    "default": 1
                 },
                 "prepare_adaptor_memory": {
                     "type": "string",
-                    
-                    "description": "",
+                    "description": "The requested memory for the process (prepare_adaptor).",
                     "help_text": "",
                     "fa_icon": "fas fa-memory",
-                    "hidden": true
+                    "hidden": true,
+                    "default": "2.GB"
                 },
                 "prepare_adaptor_walltime": {
                     "type": "string",
-                    
-                    "description": "",
+                    "description": "The requested walltime for the process (prepare_adaptor).",
                     "help_text": "",
                     "fa_icon": "far fa-clock",
-                    "hidden": true
+                    "hidden": true,
+                    "default": "1.h"
                 }
             }
         },
@@ -1008,35 +1006,35 @@
                 },
                 "bbmap_reformat_args": {
                     "type": "string",
-                    "default": null,
-                    "description": "",
+                    "default": "",
+                    "description": "The arguments to be passed to process (bbmap_reformat).",
                     "help_text": "",
                     "fa_icon": "fa fa-cog",
                     "hidden": true
                 },
                 "bbmap_reformat_cpus": {
                     "type": "integer",
-                    
-                    "description": "",
+                    "description": "The number of requested CPUs for the process (bbmap_reformat).",
                     "help_text": "",
                     "fa_icon": "fas fa-microchip",
-                    "hidden": true
+                    "hidden": true,
+                    "default": 1
                 },
                 "bbmap_reformat_memory": {
                     "type": "string",
-                    
-                    "description": "",
+                    "description": "The requested memory for the process (bbmap_reformat).",
                     "help_text": "",
                     "fa_icon": "fas fa-memory",
-                    "hidden": true
+                    "hidden": true,
+                    "default": "4.GB"
                 },
                 "bbmap_reformat_walltime": {
                     "type": "string",
-                    
-                    "description": "",
+                    "description": "The requested walltime for the process (bbmap_reformat).",
                     "help_text": "",
                     "fa_icon": "far fa-clock",
-                    "hidden": true
+                    "hidden": true,
+                    "default": "4.h"
                 }
             }
         },
@@ -1049,35 +1047,35 @@
             "properties": {
                 "convert_phyml_args": {
                     "type": "string",
-                    "default": null,
-                    "description": "",
+                    "default": "",
+                    "description": "The arguments to be passed to process (convert_phyml).",
                     "help_text": "",
                     "fa_icon": "fa fa-cog",
                     "hidden": true
                 },
                 "convert_phyml_cpus": {
                     "type": "integer",
-                    
-                    "description": "",
+                    "description": "The number of requested CPUs for the process (convert_phyml).",
                     "help_text": "",
                     "fa_icon": "fas fa-microchip",
-                    "hidden": true
+                    "hidden": true,
+                    "default": 1
                 },
                 "convert_phyml_memory": {
                     "type": "string",
-                    
-                    "description": "",
+                    "description": "The requested memory for the process (convert_phyml).",
                     "help_text": "",
                     "fa_icon": "fas fa-memory",
-                    "hidden": true
+                    "hidden": true,
+                    "default": "8.GB"
                 },
                 "convert_phyml_walltime": {
                     "type": "string",
-                    
-                    "description": "",
+                    "description": "The requested walltime for the process (convert_phyml).",
                     "help_text": "",
                     "fa_icon": "far fa-clock",
-                    "hidden": true
+                    "hidden": true,
+                    "default": "12.h"
                 }
             }
         },
@@ -1098,27 +1096,27 @@
                 },
                 "preprocessing_cpus": {
                     "type": "integer",
-                    
-                    "description": "",
+                    "description": "The number of requested CPUs for the process (preprocessing).",
                     "help_text": "",
                     "fa_icon": "fas fa-microchip",
-                    "hidden": true
+                    "hidden": true,
+                    "default": 1
                 },
                 "preprocessing_memory": {
                     "type": "string",
-                    
-                    "description": "",
+                    "description": "The requested memory for the process (preprocessing).",
                     "help_text": "",
                     "fa_icon": "fas fa-memory",
-                    "hidden": true
+                    "hidden": true,
+                    "default": "8.GB"
                 },
                 "preprocessing_walltime": {
                     "type": "string",
-                    
-                    "description": "",
+                    "description": "The requested walltime for the process (preprocessing).",
                     "help_text": "",
                     "fa_icon": "far fa-clock",
-                    "hidden": true
+                    "hidden": true,
+                    "default": "12.h"
                 }
             }
         },
@@ -1139,27 +1137,27 @@
                 },
                 "bbmap_dedupe_cpus": {
                     "type": "integer",
-                    
-                    "description": "",
+                    "description": "The number of requested CPUs for the process (bbmap_dedupe).",
                     "help_text": "",
                     "fa_icon": "fas fa-microchip",
-                    "hidden": true
+                    "hidden": true,
+                    "default": 1
                 },
                 "bbmap_dedupe_memory": {
                     "type": "string",
-                    
-                    "description": "",
+                    "description": "The requested memory for the process (bbmap_dedupe).",
                     "help_text": "",
                     "fa_icon": "fas fa-memory",
-                    "hidden": true
+                    "hidden": true,
+                    "default": "24.GB"
                 },
                 "bbmap_dedupe_walltime": {
                     "type": "string",
-                    
-                    "description": "",
+                    "description": "The requested walltime for the process (bbmap_dedupe).",
                     "help_text": "",
                     "fa_icon": "far fa-clock",
-                    "hidden": true
+                    "hidden": true,
+                    "default": "4.h"
                 }
             }
         },
@@ -1174,49 +1172,49 @@
                     "type": "number",
                     "default": 0.75,
                     "description": "Minimum identity to reference sequence to retain a read",
-                    "help_text": "Discards reads that do not map to a reference target with at least the indicated identity score. This was designed to quickly filter off-target reads such as mtDNA. Suggested Usage: 0.75",
+                    "help_text": "Discards reads that do not map to a reference target with at least the indicated identity score. This was designed to quickly filter off-target reads such as mtDNA. Suggested Usage: 0.75. It's important to note that application of the minid is more complicated than it looks. BBMAP also has an idfilter=X option which is more literal. Read the [BBMAP documentation](https://jgi.doe.gov/data-and-tools/software-tools/bbtools/bb-tools-user-guide/bbmap-guide/) and [this forum response by Brian Bushnell](https://www.biostars.org/p/376782/) for more nuance.",
                     "fa_icon": "fa fa-cog",
                     "hidden": true
                 },
                 "bbmap_filter_mem": {
                     "type": "integer",
                     "default": 2,
-                    "description": "Specify memomry use for mapping/filtering (Gb)",
+                    "description": "Specify memory use for mapping/filtering (Gb)",
                     "help_text": "",
                     "fa_icon": "fa fa-cog",
                     "hidden": true
                 },
                 "bbmap_filter_args": {
                     "type": "string",
-                    "default": null,
-                    "description": "",
+                    "default": "minid=${params.bbmap_filter_minid}",
+                    "description": "The arguments to be passed to process (bbmap_filter).",
                     "help_text": "",
                     "fa_icon": "fa fa-cog",
                     "hidden": true
                 },
                 "bbmap_filter_cpus": {
                     "type": "integer",
-                    
-                    "description": "",
+                    "description": "The number of requested CPUs for the process (bbmap_filter).",
                     "help_text": "",
                     "fa_icon": "fas fa-microchip",
-                    "hidden": true
+                    "hidden": true,
+                    "default": 1
                 },
                 "bbmap_filter_memory": {
                     "type": "string",
-                    
-                    "description": "",
+                    "description": "The requested memory for the process (bbmap_filter).",
                     "help_text": "",
                     "fa_icon": "fas fa-memory",
-                    "hidden": true
+                    "hidden": true,
+                    "default": "16.GB"
                 },
                 "bbmap_filter_walltime": {
                     "type": "string",
-                    
-                    "description": "",
+                    "description": "The requested walltime for the process (bbmap_filter).",
                     "help_text": "",
                     "fa_icon": "far fa-clock",
-                    "hidden": true
+                    "hidden": true,
+                    "default": "4.h"
                 }
             }
         },
@@ -1229,35 +1227,35 @@
             "properties": {
                 "perl_cleanup_args": {
                     "type": "string",
-                    "default": null,
-                    "description": "",
+                    "default": "-pi -w -e s/!/N/g;",
+                    "description": "The arguments to be passed to process (perl_cleanup).",
                     "help_text": "",
                     "fa_icon": "fa fa-cog",
                     "hidden": true
                 },
                 "perl_cleanup_cpus": {
                     "type": "integer",
-                    
-                    "description": "",
+                    "description": "The number of requested CPUs for the process (perl_cleanup).",
                     "help_text": "",
                     "fa_icon": "fas fa-microchip",
-                    "hidden": true
+                    "hidden": true,
+                    "default": 1
                 },
                 "perl_cleanup_memory": {
                     "type": "string",
-                    
-                    "description": "",
+                    "description": "The requested memory for the process (perl_cleanup).",
                     "help_text": "",
                     "fa_icon": "fas fa-memory",
-                    "hidden": true
+                    "hidden": true,
+                    "default": "4.GB"
                 },
                 "perl_cleanup_walltime": {
                     "type": "string",
-                    
-                    "description": "",
+                    "description": "The requested walltime for the process (perl_cleanup).",
                     "help_text": "",
                     "fa_icon": "far fa-clock",
-                    "hidden": true
+                    "hidden": true,
+                    "default": "8.h"
                 }
             }
         },
@@ -1270,35 +1268,35 @@
             "properties": {
                 "concatenate_args": {
                     "type": "string",
-                    "default": null,
-                    "description": "",
+                    "default": "",
+                    "description": "The arguments to be passed to process (concatenate).",
                     "help_text": "",
                     "fa_icon": "fa fa-cog",
                     "hidden": true
                 },
                 "concatenate_cpus": {
                     "type": "integer",
-                    
-                    "description": "",
+                    "description": "The number of requested CPUs for the process (concatenate).",
                     "help_text": "",
                     "fa_icon": "fas fa-microchip",
-                    "hidden": true
+                    "hidden": true,
+                    "default": 1
                 },
                 "concatenate_memory": {
                     "type": "string",
-                    
-                    "description": "",
+                    "description": "The requested memory for the process (concatenate).",
                     "help_text": "",
                     "fa_icon": "fas fa-memory",
-                    "hidden": true
+                    "hidden": true,
+                    "default": "4.GB"
                 },
                 "concatenate_walltime": {
                     "type": "string",
-                    
-                    "description": "",
+                    "description": "The requested walltime for the process (concatenate).",
                     "help_text": "",
                     "fa_icon": "far fa-clock",
-                    "hidden": true
+                    "hidden": true,
+                    "default": "4.h"
                 }
             }
         },
@@ -1311,35 +1309,35 @@
             "properties": {
                 "merge_trees_args": {
                     "type": "string",
-                    "default": null,
-                    "description": "",
+                    "default": "",
+                    "description": "The arguments to be passed to process (merge_trees).",
                     "help_text": "",
                     "fa_icon": "fa fa-cog",
                     "hidden": true
                 },
                 "merge_trees_cpus": {
                     "type": "integer",
-                    
-                    "description": "",
+                    "description": "The number of requested CPUs for the process (merge_trees).",
                     "help_text": "",
                     "fa_icon": "fas fa-microchip",
-                    "hidden": true
+                    "hidden": true,
+                    "default": 1
                 },
                 "merge_trees_memory": {
                     "type": "string",
-                    
-                    "description": "",
+                    "description": "The requested memory for the process (merge_trees).",
                     "help_text": "",
                     "fa_icon": "fas fa-memory",
-                    "hidden": true
+                    "hidden": true,
+                    "default": "8.GB"
                 },
                 "merge_trees_walltime": {
                     "type": "string",
-                    
-                    "description": "",
+                    "description": "The requested walltime for the process (merge_trees).",
                     "help_text": "",
                     "fa_icon": "far fa-clock",
-                    "hidden": true
+                    "hidden": true,
+                    "default": "12.h"
                 }
             }
         },
@@ -1384,35 +1382,35 @@
                 },
                 "trimmomatic_args": {
                     "type": "string",
-                    "default": null,
-                    "description": "",
+                    "default": "-phred33",
+                    "description": "The arguments to be passed to process (trimmomatic).",
                     "help_text": "",
                     "fa_icon": "fa fa-cog",
                     "hidden": true
                 },
                 "trimmomatic_cpus": {
                     "type": "integer",
-                    
-                    "description": "",
+                    "description": "The number of requested CPUs for the process (trimmomatic).",
                     "help_text": "",
                     "fa_icon": "fas fa-microchip",
-                    "hidden": true
+                    "hidden": true,
+                    "default": 1
                 },
                 "trimmomatic_memory": {
                     "type": "string",
-                    
-                    "description": "",
+                    "description": "The requested memory for the process (trimmomatic).",
                     "help_text": "",
                     "fa_icon": "fas fa-memory",
-                    "hidden": true
+                    "hidden": true,
+                    "default": "4.GB"
                 },
                 "trimmomatic_walltime": {
                     "type": "string",
-                    
-                    "description": "",
+                    "description": "The requested walltime for the process (trimmomatic).",
                     "help_text": "",
                     "fa_icon": "far fa-clock",
-                    "hidden": true
+                    "hidden": true,
+                    "default": "4.h"
                 }
             }
         },
@@ -1433,35 +1431,35 @@
                 },
                 "make_prg_args": {
                     "type": "string",
-                    "default": null,
-                    "description": "",
+                    "default": "--kept-tags ${params.make_rgb_kept_tags}",
+                    "description": "The arguments to be passed to process (make_prg).",
                     "help_text": "",
                     "fa_icon": "fa fa-cog",
                     "hidden": true
                 },
                 "make_prg_cpus": {
                     "type": "integer",
-                    
-                    "description": "",
+                    "description": "The number of requested CPUs for the process (make_prg).",
                     "help_text": "",
                     "fa_icon": "fas fa-microchip",
-                    "hidden": true
+                    "hidden": true,
+                    "default": 1
                 },
                 "make_prg_memory": {
                     "type": "string",
-                    
-                    "description": "",
+                    "description": "The requested memory for the process (make_prg).",
                     "help_text": "",
                     "fa_icon": "fas fa-memory",
-                    "hidden": true
+                    "hidden": true,
+                    "default": "4.GB"
                 },
                 "make_prg_walltime": {
                     "type": "string",
-                    
-                    "description": "",
+                    "description": "The requested walltime for the process (make_prg).",
                     "help_text": "",
                     "fa_icon": "far fa-clock",
-                    "hidden": true
+                    "hidden": true,
+                    "default": "4.h"
                 }
             }
         },
@@ -1472,7 +1470,7 @@
             "description": "The configurations of the process gblocks.",
             "help_text": "See the [Gblocks Manual](https://home.cc.umanitoba.ca/~psgendb/doc/Castresana/Gblocks_documentation.html) for more information",
             "properties": {
-                 "gblocks_b1": {
+                "gblocks_b1": {
                     "type": "number",
                     "default": 0.5,
                     "description": "Minimum number of sequences to be identified as a conserved site",
@@ -1506,35 +1504,35 @@
                 },
                 "gblocks_args": {
                     "type": "string",
-                    "default": null,
-                    "description": "",
+                    "default": "-t=DNA -b3=${params.gblocks_b3} -b4=${params.gblocks_b4} -b5=h -p=n",
+                    "description": "The arguments to be passed to process (gblocks).",
                     "help_text": "",
                     "fa_icon": "fa fa-cog",
                     "hidden": true
                 },
                 "gblocks_cpus": {
                     "type": "integer",
-                    
-                    "description": "",
+                    "description": "The number of requested CPUs for the process (gblocks).",
                     "help_text": "",
                     "fa_icon": "fas fa-microchip",
-                    "hidden": true
+                    "hidden": true,
+                    "default": 1
                 },
                 "gblocks_memory": {
                     "type": "string",
-                    
-                    "description": "",
+                    "description": "The requested memory for the process (gblocks).",
                     "help_text": "",
                     "fa_icon": "fas fa-memory",
-                    "hidden": true
+                    "hidden": true,
+                    "default": "8.GB"
                 },
                 "gblocks_walltime": {
                     "type": "string",
-                    
-                    "description": "",
+                    "description": "The requested walltime for the process (gblocks).",
                     "help_text": "",
                     "fa_icon": "far fa-clock",
-                    "hidden": true
+                    "hidden": true,
+                    "default": "12.h"
                 }
             }
         },
@@ -1555,27 +1553,27 @@
                 },
                 "testing_cpus": {
                     "type": "integer",
-                    
-                    "description": "",
+                    "description": "The number of requested CPUs for the process (testing).",
                     "help_text": "",
                     "fa_icon": "fas fa-microchip",
-                    "hidden": true
+                    "hidden": true,
+                    "default": 1
                 },
                 "testing_memory": {
                     "type": "string",
-                    
-                    "description": "",
+                    "description": "The requested memory for the process (testing).",
                     "help_text": "",
                     "fa_icon": "fas fa-memory",
-                    "hidden": true
+                    "hidden": true,
+                    "default": "8.GB"
                 },
                 "testing_walltime": {
                     "type": "string",
-                    
-                    "description": "",
+                    "description": "The requested walltime for the process (testing).",
                     "help_text": "",
                     "fa_icon": "far fa-clock",
-                    "hidden": true
+                    "hidden": true,
+                    "default": "12.h"
                 }
             }
         },
@@ -1604,35 +1602,35 @@
                 },
                 "trinity_args": {
                     "type": "string",
-                    "default": null,
-                    "description": "",
-                    "help_text": "",
+                    "default": "--seqType fq --NO_SEQTK",
+                    "description": "The arguments to be passed to process (trinity).",
+                    "help_text": "[check the wiki](https://github.com/trinityrnaseq/trinityrnaseq/wiki)",
                     "fa_icon": "fa fa-cog",
                     "hidden": true
                 },
                 "trinity_cpus": {
                     "type": "integer",
-                    
-                    "description": "",
+                    "description": "The number of requested CPUs for the process (trinity).",
                     "help_text": "",
                     "fa_icon": "fas fa-microchip",
-                    "hidden": true
+                    "hidden": true,
+                    "default": 6
                 },
                 "trinity_memory": {
                     "type": "string",
-                    
-                    "description": "",
+                    "description": "The requested memory for the process (trinity).",
                     "help_text": "",
                     "fa_icon": "fas fa-memory",
-                    "hidden": true
+                    "hidden": true,
+                    "default": "24.GB"
                 },
                 "trinity_walltime": {
                     "type": "string",
-                    
-                    "description": "",
+                    "description": "The requested walltime for the process (trinity).",
                     "help_text": "",
                     "fa_icon": "far fa-clock",
-                    "hidden": true
+                    "hidden": true,
+                    "default": "12.h"
                 }
             }
         },
@@ -1645,35 +1643,35 @@
             "properties": {
                 "iqtree_args": {
                     "type": "string",
-                    "default": null,
-                    "description": "",
+                    "default": "--quiet -B 1000",
+                    "description": "The arguments to be passed to process (iqtree).",
                     "help_text": "",
                     "fa_icon": "fa fa-cog",
                     "hidden": true
                 },
                 "iqtree_cpus": {
                     "type": "integer",
-                    
-                    "description": "",
+                    "description": "The number of requested CPUs for the process (iqtree).",
                     "help_text": "",
                     "fa_icon": "fas fa-microchip",
-                    "hidden": true
+                    "hidden": true,
+                    "default": 1
                 },
                 "iqtree_memory": {
                     "type": "string",
-                    
-                    "description": "",
+                    "description": "The requested memory for the process (iqtree).",
                     "help_text": "",
                     "fa_icon": "fas fa-memory",
-                    "hidden": true
+                    "hidden": true,
+                    "default": "8.GB"
                 },
                 "iqtree_walltime": {
                     "type": "string",
-                    
-                    "description": "",
+                    "description": "The requested walltime for the process (iqtree).",
                     "help_text": "",
                     "fa_icon": "far fa-clock",
-                    "hidden": true
+                    "hidden": true,
+                    "default": "12.h"
                 }
             }
         },
@@ -1686,35 +1684,35 @@
             "properties": {
                 "aster_args": {
                     "type": "string",
-                    "default": null,
-                    "description": "",
+                    "default": "",
+                    "description": "The arguments to be passed to process (aster).",
                     "help_text": "",
                     "fa_icon": "fa fa-cog",
                     "hidden": true
                 },
                 "aster_cpus": {
                     "type": "integer",
-                    
-                    "description": "",
+                    "description": "The number of requested CPUs for the process (aster).",
                     "help_text": "",
                     "fa_icon": "fas fa-microchip",
-                    "hidden": true
+                    "hidden": true,
+                    "default": 1
                 },
                 "aster_memory": {
                     "type": "string",
-                    
-                    "description": "",
+                    "description": "The requested memory for the process (aster).",
                     "help_text": "",
                     "fa_icon": "fas fa-memory",
-                    "hidden": true
+                    "hidden": true,
+                    "default": "8.GB"
                 },
                 "aster_walltime": {
                     "type": "string",
-                    
-                    "description": "",
+                    "description": "The requested walltime for the process (aster).",
                     "help_text": "",
                     "fa_icon": "far fa-clock",
-                    "hidden": true
+                    "hidden": true,
+                    "default": "12.h"
                 }
             }
         },
@@ -1775,59 +1773,59 @@
                 },
                 "macse_args_refine": {
                     "type": "string",
-                    "default": null,
-                    "description": "",
+                    "default": "-stop ${params.macse_stop} -prog refineAlignment",
+                    "description": "The arguments to be passed to process (macse_args_r).",
                     "help_text": "",
                     "fa_icon": "fa fa-cog",
                     "hidden": true
                 },
                 "macse_args_refineLemmon": {
                     "type": "string",
-                    "default": null,
-                    "description": "",
+                    "default": "-prog refineAlignment -optim ${params.macse_refine_alignment_optim} -local_realign_init ${params.macse_refine_alignment_local_realign_init} -local_realign_dec ${params.macse_refine_alignment_local_realign_dec} -fs ${params.macse_refine_alignment_fs}",
+                    "description": "The arguments to be passed to process (macse_args_refineL).",
                     "help_text": "",
                     "fa_icon": "fa fa-cog",
                     "hidden": true
                 },
                 "macse_args_export": {
                     "type": "string",
-                    "default": null,
-                    "description": "",
+                    "default": "-prog exportAlignment -stop ${params.macse_stop}",
+                    "description": "The arguments to be passed to process (macse_args_e).",
                     "help_text": "",
                     "fa_icon": "fa fa-cog",
                     "hidden": true
                 },
                 "macse_args_align": {
                     "type": "string",
-                    "default": null,
-                    "description": "",
+                    "default": "-prog alignSequences -stop_lr ${params.macse_stop}",
+                    "description": "The arguments to be passed to process (macse_args_).",
                     "help_text": "",
                     "fa_icon": "fa fa-cog",
                     "hidden": true
                 },
                 "macse_cpus": {
                     "type": "integer",
-                    
-                    "description": "",
+                    "description": "The number of requested CPUs for the process (macse).",
                     "help_text": "",
                     "fa_icon": "fas fa-microchip",
-                    "hidden": true
+                    "hidden": true,
+                    "default": 1
                 },
                 "macse_memory": {
                     "type": "string",
-                    
-                    "description": "",
+                    "description": "The requested memory for the process (macse).",
                     "help_text": "",
                     "fa_icon": "fas fa-memory",
-                    "hidden": true
+                    "hidden": true,
+                    "default": "8.GB"
                 },
                 "macse_walltime": {
                     "type": "string",
-                    
-                    "description": "",
+                    "description": "The requested walltime for the process (macse).",
                     "help_text": "",
                     "fa_icon": "far fa-clock",
-                    "hidden": true
+                    "hidden": true,
+                    "default": "12.h"
                 }
             }
         },
@@ -1848,35 +1846,35 @@
                 },
                 "mafft_args": {
                     "type": "string",
-                    "default": null,
-                    "description": "",
+                    "default": "--maxiterate ${params.mafft_maxiterate} --globalpair --adjustdirection --quiet",
+                    "description": "The arguments to be passed to process (mafft).",
                     "help_text": "",
                     "fa_icon": "fa fa-cog",
                     "hidden": true
                 },
                 "mafft_cpus": {
                     "type": "integer",
-                    
-                    "description": "",
+                    "description": "The number of requested CPUs for the process (mafft).",
                     "help_text": "",
                     "fa_icon": "fas fa-microchip",
-                    "hidden": true
+                    "hidden": true,
+                    "default": 1
                 },
                 "mafft_memory": {
                     "type": "string",
-                    
-                    "description": "",
+                    "description": "The requested memory for the process (mafft).",
                     "help_text": "",
                     "fa_icon": "fas fa-memory",
-                    "hidden": true
+                    "hidden": true,
+                    "default": "4.GB"
                 },
                 "mafft_walltime": {
                     "type": "string",
-                    
-                    "description": "",
+                    "description": "The requested walltime for the process (mafft).",
                     "help_text": "",
                     "fa_icon": "far fa-clock",
-                    "hidden": true
+                    "hidden": true,
+                    "default": "4.h"
                 }
             }
         },
@@ -1897,35 +1895,35 @@
                 },
                 "raxml_args": {
                     "type": "string",
-                    "default": null,
-                    "description": "",
+                    "default": "-m GTRCAT -f a -n",
+                    "description": "The arguments to be passed to process (raxml).",
                     "help_text": "",
                     "fa_icon": "fa fa-cog",
                     "hidden": true
                 },
                 "raxml_cpus": {
                     "type": "integer",
-                    
-                    "description": "",
+                    "description": "The number of requested CPUs for the process (raxml).",
                     "help_text": "",
                     "fa_icon": "fas fa-microchip",
-                    "hidden": true
+                    "hidden": true,
+                    "default": 1
                 },
                 "raxml_memory": {
                     "type": "string",
-                    
-                    "description": "",
+                    "description": "The requested memory for the process (raxml).",
                     "help_text": "",
                     "fa_icon": "fas fa-memory",
-                    "hidden": true
+                    "hidden": true,
+                    "default": "8.GB"
                 },
                 "raxml_walltime": {
                     "type": "string",
-                    
-                    "description": "",
+                    "description": "The requested walltime for the process (raxml).",
                     "help_text": "",
                     "fa_icon": "far fa-clock",
-                    "hidden": true
+                    "hidden": true,
+                    "default": "12.h"
                 }
             }
         },
@@ -1954,35 +1952,35 @@
                 },
                 "blat_args": {
                     "type": "string",
-                    "default": null,
-                    "description": "",
+                    "default": "-out=blast8",
+                    "description": "The arguments to be passed to process (blat).",
                     "help_text": "",
                     "fa_icon": "fa fa-cog",
                     "hidden": true
                 },
                 "blat_cpus": {
                     "type": "integer",
-                    
-                    "description": "",
+                    "description": "The number of requested CPUs for the process (blat).",
                     "help_text": "",
                     "fa_icon": "fas fa-microchip",
-                    "hidden": true
+                    "hidden": true,
+                    "default": 1
                 },
                 "blat_memory": {
                     "type": "string",
-                    
-                    "description": "",
+                    "description": "The requested memory for the process (blat).",
                     "help_text": "",
                     "fa_icon": "fas fa-memory",
-                    "hidden": true
+                    "hidden": true,
+                    "default": "4.GB"
                 },
                 "blat_walltime": {
                     "type": "string",
-                    
-                    "description": "",
+                    "description": "The requested walltime for the process (blat).",
                     "help_text": "",
                     "fa_icon": "far fa-clock",
-                    "hidden": true
+                    "hidden": true,
+                    "default": "4.h"
                 }
             }
         },
@@ -1995,35 +1993,35 @@
             "properties": {
                 "pear_args": {
                     "type": "string",
-                    "default": null,
-                    "description": "",
+                    "default": "",
+                    "description": "The arguments to be passed to process (pear).",
                     "help_text": "",
                     "fa_icon": "fa fa-cog",
                     "hidden": true
                 },
                 "pear_cpus": {
                     "type": "integer",
-                    
-                    "description": "",
+                    "description": "The number of requested CPUs for the process (pear).",
                     "help_text": "",
                     "fa_icon": "fas fa-microchip",
-                    "hidden": true
+                    "hidden": true,
+                    "default": 1
                 },
                 "pear_memory": {
                     "type": "string",
-                    
-                    "description": "",
+                    "description": "The requested memory for the process (pear).",
                     "help_text": "",
                     "fa_icon": "fas fa-memory",
-                    "hidden": true
+                    "hidden": true,
+                    "default": "8.GB"
                 },
                 "pear_walltime": {
                     "type": "string",
-                    
-                    "description": "",
+                    "description": "The requested walltime for the process (pear).",
                     "help_text": "",
                     "fa_icon": "far fa-clock",
-                    "hidden": true
+                    "hidden": true,
+                    "default": "12.h"
                 }
             }
         },
@@ -2036,39 +2034,38 @@
             "properties": {
                 "sed_args": {
                     "type": "string",
-                    "default": null,
-                    "description": "",
+                    "default": "",
+                    "description": "The arguments to be passed to process (sed).",
                     "help_text": "",
                     "fa_icon": "fa fa-cog",
                     "hidden": true
                 },
                 "sed_cpus": {
                     "type": "integer",
-                    
-                    "description": "",
+                    "description": "The number of requested CPUs for the process (sed).",
                     "help_text": "",
                     "fa_icon": "fas fa-microchip",
-                    "hidden": true
+                    "hidden": true,
+                    "default": 1
                 },
                 "sed_memory": {
                     "type": "string",
-                    
-                    "description": "",
+                    "description": "The requested memory for the process (sed).",
                     "help_text": "",
                     "fa_icon": "fas fa-memory",
-                    "hidden": true
+                    "hidden": true,
+                    "default": "8.GB"
                 },
                 "sed_walltime": {
                     "type": "string",
-                    
-                    "description": "",
+                    "description": "The requested walltime for the process (sed).",
                     "help_text": "",
                     "fa_icon": "far fa-clock",
-                    "hidden": true
+                    "hidden": true,
+                    "default": "12.h"
                 }
             }
-        }
-        
+        }        
     },
     "allOf": [
         {
