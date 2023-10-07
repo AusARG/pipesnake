@@ -113,7 +113,7 @@ You can customise the resources requested for each stage of the pipeline includi
 
 Examples:
 
-`--perl_cleanup_cpus 4 blat_memory 8.GB mafft_walltime 9.h`
+`--perl_cleanup_cpus 4 --blat_memory 8.GB --mafft_walltime 9.h`
 
 
 
