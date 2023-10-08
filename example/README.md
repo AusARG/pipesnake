@@ -9,7 +9,7 @@ Follow the nextflow and pipesnake installation instructions in the [Quick-Start 
 For a quick test, you can use a preconfiogured `test` profile that downloads all needed file from this example data.
 
 ```
-nextflow run ausarg/pipesnake -profile test,docker -r main 
+nextflow run ausarg/pipesnake -profile test,docker -r main -latest
 ```
 
 ### Using the example data locally
