@@ -18,7 +18,7 @@ nextflow run ausarg/pipesnake -profile test,docker -r main -latest
 2. Run the example analysis with read filtering:
 
 ```
-nextflow run ausarg/pipesnake --input pipesnake/example/data/ToyData_SampleInfo.csv --outdir [out_directory] --blat_db pipesnake/example/data/ToyData_SqCL_25Targets.fasta --fasta pipesnake/example/data/ToyData_SqCL_Filter.fasta -profile [docker/singularity/conda choose accordingly]
+nextflow run ausarg/pipesnake --input pipesnake/example/data/ToyData_SampleInfo.csv --outdir [out_directory] --blat_db pipesnake/example/data/ToyData_SqCL_25Targets.fasta --reference_genome pipesnake/example/data/ToyData_SqCL_Filter.fasta -profile [docker/singularity/conda choose accordingly]
 ```
 
 Or run the example analysis without read filtering:
@@ -37,7 +37,7 @@ Files contained in the `pipesnake/example/data` directory are as follows:
 
 + *`ToyData_SampleInfo.csv`*: sample info file for the `--input` command. It's ***essential*** that you adjust the paths to the raw read files before running this example dataset. 
 
-+ *`ToyData_SqCL_Filter.fasta`*: target sequences from phylogenetically near (same family) relatives to the ToyData samples. This fasta file can be used for the read filtering step: `--fasta` command.
++ *`ToyData_SqCL_Filter.fasta`*: target sequences from phylogenetically near (same family) relatives to the ToyData samples. This fasta file can be used for the read filtering step: `--reference_genome` command.
 
 + *`ToyData_SqCL_25Targets.fasta`*: 25 target sequences to assemble/match from the example data. This fasta file accompanies the `---blat-db` command and is used in the BLAT steps. 
 
