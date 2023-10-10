@@ -23,7 +23,7 @@ process ASTER {
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        BBMAP - reformat.sh: 
+        astral-hybrid: \$(astral-hybrid 2>&1 | sed -n '2{p;q}' |  sed 's/Version: v//g')
     END_VERSIONS
     """
 }

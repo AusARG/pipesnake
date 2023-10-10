@@ -263,7 +263,7 @@ workflow PIPESNAKE {
     )
 
     
-    if (params.assembly == "SPAdes"){
+    if (false)//params.assembly == "SPAdes"){
         SPADES(
             ch_prepared_reads
             .join( CONCATENATE3
