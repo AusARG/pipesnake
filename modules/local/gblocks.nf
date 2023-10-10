@@ -18,8 +18,6 @@ process GBLOCKS {
     
     """
     for fasta in ${fasta_ls.join(' ')}; do
-        file_base_name="\$(basename -- "\$fasta")"
-        ln -s "\${fasta}" \$file_base_name  
         num_seq=\$(cat \${fasta} | grep \\> | wc -l)
         
         b1=\$(awk "BEGIN {printf \\"%.0f\\", ${task.ext.gblocks_b1} * \$num_seq + 0.5}")
@@ -31,7 +29,7 @@ process GBLOCKS {
             b2=\$b1
         fi
 
-        Gblocks \${file_base_name}  -b1=\$b1  -b2=\$b2  ${task.ext.args} || true
+        Gblocks \${fasta}  -b1=\$b1  -b2=\$b2  ${task.ext.args} || true
     done
 
     cat <<-END_VERSIONS > versions.yml
