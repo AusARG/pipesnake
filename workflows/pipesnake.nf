@@ -211,27 +211,13 @@ workflow PIPESNAKE {
     .trimmed_cleaned_paired
     .set{ prepared_fastq }
 
+    
     TRIMMOMATIC_CLEAN_SE(
         unpaired_concatenated_ch
     )
 
     
 
-
-    // The step below seems just to concatenate files but not using them any more. Maybe we cancel it.
-    CONCATENATE2(
-        TRIMMOMATIC_CLEAN_PE
-        .out
-        .trimmed_cleaned_unpaired
-        .join( TRIMMOMATIC_CLEAN_SE
-                .out
-                .trimmed_cleaned_se
-        )
-        .map{ it -> [it[0], [it[1], it[2], it[3]]] }
-        , Channel.value("trimmed_unpaired_pe_seconcatenated")
-    )
-
-    
     if (!params.disable_filter){
         BBMAP_FILTER(
             TRIMMOMATIC_CLEAN_PE
@@ -250,27 +236,11 @@ workflow PIPESNAKE {
             .out
             .trimmed_cleaned_paired
     }
-    
-    
-    CONCATENATE3(
-        ch_prepared_reads
-        .join( CONCATENATE2
-                .out
-                .concatenated
-        )
-        .map{ it -> [it[0], [it[1], it[3]]] }
-        , Channel.value("trinity_r1_unpaired_concatenated")
-    )
 
-    
-    if (false){//params.assembly == "SPAdes"){
+
+    if (params.assembly == "SPAdes"){
         SPADES(
             ch_prepared_reads
-            .join( CONCATENATE3
-                    .out
-                    .concatenated
-                )
-            .map{ it -> [it[0], it[3], it[2]] }
         )
 
         ch_versions = ch_versions.mix(SPADES.out.versions)
@@ -278,6 +248,30 @@ workflow PIPESNAKE {
         .out
         .contigs
      } else {    
+        
+        CONCATENATE2(
+        TRIMMOMATIC_CLEAN_PE
+        .out
+        .trimmed_cleaned_unpaired
+        .join( TRIMMOMATIC_CLEAN_SE
+                .out
+                .trimmed_cleaned_se
+        )
+        .map{ it -> [it[0], [it[1], it[2], it[3]]] }
+        , Channel.value("trimmed_unpaired_pe_seconcatenated")
+        )
+        
+        CONCATENATE3(
+            ch_prepared_reads
+            .join( CONCATENATE2
+                    .out
+                    .concatenated
+            )
+            .map{ it -> [it[0], [it[1], it[3]]] }
+            , Channel.value("trinity_r1_unpaired_concatenated")
+        )
+
+        
         TRINITY(
         ch_prepared_reads
         .join( CONCATENATE3
@@ -291,6 +285,8 @@ workflow PIPESNAKE {
         .out
         .trinity_fasta
         
+        ch_versions = ch_versions.mix(CONCATENATE2.out.versions)
+        ch_versions = ch_versions.mix(CONCATENATE3.out.versions)
         ch_versions = ch_versions.mix(TRINITY.out.versions)
     }
     
@@ -412,8 +408,7 @@ workflow PIPESNAKE {
     
     ch_versions = ch_versions.mix(CONCATENATE.out.versions)
     ch_versions = ch_versions.mix(CONCATENATE_RAW.out.versions)
-    ch_versions = ch_versions.mix(CONCATENATE2.out.versions)
-    ch_versions = ch_versions.mix(CONCATENATE3.out.versions)
+    
     ch_versions = ch_versions.mix( TRIMMOMATIC_CLEAN_PE.out.versions)
     ch_versions = ch_versions.mix( TRIMMOMATIC_CLEAN_SE.out.versions)
 
