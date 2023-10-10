@@ -426,11 +426,11 @@
                 },
                 "merge_trees_keep_output": {
                     "type": "boolean",
-                    "default": false,
+                    "default": true,
                     "description": "If enabled, the output of process 'merge_trees' will be saved in the output directory.",
                     "help_text": "",
                     "fa_icon": "fas fa-copy",
-                    "hidden": true
+                    "hidden": false
                 },
                 "trimmomatic_keep_output": {
                     "type": "boolean",
@@ -442,19 +442,19 @@
                 },
                 "make_prg_keep_output": {
                     "type": "boolean",
-                    "default": false,
+                    "default": true,
                     "description": "If enabled, the output of process 'make_prg' will be saved in the output directory.",
                     "help_text": "process output for each sample is a single Pseudo-Reference-Genome fasta file holding the successfully assembled and annotated targets. These are worthile to retain.",
                     "fa_icon": "fas fa-copy",
-                    "hidden": true
+                    "hidden": false
                 },
                 "gblocks_keep_output": {
                     "type": "boolean",
-                    "default": false,
+                    "default": true,
                     "description": "If enabled, the output of process 'gblocks' will be saved in the output directory.",
                     "help_text": "",
                     "fa_icon": "fas fa-copy",
-                    "hidden": true
+                    "hidden": false
                 },
                 "testing_keep_output": {
                     "type": "boolean",
@@ -474,19 +474,19 @@
                 },
                 "iqtree_keep_output": {
                     "type": "boolean",
-                    "default": false,
+                    "default": true,
                     "description": "If enabled, the output of process 'iqtree' will be saved in the output directory.",
                     "help_text": "",
                     "fa_icon": "fas fa-copy",
-                    "hidden": true
+                    "hidden": false
                 },
                 "aster_keep_output": {
                     "type": "boolean",
-                    "default": false,
+                    "default": true,
                     "description": "If enabled, the output of process 'aster' will be saved in the output directory.",
                     "help_text": "",
                     "fa_icon": "fas fa-copy",
-                    "hidden": true
+                    "hidden": false
                 },
                 "macse_keep_output": {
                     "type": "boolean",
