@@ -10,11 +10,7 @@ process SPADES {
     tuple val(sample_id), path(fastq1), path(fastq2)
     
     output:
-    tuple val(sample_id), path('*.scaffolds.fa')    , optional:true, emit: scaffolds
-    tuple val(sample_id), path('*.contigs.fa')      , optional:true, emit: contigs
-    tuple val(sample_id), path('*.transcripts.fa')  , optional:true, emit: transcripts
-    tuple val(sample_id), path('*.gene_clusters.fa'), optional:true, emit: gene_clusters
-    tuple val(sample_id), path('*.assembly.gfa')    , optional:true, emit: gfa
+    tuple val(sample_id), path('contigs.fasta')      , emit: contigs
     tuple val(sample_id), path('*.log')                , emit: log
     path  "versions.yml"                          , emit: versions
 

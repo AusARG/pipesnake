@@ -273,12 +273,12 @@ workflow PIPESNAKE {
 
         
         TRINITY(
-        ch_prepared_reads
-        .join( CONCATENATE3
-                .out
-                .concatenated
-            )
-        .map{ it -> [it[0], it[3], it[2]] }
+            ch_prepared_reads
+            .join( CONCATENATE3
+                    .out
+                    .concatenated
+                )
+            .map{ it -> [it[0], it[3], it[2]] }
         )
 
         ch_assembly_out = TRINITY
