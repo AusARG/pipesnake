@@ -23,8 +23,7 @@ process MERGE_TREES {
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        cat: \$(cat -V | sed -n '1 p' | sed 's/gzip //g')
-        gzip: \$(gzip --version | sed -n '1 p' | sed 's/gzip //g')
+        BusyBox: v1.22.1
     END_VERSIONS
     """
 }

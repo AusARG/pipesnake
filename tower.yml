@@ -1,0 +1,7 @@
+reports:
+  "**/aster_tree_final":
+    display: "Asater report"
+    mimeType: "txt"
+  "**/software_versions.yml":
+    display: "Software versions"
+    mimeType: "txt"

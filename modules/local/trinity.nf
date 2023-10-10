@@ -30,7 +30,7 @@ process TRINITY {
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        Trinity: \$(Trinity --version | sed -n '1 p' | sed 's/Trinity version: //g')
+        trinity: \$(echo \$(Trinity --version | head -n 1 2>&1) | sed 's/^Trinity version: Trinity-v//' ))
     END_VERSIONS
     """
 }

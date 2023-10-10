@@ -49,7 +49,7 @@ process RAXML {
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        raxml : \$(raxmlHPC -v | sed -n '3 p')
+        raxml : \$(raxmlHPC -v | sed -n '3 p' | sed 's/This is RAxML version //g' | sed 's/ released by Alexandros Stamatakis on July 20 2016.//' )
     END_VERSIONS
     """
 }

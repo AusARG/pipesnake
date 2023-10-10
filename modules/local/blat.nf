@@ -25,7 +25,7 @@ process BLAT {
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        blat: \$(blat | sed -n '1 p' | sed 's/blat - Standalone BLAT //g' | sed 's/ fast sequence search command line tool/ /g')
+        blat: \$(blat | sed -n '1 p' | sed 's/blat - Standalone BLAT v. //g' | sed 's/ fast sequence search command line tool/ /g' )
     END_VERSIONS
     """
 }

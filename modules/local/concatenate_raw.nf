@@ -22,8 +22,7 @@ process CONCATENATE_RAW {
     zcat ${fastq2.join(" ")} | gzip -c > ${sample_id}_${name_suffix}_R2.${task.ext.fastq_suffix}.gz
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        zcat: \$(zcat -V | sed -n '1 p' | sed 's/gzip //g')
-        gzip: \$(gzip --version | sed -n '1 p' | sed 's/gzip //g')
+        BusyBox: v1.22.1
     END_VERSIONS
     """
 }
