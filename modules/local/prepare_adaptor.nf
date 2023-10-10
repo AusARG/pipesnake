@@ -25,7 +25,7 @@ process PREPARE_ADAPTOR {
 	    fa_file.write(">ad1\\n{}\\n>ad1_rc\\n{}\\n".format(f_adaptor_1, "".join([seq_dict[base] for base in reversed(f_adaptor_1)])))
 	    fa_file.write(">ad1\\n{}\\n>ad1_rc\\n{}\\n".format(f_adaptor_2, "".join([seq_dict[base] for base in reversed(f_adaptor_2)])))
 	with open ("versions.yml", "w") as version_file:
-	    version_file.write("${task.process}:\\n\\tpython: " + sys.version.split()[0].strip())
+	    version_file.write("\\"${task.process}\\":\\n    python: {}\\n".format(sys.version.split()[0].strip()))
     
     """
 }

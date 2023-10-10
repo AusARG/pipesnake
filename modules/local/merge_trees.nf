@@ -7,7 +7,7 @@ process MERGE_TREES {
         'biocontainers/python:3.8.3' }"
 
     input:
-    val(tree_list)
+    path(tree_list)
     
     output:
     path("AllLoci.trees"), emit: merged_trees

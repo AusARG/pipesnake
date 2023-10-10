@@ -24,8 +24,7 @@ process PEAR {
     
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        PEAR: \$(pear -h 2>&1 | sed -n '6 p' | awk '{print \$2}')
-        gzip: \$(gzip --version | sed -n '1 p' | sed 's/gzip //g')
+        pear: \$(pear -h | grep 'PEAR v' | sed 's/PEAR v//' | sed 's/ .*//' ))
     END_VERSIONS
     """
 }

@@ -8,7 +8,7 @@ process BBMAP_REFORMAT2 {
         'biocontainers/bbmap:39.01--h5c4e2a8_0' }"
 
     input:
-    val(fasta_ls) //, val(meta)
+    path(fasta_ls) //, val(meta)
     
     output:
     path "*.fasta", emit: reformated

@@ -8,7 +8,7 @@ process IQTREE {
         'biocontainers/iqtree:2.2.5--h21ec9f0_0' }"
 
     input:
-    val(fasta_ls)
+    path(fasta_ls)
     
     output:
     path("*.contree"), emit: contree

@@ -1,4 +1,4 @@
-process TRINITY_POSTPROCESSING {
+process ASSEMBLY_POSTPROCESSING {
     tag "$sample_id"
 
     conda "conda-forge::python=3.8.3"
@@ -7,10 +7,10 @@ process TRINITY_POSTPROCESSING {
         'biocontainers/python:3.8.3' }"
 
     input:
-    tuple val(sample_id), path(trinity_input)
+    tuple val(sample_id), path(assembly_input)
     
     output:
-    tuple val(sample_id), path ("${sample_id}_trinity_processed.fasta"), emit: processed
+    tuple val(sample_id), path ("${sample_id}_assembly_processed.fasta"), emit: processed
     path "versions.yml", emit: versions
 
 
@@ -18,14 +18,14 @@ process TRINITY_POSTPROCESSING {
     """
     #!/usr/bin/env python
     import sys
-    with open ("${trinity_input}", "r") as trinity_input:
-        with open ("${sample_id}_trinity_processed.fasta", "w") as trinity_processed:
+    with open ("${assembly_input}", "r") as assembly_input:
+        with open ("${sample_id}_assembly_processed.fasta", "w") as assembly_processed:
             contig_cntr = 1
-            for line in trinity_input:
+            for line in assembly_input:
                 if line[0] == ">":
-                    line = ">${sample_id}_${task.ext.trinity_header}{}\\n".format(contig_cntr)
+                    line = ">${sample_id}_${task.ext.assembly_header}{}\\n".format(contig_cntr)
                     contig_cntr += 1
-                trinity_processed.write(line)
+                assembly_processed.write(line)
     
     with open ("versions.yml", "w") as version_file:
         version_file.write("${task.process}:\\n\\tpython: " + sys.version.split()[0].strip())

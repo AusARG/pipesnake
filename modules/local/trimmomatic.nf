@@ -7,7 +7,7 @@ process TRIMMOMATIC {
         'biocontainers/trimmomatic:0.39--hdfd78af_2' }"
 
     input:
-    tuple val(sample_id), val(fastq1), val(fastq2), path(adaptor)
+    tuple val(sample_id), path(fastq1), path(fastq2), path(adaptor)
     
     output:
     tuple val(sample_id), path("*_R1_paired_trimmed.${task.ext.fastq_suffix}.gz"), path ("*_R2_paired_trimmed.${task.ext.fastq_suffix}.gz"), emit: trimmed_paired

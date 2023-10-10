@@ -7,7 +7,7 @@ process TRINITY {
         'biocontainers/trinity:2.15.1--hff880f7_1' }"
         
     input:
-    tuple val(sample_id), val(fastq1), val(fastq2)
+    tuple val(sample_id), path(fastq1), path(fastq2)
     
     output:
     tuple val(sample_id), path ("${sample_id}_trinity.tar.gz"), emit: trinity_dir

@@ -36,8 +36,8 @@
                 }
             }
         },
-        "reference_genome_options": {
-            "title": "Reference genome, Blat Database and general options",
+        "general_options": {
+            "title": "Filter genome, Blat Database and general options",
             "type": "object",
             "fa_icon": "fas fa-dna",
             "description": "Reference genome and and Blat Database related files and options required for the workflow.",
@@ -51,7 +51,7 @@
                     "fa_icon": "fa fa-cog",
                     "hidden": true
                 },
-                "reference_genome": {
+                "filter": {
                     "type": "string",
                     "format": "file-path",
                     "mimetype": "text/plain",
@@ -74,6 +74,14 @@
                     "default": "iqtree",
                     "fa_icon": "fas fa-question-circle",
                     "enum": ["iqtree", "raxml"]
+                },
+                "assembly": {
+                    "type": "string",
+                    "description": "The assembly to be used in the analysis.",
+                    "help_text": "Supported options are: 'trinity' or 'SPAdes'. Suggested Usage: trinity",
+                    "default": "trinity",
+                    "fa_icon": "fas fa-question-circle",
+                    "enum": ["trinity", "SPAdes"]
                 },
                 "trim_alignment": {
                     "type": "boolean",
@@ -296,10 +304,10 @@
                     "fa_icon": "fas fa-copy",
                     "hidden": true
                 },
-                "trinity_postprocessing_keep_output": {
+                "assembly_postprocessing_keep_output": {
                     "type": "boolean",
                     "default": false,
-                    "description": "If enabled, the output of process 'trinity_postprocessing' will be saved in the output directory.",
+                    "description": "If enabled, the output of process 'assembly_postprocessing' will be saved in the output directory.",
                     "help_text": "process output for each sample is a single fasta file containing all assembled contigs, as well as a directory with all Trinity output files (inchworm, jellyfish, read normalization files). Each sample directory can be very large (>3G), so we do not recommend retaining these files.",
                     "fa_icon": "fas fa-copy",
                     "hidden": true
@@ -317,14 +325,6 @@
                     "default": false,
                     "description": "If enabled, the output of process 'trimmomatic_clean_se' will be saved in the output directory.",
                     "help_text": "process output for each sample is a single unpaired fq.gz file. This is the result of leading/trailing read trimming.",
-                    "fa_icon": "fas fa-copy",
-                    "hidden": true
-                },
-                "prepare_samplesheet_keep_output": {
-                    "type": "boolean",
-                    "default": false,
-                    "description": "If enabled, the output of process 'prepare_samplesheet' will be saved in the output directory.",
-                    "help_text": "",
                     "fa_icon": "fas fa-copy",
                     "hidden": true
                 },
@@ -535,6 +535,14 @@
                     "help_text": "",
                     "fa_icon": "fas fa-copy",
                     "hidden": true
+                },
+                "spades_keep_output": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "If enabled, the output of process 'SPAdes' will be saved in the output directory.",
+                    "help_text": "",
+                    "fa_icon": "fas fa-copy",
+                    "hidden": true
                 }
             }
         },
@@ -579,14 +587,14 @@
                 }
             }
         },
-        "trinity_postprocessing_options": {
-            "title": "trinity_postprocessing options",
+        "assembly_postprocessing_options": {
+            "title": "assembly_postprocessing options",
             "type": "object",
             "fa_icon": "fa-solid fa-arrow-progress",
-            "description": "The configurations of the process trinity_postprocessing.",
+            "description": "The configurations of the process assembly_postprocessing.",
             "help_text": "",
             "properties": {
-                "trinity_processed_header": {
+                "assembly_processed_header": {
                     "type": "string",
                     "default": "contig",
                     "description": "Prefix for a contig of assembled reads",
@@ -594,32 +602,32 @@
                     "fa_icon": "fa fa-cog",
                     "hidden": true
                 },
-                "trinity_postprocessing_args": {
+                "assembly_postprocessing_args": {
                     "type": "string",
                     "description": "",
                     "help_text": "",
                     "fa_icon": "fa fa-cog",
                     "hidden": true
                 },
-                "trinity_postprocessing_cpus": {
+                "assembly_postprocessing_cpus": {
                     "type": "integer",
-                    "description": "The number of requested CPUs for the process (trinity_postprocessing).",
+                    "description": "The number of requested CPUs for the process (assembly_postprocessing).",
                     "help_text": "",
                     "fa_icon": "fas fa-microchip",
                     "hidden": true,
                     "default": 1
                 },
-                "trinity_postprocessing_memory": {
+                "assembly_postprocessing_memory": {
                     "type": "string",
-                    "description": "The requested memory for the process (trinity_postprocessing).",
+                    "description": "The requested memory for the process (assembly_postprocessing).",
                     "help_text": "",
                     "fa_icon": "fas fa-memory",
                     "hidden": true,
                     "default": "4.GB"
                 },
-                "trinity_postprocessing_walltime": {
+                "assembly_postprocessing_walltime": {
                     "type": "string",
-                    "description": "The requested walltime for the process (trinity_postprocessing).",
+                    "description": "The requested walltime for the process (assembly_postprocessing).",
                     "help_text": "",
                     "fa_icon": "far fa-clock",
                     "hidden": true,
@@ -706,47 +714,6 @@
                     "fa_icon": "far fa-clock",
                     "hidden": true,
                     "default": "4.h"
-                }
-            }
-        },
-        "prepare_samplesheet_options": {
-            "title": "prepare_samplesheet options",
-            "type": "object",
-            "fa_icon": "fa-solid fa-arrow-progress",
-            "description": "The configurations of the process prepare_samplesheet.",
-            "help_text": "",
-            "properties": {
-                "prepare_samplesheet_args": {
-                    "type": "string",
-                    "default": "",
-                    "description": "The arguments to be passed to process (prepare_samplesheet).",
-                    "help_text": "",
-                    "fa_icon": "fa fa-cog",
-                    "hidden": true
-                },
-                "prepare_samplesheet_cpus": {
-                    "type": "integer",
-                    "description": "The number of requested CPUs for the process (prepare_samplesheet).",
-                    "help_text": "",
-                    "fa_icon": "fas fa-microchip",
-                    "hidden": true,
-                    "default": 1
-                },
-                "prepare_samplesheet_memory": {
-                    "type": "string",
-                    "description": "The requested memory for the process (prepare_samplesheet).",
-                    "help_text": "",
-                    "fa_icon": "fas fa-memory",
-                    "hidden": true,
-                    "default": "8.GB"
-                },
-                "prepare_samplesheet_walltime": {
-                    "type": "string",
-                    "description": "The requested walltime for the process (prepare_samplesheet).",
-                    "help_text": "",
-                    "fa_icon": "far fa-clock",
-                    "hidden": true,
-                    "default": "12.h"
                 }
             }
         },
@@ -1854,14 +1821,55 @@
                     "default": "12.h"
                 }
             }
-        }        
+        },
+        "spades_options": {
+            "title": "spades options",
+            "type": "object",
+            "fa_icon": "fa-solid fa-arrow-progress",
+            "description": "The configurations of the process SPAdes.",
+            "help_text": "",
+            "properties": {
+                "spades_args": {
+                    "type": "string",
+                    "default": null,
+                    "description": "The arguments to be passed to process (SPAdes).",
+                    "help_text": "",
+                    "fa_icon": "fa fa-cog",
+                    "hidden": true
+                },
+                "spades_cpus": {
+                    "type": "integer",
+                    "description": "The number of requested CPUs for the process (SPAdes).",
+                    "help_text": "",
+                    "fa_icon": "fas fa-microchip",
+                    "hidden": true,
+                    "default": 6
+                },
+                "spades_memory": {
+                    "type": "string",
+                    "description": "The requested memory for the process (SPAdes).",
+                    "help_text": "",
+                    "fa_icon": "fas fa-memory",
+                    "hidden": true,
+                    "default": "24.GB"
+                },
+                "spades_walltime": {
+                    "type": "string",
+                    "description": "The requested walltime for the process (SPAdes).",
+                    "help_text": "",
+                    "fa_icon": "far fa-clock",
+                    "hidden": true,
+                    "default": "12.h"
+                }
+            }
+        }      
     },
     "allOf": [
         {
             "$ref": "#/definitions/input_output_options"
         },
         {
-            "$ref": "#/definitions/reference_genome_options"
+            "$ref": "#/definitions/general_options"
         },
         {
             "$ref": "#/definitions/institutional_config_options"
@@ -1876,19 +1884,16 @@
             "$ref": "#/definitions/saved_output_options"
         },
         {
-        "$ref": "#/definitions/phylogeny_make_alignments_options"
+            "$ref": "#/definitions/phylogeny_make_alignments_options"
         },
         {
-            "$ref": "#/definitions/trinity_postprocessing_options"
+            "$ref": "#/definitions/assembly_postprocessing_options"
         },
         {
             "$ref": "#/definitions/trimmomatic_clean_pe_options"
         },
         {
             "$ref": "#/definitions/trimmomatic_clean_se_options"
-        },
-        {
-            "$ref": "#/definitions/prepare_samplesheet_options"
         },
         {
             "$ref": "#/definitions/parse_blat_results_options"
@@ -1964,6 +1969,9 @@
         },
         {
             "$ref": "#/definitions/sed_options"
+        },
+        {
+            "$ref": "#/definitions/spades_options"
         }
     ]
 }

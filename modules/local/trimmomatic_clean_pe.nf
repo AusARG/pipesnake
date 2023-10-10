@@ -8,7 +8,7 @@ process TRIMMOMATIC_CLEAN_PE {
 
 
     input:
-    tuple val(sample_id), val(fastq1), val(fastq2)
+    tuple val(sample_id), path(fastq1), path(fastq2)
     
     output:
     tuple val(sample_id), path("*_R1_paired_trimmed_cleaned.${task.ext.fastq_suffix}.gz"), path ("*_R2_paired_trimmed_cleaned.${task.ext.fastq_suffix}.gz"), emit: trimmed_cleaned_paired

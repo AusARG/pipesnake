@@ -8,7 +8,7 @@ process GBLOCKS {
         'biocontainers/gblocks:0.91b--h9ee0642_2' }"
 
     input:
-    val(fasta_ls)
+    path(fasta_ls)
     
     output:
     path("*-gb"), emit: trimmed_allignments

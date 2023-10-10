@@ -11,7 +11,7 @@ WorkflowPipesnake.initialise(params, log)
 
 // TODO nf-core: Add all file path parameters for the pipeline to the list below
 // Check input path parameters to see if they exist
-def checkPathParamList = [ params.input, params.reference_genome, params.blat_db ]
+def checkPathParamList = [ params.input, params.filter, params.blat_db ]
 for (param in checkPathParamList) { if (param) { file(param, checkIfExists: true) } }
 
 // Check mandatory parameters
@@ -26,8 +26,6 @@ for (param in checkPathParamList) { if (param) { file(param, checkIfExists: true
 include { BBMAP_DEDUPE } from '../modules/local/bbmap_dedupe'
 include { PREPARE_ADAPTOR } from '../modules/local/prepare_adaptor'
 
-include { INPUT_CHECK } from '../subworkflows/local/input_check'
-include { PREPARE_SAMPLESHEET } from '../modules/local/prepare_samplesheet'
 include { BBMAP_REFORMAT } from '../modules/local/bbmap_reformat'
 include { TRIMMOMATIC } from '../modules/local/trimmomatic'
 include { PEAR } from '../modules/local/pear'
@@ -40,12 +38,11 @@ include {TRIMMOMATIC_CLEAN_SE} from '../modules/local/trimmomatic_clean_se'
 
 include {BBMAP_FILTER} from '../modules/local/bbmap_filter'
 include {TRINITY} from '../modules/local/trinity'
-include {TRINITY_POSTPROCESSING} from '../modules/local/trinity_postprocessing'
+include {ASSEMBLY_POSTPROCESSING} from '../modules/local/assembly_postprocessing'
 include {BLAT} from '../modules/local/blat'
 include {BLAT as BLAT2} from '../modules/local/blat'
 include {PARSE_BLAT_RESULTS} from '../modules/local/parse_blat_results'
 include {MAFFT} from '../modules/local/mafft'
-include { MACSE } from '../modules/local/macse'
 include {PERL_CLEANUP} from '../modules/local/perl_cleanup'
 
 include {MAKE_PRG} from '../modules/local/make_prg'
@@ -53,13 +50,15 @@ include {QUALITY_2_ASSEMBLY} from '../modules/local/quality_2_assembly'
 include {PHYLOGENY_MAKE_ALIGNMENTS} from '../modules/local/phylogeny_make_alignments'
 include { GBLOCKS } from '../modules/local/gblocks'
 
-include { CONVERT_PHYML } from '../modules/local/convert_phyml'
+//include { CONVERT_PHYML } from '../modules/local/convert_phyml'
 include { RAXML } from '../modules/local/raxml'
 include { IQTREE } from '../modules/local/iqtree'
 include { SED } from '../modules/local/sed'
 include { BBMAP_REFORMAT2 } from '../modules/local/bbmap_reformat2.nf'
 include { MERGE_TREES } from '../modules/local/merge_trees.nf'
 include { ASTER } from '../modules/local/aster.nf'
+include { SPADES } from '../modules/local/spades.nf'
+include { CUSTOM_DUMPSOFTWAREVERSIONS } from '../modules/nf-core/custom/dumpsoftwareversions/main'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -78,7 +77,6 @@ include { ASTER } from '../modules/local/aster.nf'
 */
 
 // Info required for completion email and summary
-def multiqc_report = []
 
 workflow PIPESNAKE {
 
@@ -152,9 +150,9 @@ workflow PIPESNAKE {
     .set{ch_prepared_fastq}
     
     Channel
-        .fromPath(params.reference_genome, checkIfExists:true)
+        .fromPath(params.filter, checkIfExists:true)
         .collect()
-        .set{ch_reference_genome}
+        .set{ch_filter}
     
     Channel
         .fromPath(params.blat_db, checkIfExists:true)
@@ -167,6 +165,7 @@ workflow PIPESNAKE {
     PREPARE_ADAPTOR( ch_meta )
     .adaptor
     .set{ adaptor_ch }
+
 
     BBMAP_DEDUPE( ch_prepared_fastq )
     .deduplicates
@@ -216,6 +215,7 @@ workflow PIPESNAKE {
         unpaired_concatenated_ch
     )
 
+    
 
 
     // The step below seems just to concatenate files but not using them any more. Maybe we cancel it.
@@ -237,9 +237,10 @@ workflow PIPESNAKE {
             TRIMMOMATIC_CLEAN_PE
             .out
             .trimmed_cleaned_paired
-            , ch_reference_genome
+            , ch_filter
         )
 
+        ch_versions = ch_versions.mix( BBMAP_FILTER.out.versions)
         ch_prepared_reads = BBMAP_FILTER
         .out
         .prepared_reads
@@ -261,23 +262,45 @@ workflow PIPESNAKE {
         , Channel.value("trinity_r1_unpaired_concatenated")
     )
 
-    TRINITY(
+    
+    if (params.assembly == "SPAdes"){
+        SPADES(
+            ch_prepared_reads
+            .join( CONCATENATE3
+                    .out
+                    .concatenated
+                )
+            .map{ it -> [it[0], it[3], it[2]] }
+        )
+
+        ch_versions = ch_versions.mix(SPADES.out.versions)
+        ch_assembly_out = SPADES
+        .out
+        .contigs
+     } else {    
+        TRINITY(
         ch_prepared_reads
         .join( CONCATENATE3
                 .out
                 .concatenated
-        )
+            )
         .map{ it -> [it[0], it[3], it[2]] }
-    )
+        )
 
-    TRINITY_POSTPROCESSING(
-        TRINITY
+        ch_assembly_out = TRINITY
         .out
         .trinity_fasta
+        
+        ch_versions = ch_versions.mix(TRINITY.out.versions)
+    }
+    
+
+    ASSEMBLY_POSTPROCESSING(
+        ch_assembly_out
     )
     
     BLAT(
-        TRINITY_POSTPROCESSING
+        ASSEMBLY_POSTPROCESSING
         .out
         .processed
         , ch_blat_db
@@ -288,7 +311,7 @@ workflow PIPESNAKE {
     )
 
     BLAT2(
-        TRINITY_POSTPROCESSING
+        ASSEMBLY_POSTPROCESSING
         .out
         .processed
         , ch_blat_db
@@ -300,7 +323,7 @@ workflow PIPESNAKE {
     
     
     PARSE_BLAT_RESULTS(
-        TRINITY_POSTPROCESSING
+        ASSEMBLY_POSTPROCESSING
         .out
         .processed
         .join(BLAT.out.matches)
@@ -308,7 +331,7 @@ workflow PIPESNAKE {
     )
     
     MAKE_PRG(
-        TRINITY_POSTPROCESSING
+        ASSEMBLY_POSTPROCESSING
         .out
         .processed
         .join(
@@ -318,7 +341,7 @@ workflow PIPESNAKE {
     )
 
     QUALITY_2_ASSEMBLY(
-        TRINITY_POSTPROCESSING
+        ASSEMBLY_POSTPROCESSING
         .out
         .processed
         .join(
@@ -346,6 +369,8 @@ workflow PIPESNAKE {
         )
         .trimmed_allignments
         .set{ch_alignment}
+        
+    ch_versions = ch_versions.mix(GBLOCKS.out.versions)
     } else{
         ch_alignment = MAFFT.out.aligned.map{if (params.batching_size == 1) [it] else it}
     }
@@ -359,12 +384,15 @@ workflow PIPESNAKE {
             BBMAP_REFORMAT2.out.reformated.map{if (params.batching_size == 1) [it] else it}
         )
         ch_all_trees = RAXML.out.tree_bipartitions.flatten().toSortedList()
-
+        
+        ch_versions = ch_versions.mix(RAXML.out.versions)
     }else if (params.tree_method == 'iqtree'){
         IQTREE(
             BBMAP_REFORMAT2.out.reformated.map{if (params.batching_size == 1) [it] else it}
         )
         ch_all_trees = IQTREE.out.contree.flatten().toSortedList()
+        
+        ch_versions = ch_versions.mix(IQTREE.out.versions)
     }
 
     MERGE_TREES(
@@ -375,6 +403,42 @@ workflow PIPESNAKE {
         MERGE_TREES.out.merged_trees
     )
 
+
+    ch_versions = ch_versions.mix(BBMAP_DEDUPE.out.versions)
+    ch_versions = ch_versions.mix(PREPARE_ADAPTOR.out.versions)
+    ch_versions = ch_versions.mix(BBMAP_REFORMAT.out.versions)
+    ch_versions = ch_versions.mix(TRIMMOMATIC.out.versions)
+    ch_versions = ch_versions.mix(PEAR.out.versions)
+    
+    ch_versions = ch_versions.mix(CONCATENATE.out.versions)
+    ch_versions = ch_versions.mix(CONCATENATE_RAW.out.versions)
+    ch_versions = ch_versions.mix(CONCATENATE2.out.versions)
+    ch_versions = ch_versions.mix(CONCATENATE3.out.versions)
+    ch_versions = ch_versions.mix( TRIMMOMATIC_CLEAN_PE.out.versions)
+    ch_versions = ch_versions.mix( TRIMMOMATIC_CLEAN_SE.out.versions)
+
+    
+    ch_versions = ch_versions.mix( ASSEMBLY_POSTPROCESSING.out.versions)
+    ch_versions = ch_versions.mix( BLAT.out.versions)
+    ch_versions = ch_versions.mix( BLAT2.out.versions)
+    ch_versions = ch_versions.mix( PARSE_BLAT_RESULTS.out.versions)
+    ch_versions = ch_versions.mix( MAFFT.out.versions)
+    //ch_versions = ch_versions.mix( PERL_CLEANUP.out.versions)
+
+    ch_versions = ch_versions.mix( MAKE_PRG.out.versions)
+    ch_versions = ch_versions.mix( QUALITY_2_ASSEMBLY.out.versions)
+    ch_versions = ch_versions.mix( PHYLOGENY_MAKE_ALIGNMENTS.out.versions)
+    
+    //ch_versions = ch_versions.mix(CONVERT_PHYML.out.versions)
+    ch_versions = ch_versions.mix(SED.out.versions)
+    ch_versions = ch_versions.mix(BBMAP_REFORMAT2.out.versions)
+    ch_versions = ch_versions.mix(MERGE_TREES.out.versions)
+    ch_versions = ch_versions.mix(ASTER.out.versions)
+
+
+    CUSTOM_DUMPSOFTWAREVERSIONS (
+        ch_versions.unique().collectFile(name: 'collated_versions.yml')
+    )
 }
 
 /*

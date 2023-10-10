@@ -9,7 +9,7 @@ process MAFFT {
 
 
     input:
-    val (fasta_ls)
+    path (fasta_ls)
     
     output:
     path("*fasta.aln"), emit: aligned

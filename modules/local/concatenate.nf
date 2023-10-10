@@ -7,7 +7,7 @@ process CONCATENATE {
         'biocontainers/pigz:2.3.4' }"
 
     input:
-    tuple val(sample_id), val(fastq)
+    tuple val(sample_id), path(fastq)
     val(name_suffix)
     
     output:

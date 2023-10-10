@@ -9,7 +9,7 @@ process RAXML {
       
 
     input:
-    val(fasta_ls)
+    path(fasta_ls)
     
     output:
     path("RAxML_info.*"), emit: tree_info

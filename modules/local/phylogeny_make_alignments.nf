@@ -7,7 +7,7 @@ process PHYLOGENY_MAKE_ALIGNMENTS {
         'biocontainers/python:3.8.3' }"
 
     input:
-    val (lineage_list)
+    path (lineage_list)
     
     output:
     path("locus_data.csv"), emit: locus_info

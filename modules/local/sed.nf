@@ -8,7 +8,7 @@ process SED {
         'biocontainers/python:3.8.3' }"
 
     input:
-    val (fasta_ls)
+    path (fasta_ls)
     
     output:
     path("*.sed.fasta"), emit: seded
