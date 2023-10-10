@@ -45,7 +45,7 @@ process CONVERT_PHYML {
     
     
     with open ("versions.yml", "w") as version_file:
-        version_file.write("${task.process}:\\n\\tpython: " + sys.version.split()[0].strip())
+	    version_file.write("\\"${task.process}\\":\\n    python: {}\\n".format(sys.version.split()[0].strip()))
     
     """
 }
