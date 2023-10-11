@@ -149,11 +149,15 @@ workflow PIPESNAKE {
     )
     .set{ch_prepared_fastq}
     
-    Channel
+    if (!params.disable_filter){
+        Channel
         .fromPath(params.filter, checkIfExists:true)
         .collect()
         .set{ch_filter}
-    
+    }else{
+        Channel.empty().set{ch_filter}
+    }
+
     Channel
         .fromPath(params.blat_db, checkIfExists:true)
         .collect()
