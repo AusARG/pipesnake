@@ -149,7 +149,7 @@ workflow PIPESNAKE {
     )
     .set{ch_prepared_fastq}
     
-    if (!params.disable_filter){
+    if (params.filter){
         Channel
         .fromPath(params.filter, checkIfExists:true)
         .collect()
@@ -222,7 +222,7 @@ workflow PIPESNAKE {
 
     
 
-    if (!params.disable_filter){
+    if (params.filter){
         BBMAP_FILTER(
             TRIMMOMATIC_CLEAN_PE
             .out

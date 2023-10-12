@@ -18,10 +18,11 @@ class WorkflowPipesnake {
             System.exit(1)
         }
 
+        /*
         if (!params.disable_filter && !params.filter) {
             log.error "filter file is not specified with e.g. '--filter rf.fasta' or via a detectable config file. This parameter is mandatory unless the filter is disabled using `--disable_filter true`." 
             System.exit(1)
-        }
+        }*/
 
         if (!params.input) {
             log.error "Input directory containing fastq files is not specified with e.g. '--input all-samples/' or via a detectable config file."

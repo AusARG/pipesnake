@@ -43,14 +43,6 @@
             "description": "Reference genome and and Blat Database related files and options required for the workflow.",
             "required": ["blat_db"],
             "properties": {
-                "disable_filter": {
-                    "type": "boolean",
-                    "default": true,
-                    "description": "Disable bbmap filtration process. This speed up the performance. When enabled, the reference genome parameter is reqiured.",
-                    "help_text": "",
-                    "fa_icon": "fa fa-cog",
-                    "hidden": true
-                },
                 "filter": {
                     "type": "string",
                     "format": "file-path",
