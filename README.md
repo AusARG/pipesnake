@@ -55,9 +55,9 @@ If you use `pipesnake`, please consider citing it and its depenedencies.
 
 > *pipesnake: Generalized software for the assembly and analysis of phylogenomic datasets from conserved genomic loci*
 >
-> Name1, Name2, Name3
+> Brennan, I.G., Singhal, S., Al Bkhetan, Z. 
 >
-> A journal. Maybe bioRxiv.
+> *in review*
 
 <!-- TODO nf-core: Add citation for pipeline after first release. Uncomment lines below and update Zenodo doi and badge at the top of this file. -->
 <!-- If you use  ausarg/pipesnake for your analysis, please cite it using the following doi: [10.5281/zenodo.XXXXXX](https://doi.org/10.5281/zenodo.XXXXXX) -->
