@@ -433,12 +433,13 @@ workflow PIPESNAKE {
     ch_versions = ch_versions.mix(SED.out.versions)
     ch_versions = ch_versions.mix(BBMAP_REFORMAT2.out.versions)
     ch_versions = ch_versions.mix(MERGE_TREES.out.versions)
-    //ch_versions = ch_versions.mix(ASTER.out.versions)
+    /*ch_versions = ch_versions.mix(ASTER.out.versions)
 
 
     CUSTOM_DUMPSOFTWAREVERSIONS (
         ch_versions.unique().collectFile(name: 'collated_versions.yml')
     )
+    */
 }
 
 /*
