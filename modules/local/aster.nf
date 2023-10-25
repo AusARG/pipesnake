@@ -3,8 +3,8 @@ process ASTER {
 
     conda "bioconda::aster=1.15"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/aster:1.15--h9f5acd7_0' :
-        'biocontainers/aster:1.15--h9f5acd7_1' }"
+        'https://depot.galaxyproject.org/singularity/aster:1.15--h4ac6f70_2' :
+        'biocontainers/aster:1.15--h4ac6f70_2' }"
 
     input:
     path all_trees
