@@ -399,10 +399,11 @@ workflow PIPESNAKE {
         ch_all_trees
     )
 
+    /*
     ASTER(
         MERGE_TREES.out.merged_trees
     )
-
+    */
 
     ch_versions = ch_versions.mix(BBMAP_DEDUPE.out.versions)
     ch_versions = ch_versions.mix(PREPARE_ADAPTOR.out.versions)
@@ -432,7 +433,7 @@ workflow PIPESNAKE {
     ch_versions = ch_versions.mix(SED.out.versions)
     ch_versions = ch_versions.mix(BBMAP_REFORMAT2.out.versions)
     ch_versions = ch_versions.mix(MERGE_TREES.out.versions)
-    ch_versions = ch_versions.mix(ASTER.out.versions)
+    //ch_versions = ch_versions.mix(ASTER.out.versions)
 
 
     CUSTOM_DUMPSOFTWAREVERSIONS (
