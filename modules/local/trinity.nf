@@ -10,7 +10,7 @@ process TRINITY {
     tuple val(sample_id), path(fastq1), path(fastq2)
     
     output:
-    //tuple val(sample_id), path ("${sample_id}_trinity.tar.gz"), emit: trinity_dir
+    tuple val(sample_id), path ("${sample_id}_trinity.tar.gz"), emit: trinity_dir
     tuple val(sample_id), path ("${sample_id}_trinity.Trinity.fasta"), emit: trinity_fasta
     path "versions.yml", emit: versions
 
