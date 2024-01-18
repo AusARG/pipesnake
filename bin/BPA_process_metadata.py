@@ -115,9 +115,9 @@ def BPA_sample_info(args):
     info["adaptor2"] = args.adaptor2
     
     # Split files into two dataframes to merge later
-    file_ids_f = file_ids[file_ids["direction"] == "R1"]
-    file_ids_r = file_ids[file_ids["direction"] == "R2"]
-    
+    file_ids_f = file_ids[file_ids["direction"] == "R1"].copy()
+    file_ids_r = file_ids[file_ids["direction"] == "R2"].copy()
+
     # Get the appropriate barcodes
     file_ids_f["barcode"] = file_ids_f["sample_id"].apply(lambda x: info.loc[info["sample_id"] == x, "library_index_seq"].values[0])
     file_ids_r["barcode"] = file_ids_r["sample_id"].apply(lambda x: info.loc[info["sample_id"] == x, "library_index_seq_dual"].values[0])
@@ -134,6 +134,8 @@ def BPA_sample_info(args):
     file_id_combo = pd.concat([file_ids_f, file_ids_r])
     file_id_combo = file_id_combo[["filename", "sample_id", "direction", "lane_no", "barcode", "adaptor", "lineage"]]
     
+    ####
+    
     # Write the file_id_combo to file
     file_id_combo.to_csv("BPA_ReadFileInfo.csv", index=False)
     
@@ -142,24 +144,33 @@ def BPA_sample_info(args):
     no_samps = file_id_combo["sample_id"].unique()
     
     # Create an empty sample info dataframe
-    samp_info = pd.DataFrame()
+    samp_info = []
     
     # Run a loop across the file_id_combo file making a traditional sample_info.csv file
     for lane in no_lanes:
         curr_lane = file_id_combo[file_id_combo["lane_no"] == lane]
         for samp in no_samps:
             curr_samp = curr_lane[curr_lane["sample_id"] == samp]
-            samp_info = samp_info.append({
-                "sample_id": samp,
-                "read1": os.path.join(indir, curr_samp.loc[curr_samp["direction"] == "R1", "filename"].values[0]),
-                "read2": os.path.join(indir, curr_samp.loc[curr_samp["direction"] == "R2", "filename"].values[0]),
-                "barcode1": curr_samp.loc[curr_samp["direction"] == "R1", "barcode"].values[0],
-                "barcode2": curr_samp.loc[curr_samp["direction"] == "R2", "barcode"].values[0],
-                "adaptor1": args.adaptor1,
-                "adaptor2": args.adaptor2,
-                "lineage": curr_samp["lineage"].values[0]
-            }, ignore_index=True)
-    #samp_info['read1'] = args.indir + "/" + samp_info['read1']
+            
+            # Check if curr_samp is not empty before accessing values
+            if not curr_samp.empty:
+                samp_info.append({
+                    "sample_id": samp,
+                    "read1": os.path.join(indir, curr_samp.loc[curr_samp["direction"] == "R1", "filename"].values[0]),
+                    "read2": os.path.join(indir, curr_samp.loc[curr_samp["direction"] == "R2", "filename"].values[0]),
+                    "barcode1": curr_samp.loc[curr_samp["direction"] == "R1", "barcode"].values[0],
+                    "barcode2": curr_samp.loc[curr_samp["direction"] == "R2", "barcode"].values[0],
+                    "adaptor1": args.adaptor1,
+                    "adaptor2": args.adaptor2,
+                    "lineage": curr_samp["lineage"].values[0]
+                })
+    
+    # Convert the list of dictionaries to a DataFrame
+    samp_info = pd.DataFrame(samp_info)
+    
+    # Reset the index
+    samp_info.reset_index(drop=True, inplace=True)
+    
     # Write the sample info dataframe to file
     samp_info.to_csv("BPA_SampleInfo.csv", index=False)
 
