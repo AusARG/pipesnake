@@ -19,7 +19,7 @@ process MAFFT {
     """
     for fasta in ${fasta_ls.join(' ')}; do
         f_out="\$(basename -- "\$fasta" | sed 's/\\(.*\\)\\..*/\\1/')"
-        mafft ${task.ext.args} \${fasta} > \${f_out}.fasta.aln  
+        mafft --thread -1 ${task.ext.args} \${fasta} > \${f_out}.fasta.aln  
 
     done
 
