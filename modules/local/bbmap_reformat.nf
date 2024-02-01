@@ -23,7 +23,7 @@ process BBMAP_REFORMAT {
     }
 
     """
-    reformat.sh -Xmx${avail_mem}M threads=${task.cpus} in=${fastq} \
+    reformat.sh -Xmx${avail_mem}M threads=auto in=${fastq} \
         out1=${sample_id}_R1_reformated.${task.ext.fastq_suffix}.gz \
         out2=${sample_id}_R2_reformated.${task.ext.fastq_suffix}.gz \
         ${task.ext.args}

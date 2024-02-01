@@ -31,7 +31,7 @@ tag "$sample_id"
         ref=${reference_genome} \
         outm1=${sample_id}_R1_bbmap.${task.ext.fastq_suffix}.gz \
         outm2=${sample_id}_R2_bbmap.${task.ext.fastq_suffix}.gz \
-        ${task.ext.args} threads=${task.cpus}
+        ${task.ext.args} threads=auto
 						
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

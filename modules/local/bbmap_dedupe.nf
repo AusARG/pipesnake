@@ -29,7 +29,7 @@ process BBMAP_DEDUPE {
     }
 
     """
-    dedupe.sh -Xmx${avail_mem}M ${input}  out=${sample_id}_deduped.${task.ext.fastq_suffix}.gz outd=${sample_id}_duplicates.${task.ext.fastq_suffix}.gz ${task.ext.args} threads=${task.cpus} 
+    dedupe.sh -Xmx${avail_mem}M ${input}  out=${sample_id}_deduped.${task.ext.fastq_suffix}.gz outd=${sample_id}_duplicates.${task.ext.fastq_suffix}.gz ${task.ext.args} threads=auto 
     
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

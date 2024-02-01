@@ -19,7 +19,6 @@ process TRIMMOMATIC {
     
     """
     trimmomatic PE \
-        -threads ${task.cpus} \
         ${fastq1} \
         ${fastq2} \
         ${sample_id}_R1_paired_trimmed.${task.ext.fastq_suffix}.gz \

@@ -23,7 +23,7 @@ process SPADES {
     spades.py \
         -1 ${fastq1} \
         -2 ${fastq2} \
-        --threads $task.cpus \
+        --threads ${task.cpus} \
         --memory $maxmem \
         -o ./ \
         ${task.ext.args} \

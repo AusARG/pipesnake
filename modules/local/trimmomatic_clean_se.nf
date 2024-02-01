@@ -19,7 +19,6 @@ process TRIMMOMATIC_CLEAN_SE {
     
     """
     trimmomatic SE \
-        -threads ${task.cpus} \
         ${fastq} \
         ${sample_id}_unpaired_trimmed_cleaned_se.${task.ext.fastq_suffix}.gz \
         ${task.ext.args}

@@ -7,25 +7,26 @@ process PREPARE_ADAPTOR {
         'biocontainers/python:3.8.3' }"
 
     input:
-    tuple val(sample_id), val(meta_info)
+    val(samples_info)
 
     output:
-    tuple val(sample_id), path ("${sample_id}.fa") , emit: adaptor
+    path ("*.fa") , emit: adaptor
     path "versions.yml", emit: versions
 
-    
     script:
     """
 	#!/usr/bin/env python
 	import sys
 	seq_dict = {'A':'T','T':'A','G':'C','C':'G'}
-	f_adaptor_1 = "${meta_info[0]}".replace("*", "${meta_info[2]}")
-	f_adaptor_2 = "${meta_info[1]}".replace("*", "${meta_info[3]}")
-	with open ("${sample_id}.fa", "w") as fa_file:
-	    fa_file.write(">ad1\\n{}\\n>ad1_rc\\n{}\\n".format(f_adaptor_1, "".join([seq_dict[base] for base in reversed(f_adaptor_1)])))
-	    fa_file.write(">ad1\\n{}\\n>ad1_rc\\n{}\\n".format(f_adaptor_2, "".join([seq_dict[base] for base in reversed(f_adaptor_2)])))
+	for sample_info in ${samples_info.collect{"[${it.collect{x -> "\"$x\""}.join(", ")}]"}.toString()}:
+        f_adaptor_1 = sample_info[1].replace("*", sample_info[3])
+        f_adaptor_2 = sample_info[2].replace("*", sample_info[4])
+        with open (sample_info[0] + ".fa", "w") as fa_file:
+            fa_file.write(">ad1\\n{}\\n>ad1_rc\\n{}\\n".format(f_adaptor_1, "".join([seq_dict[base] for base in reversed(f_adaptor_1)])))
+            fa_file.write(">ad1\\n{}\\n>ad1_rc\\n{}\\n".format(f_adaptor_2, "".join([seq_dict[base] for base in reversed(f_adaptor_2)])))
 	with open ("versions.yml", "w") as version_file:
 	    version_file.write("\\"${task.process}\\":\\n    python: {}\\n".format(sys.version.split()[0].strip()))
     
     """
 }
+

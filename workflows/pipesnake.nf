@@ -91,7 +91,9 @@ workflow PIPESNAKE {
         .fromPath(params.input, checkIfExists:true)
         .splitCsv(header:true, strip:true)
         .map {row -> tuple(
-                row.sample_id, row.read1, row.read2, 
+                row.sample_id, 
+                file(row.read1, checkIfExists: true), 
+                file(row.read2, checkIfExists: true), 
                 row.adaptor1, row.adaptor2, row.barcode1, row.barcode2, row.lineage
                 ) 
              }
@@ -101,8 +103,14 @@ workflow PIPESNAKE {
     //ch_sample_sheet.map{it -> [it[0], it[1][4]]}.set{ch_lineage}
     //ch_sample_sheet.view()
     //ch_sample_sheet_raw.view()
+    ch_sample_sheet_raw.map{it[7]}.unique().count().view()
 
-    
+    /*
+    if (ch_sample_sheet_raw.map{it[7]}.unique().count() != ch_sample_sheet_raw.count()){
+            exit 1, "Looks like the smaple sheet has duplicate lineages, Lineage column should be unique!"
+    }
+    */
+
     ch_sample_sheet_raw.groupTuple().map{
         if (it[3].unique().size() != 1){
             exit 1, "Adaptor1 for the sample ${it[0]} should be unique across all records for this sample!"
@@ -166,8 +174,11 @@ workflow PIPESNAKE {
     //ch_meta.view()
     //println("dfdfdf");
     //ch_lineage.view()
-    PREPARE_ADAPTOR( ch_meta )
+    
+    PREPARE_ADAPTOR( ch_meta.map{[it[0], it[1][0], it[1][1], it[1][2], it[1][3]]}.toList())
     .adaptor
+    .flatten()
+    .map{[it.getSimpleName(), it]}
     .set{ adaptor_ch }
 
 
@@ -455,6 +466,7 @@ workflow.onComplete {
         NfcoreTemplate.IM_notification(workflow, params, summary_params, projectDir, log)
     }
 }
+
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

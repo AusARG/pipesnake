@@ -35,7 +35,7 @@ process IQTREE {
             then
                 echo "\$fasta" >> fasta_few_specieis.txt
             else
-                iqtree -s \${fasta} -T ${task.cpus} ${task.ext.args} -pre \$(basename "\$fasta")
+                iqtree -s \${fasta} -T AUTO ${task.ext.args} -pre \$(basename "\$fasta")
             fi
         else
             echo "\$fasta" >> empty_fastq.txt
