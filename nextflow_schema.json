@@ -45,7 +45,7 @@
             "properties": {
                 "stage": {
                     "type": "string",
-                    "description": "The stage to start the workflow from ('from-start' or 'from-prg').",
+                    "description": "The stage to start the workflow from ('from-start' or 'from-prg'). By default the workflow runs 'from-start' meaning it looks for a sample info file with paths to raw reads. If '--stage from-prg' is specified the workflow looks for a modified sample info file with paths to PRG files.",
                     "help_text": ".",
                     "fa_icon": "fas fa-question-circle",
                     "default": "from-start",
