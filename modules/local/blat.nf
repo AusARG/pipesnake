@@ -4,7 +4,7 @@ process BLAT {
     conda "bioconda::blat=36-0"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/blat:36--0' :
-        'biocontainers/blat:36--0' }"
+        'quay.io/biocontainers/blat:36--0' }"
 
     input:
     tuple val(sample_id), path(fasta)

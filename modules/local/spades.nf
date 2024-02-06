@@ -4,7 +4,7 @@ process SPADES {
     conda "bioconda::spades=3.15.5"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/spades:3.15.5--h95f258a_1' :
-        'biocontainers/spades:3.15.5--h95f258a_1' }"
+        'quay.io/biocontainers/spades:3.15.5--h95f258a_1' }"
         
     input:
     tuple val(sample_id), path(fastq1), path(fastq2)

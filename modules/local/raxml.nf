@@ -4,7 +4,7 @@ process RAXML {
     conda "bioconda::raxml=8.2.12"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/raxml:8.2.9--hec16e2b_5' :
-        'biocontainers/raxml:8.2.9--h516909a_3' }"
+        'quay.io/biocontainers/raxml:8.2.9--h516909a_3' }"
 
       
 

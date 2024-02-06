@@ -4,7 +4,7 @@ process BBMAP_REFORMAT {
     conda "bioconda::bbmap=39.01"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/bbmap:39.01--h5c4e2a8_0':
-        'biocontainers/bbmap:39.01--h5c4e2a8_0' }"
+        'quay.io/biocontainers/bbmap:39.01--h5c4e2a8_0' }"
 
     input:
     tuple val(sample_id), path(fastq) //, val(meta)

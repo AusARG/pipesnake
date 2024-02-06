@@ -4,7 +4,7 @@ process PERL_CLEANUP {
     conda "conda-forge::perl=5.32.1"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/perl:5.26.2' :
-        'biocontainers/perl:5.26.2' }"
+        'quay.io/biocontainers/perl:5.26.2' }"
 
     input:
     tuple val(sample_id), path(fasta) //, val(meta)

@@ -4,7 +4,7 @@ process CONCATENATE {
     conda "conda-forge::pigz=2.3.4"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/pigz:2.3.4' :
-        'biocontainers/pigz:2.3.4' }"
+        'quay.io/biocontainers/pigz:2.3.4' }"
 
     input:
     tuple val(sample_id), path(fastq)

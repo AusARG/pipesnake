@@ -5,7 +5,7 @@ process MAFFT {
     conda "bioconda::mafft=7.520"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/mafft:7.520--hec16e2b_0':
-        'biocontainers/mafft:7.520--hec16e2b_0' }"
+        'quay.io/biocontainers/mafft:7.520--hec16e2b_0' }"
 
 
     input:

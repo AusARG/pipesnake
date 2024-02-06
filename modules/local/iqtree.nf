@@ -5,7 +5,7 @@ process IQTREE {
     conda "bioconda::iqtree=2.2.5"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/iqtree:2.2.5--h21ec9f0_0' :
-        'biocontainers/iqtree:2.2.5--h21ec9f0_0' }"
+        'quay.io/biocontainers/iqtree:2.2.5--h21ec9f0_0' }"
 
     input:
     path(fasta_ls)

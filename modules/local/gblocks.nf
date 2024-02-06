@@ -5,7 +5,7 @@ process GBLOCKS {
     conda "bioconda::gblocks=0.91b"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/gblocks:0.91b--h9ee0642_2' :
-        'biocontainers/gblocks:0.91b--h9ee0642_2' }"
+        'quay.io/biocontainers/gblocks:0.91b--h9ee0642_2' }"
 
     input:
     path(fasta_ls)
