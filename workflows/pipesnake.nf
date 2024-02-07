@@ -423,7 +423,7 @@ workflow PIPESNAKE {
         ch_all_trees
     )
 
-    if !params.no_tree_merge{
+    if (!params.no_tree_merge){
         ASTER(
         MERGE_TREES.out.merged_trees
         )
