@@ -1,5 +1,5 @@
 reports:
-  "**/aster_tree_final":
+  "**/aster_tree_final.txt":
     display: "Asater report"
     mimeType: "txt"
   "**/software_versions.yml":

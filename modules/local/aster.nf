@@ -1,16 +1,16 @@
 process ASTER {
     tag "Final Tree"
 
-    conda "bioconda::aster=1.15"
+    conda "bioconda::aster=1.16"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/aster:1.16--h4ac6f70_0' :
-        'ziadbkh/aster:1.16' }"
+        'quay.io/biocontainers/aster:1.16--h4ac6f70_0' }"
 
     input:
     path all_trees
     
     output:
-    path("aster_tree_final"), emit: final_tree
+    path("aster_tree_final.txt"), emit: final_tree
     path "versions.yml", emit: versions
 
     script:
@@ -19,7 +19,7 @@ process ASTER {
     """
     astral-hybrid \
     -i ${all_trees} \
-    -o aster_tree_final
+    -o aster_tree_final.txt
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
