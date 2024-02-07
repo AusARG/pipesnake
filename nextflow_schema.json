@@ -102,6 +102,12 @@
                     "description": "Trinity generates large number of intermediate files which can be an issue for some HPCs that limits the file number for each user. This option will make trinity writes to `/tmp` directory on the compute node then copy the compressed output directory (not the fasta) to the workdirectory to avoid this issue.",
                     "default": true,
                     "fa_icon": "fas fa-question-circle"
+                },
+                "no_tree_merge": {
+                    "type": "boolean",
+                    "description": "Do not merge all tree.",
+                    "default": false,
+                    "fa_icon": "fas fa-question-circle"
                 }
                 
             }
