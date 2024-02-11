@@ -425,7 +425,7 @@ workflow PIPESNAKE {
 
     if (!params.no_tree_merge){
         ASTER(
-        MERGE_TREES.out.merged_trees
+            MERGE_TREES.out.merged_trees
         )
         ch_versions = ch_versions.mix(ASTER.out.versions)
     }

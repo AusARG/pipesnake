@@ -105,7 +105,7 @@
                 },
                 "no_tree_merge": {
                     "type": "boolean",
-                    "description": "Do not merge all tree.",
+                    "description": "Do not merge all trees at the end.",
                     "default": false,
                     "fa_icon": "fas fa-question-circle"
                 }
