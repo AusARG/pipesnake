@@ -232,7 +232,10 @@ workflow PIPESNAKE {
             TRIMMOMATIC( 
                 reformated_ch.join( adaptor_ch ) 
             )
-             TRIMMOMATIC.out.trimmed_paired.set{pear_input_ch}        
+             TRIMMOMATIC.out.trimmed_paired.set{pear_input_ch}
+
+            ch_versions = ch_versions.mix(PREPARE_ADAPTOR.out.versions)
+            ch_versions = ch_versions.mix(TRIMMOMATIC.out.versions)
         }
      
 
@@ -327,6 +330,8 @@ workflow PIPESNAKE {
                 }
                 ch_versions = ch_versions.mix(CONCATENATE2.out.versions)
                 ch_versions = ch_versions.mix(CONCATENATE3.out.versions)
+                ch_versions = ch_versions.mix(CONCATENATE.out.versions)
+                ch_versions = ch_versions.mix( TRIMMOMATIC_CLEAN_SE.out.versions)
             }else{
                 ch_prepared_reads
                 .set{
@@ -403,16 +408,13 @@ workflow PIPESNAKE {
         )
 
         ch_versions = ch_versions.mix(BBMAP_DEDUPE.out.versions)
-        ch_versions = ch_versions.mix(PREPARE_ADAPTOR.out.versions)
         ch_versions = ch_versions.mix(BBMAP_REFORMAT.out.versions)
-        ch_versions = ch_versions.mix(TRIMMOMATIC.out.versions)
         ch_versions = ch_versions.mix(PEAR.out.versions)
         
-        ch_versions = ch_versions.mix(CONCATENATE.out.versions)
         ch_versions = ch_versions.mix(CONCATENATE_RAW.out.versions)
         
         ch_versions = ch_versions.mix( TRIMMOMATIC_CLEAN_PE.out.versions)
-        ch_versions = ch_versions.mix( TRIMMOMATIC_CLEAN_SE.out.versions)
+        
 
         
         ch_versions = ch_versions.mix( ASSEMBLY_POSTPROCESSING.out.versions)
