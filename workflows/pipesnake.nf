@@ -98,20 +98,38 @@ workflow PIPESNAKE {
             }
             .set{ch_prg_out}
     }else{
+        def lineange_indx = params.disable_adapapter_trimming ? 3 : 7 
         Channel
             .fromPath(params.input, checkIfExists:true)
             .splitCsv(header:true, strip:true)
-            .map {row -> tuple(
-                    row.sample_id, 
-                    file(row.read1, checkIfExists: true), 
-                    file(row.read2, checkIfExists: true), 
-                    row.adaptor1, row.adaptor2, row.barcode1, row.barcode2, row.lineage
-                    ) 
+            .map {row -> 
+                if (params.disable_adapapter_trimming){
+                    tuple(
+                        row.sample_id, 
+                        file(row.read1, checkIfExists: true), 
+                        file(row.read2, checkIfExists: true), 
+                        row.lineage
+                    )
+                }else{
+                    tuple(
+                        row.sample_id, 
+                        file(row.read1, checkIfExists: true), 
+                        file(row.read2, checkIfExists: true), 
+                        row.adaptor1, row.adaptor2, row.barcode1, row.barcode2, row.lineage
+                    )
                 }
+            }
             .set{ch_sample_sheet_raw}
-
+            
+        
         ch_sample_sheet_raw
-        .map{it[7]}
+        .groupTuple()
+        .map{
+            if (it[lineange_indx].unique().size() != 1){
+                    exit 1, "Lineage for sample ${it[0]} should be unique across all records for this sample!"
+            }
+            it[lineange_indx][0]
+        }
         .toList()
         .subscribe{
             if (it.toSet().size() != it.size()){
@@ -119,22 +137,25 @@ workflow PIPESNAKE {
             }
         }
 
-        
-
         ch_sample_sheet_raw.groupTuple().map{
-            if (it[3].unique().size() != 1){
-                exit 1, "Adaptor1 for the sample ${it[0]} should be unique across all records for this sample!"
+            if (!params.disable_adapapter_trimming){
+                if (it[3].unique().size() != 1){
+                    exit 1, "Adaptor1 for the sample ${it[0]} should be unique across all records for this sample!"
+                }
+                if (it[4].unique().size() != 1){
+                    exit 1, "Adaptor2 for the sample ${it[0]} should be unique across all records for this sample!"
+                }
+                if (it[5].unique().size() != 1){
+                    exit 1, "barcode1 for the sample ${it[0]} should be unique across all records for this sample!"
+                }
+                if (it[6].unique().size() != 1){
+                    exit 1, "barcode2 for the sample ${it[0]} should be unique across all records for this sample!"
+                }
+                [it[0], it[1], it[2], it[3][0], it[4][0], it[5][0], it[6][0], it[7][0]]
+            }else{
+                [it[0], it[1], it[2], it[3][0]]
             }
-            if (it[4].unique().size() != 1){
-                exit 1, "Adaptor2 for the sample ${it[0]} should be unique across all records for this sample!"
-            }
-            if (it[5].unique().size() != 1){
-                exit 1, "barcode1 for the sample ${it[0]} should be unique across all records for this sample!"
-            }
-            if (it[6].unique().size() != 1){
-                exit 1, "barcode2 for the sample ${it[0]} should be unique across all records for this sample!"
-            }
-            [it[0], it[1], it[2], it[3][0], it[4][0], it[5][0], it[6][0], it[7][0]]
+            
         }.branch{
             singles: it[1].size() == 1
             multiples: it[1].size() > 1
@@ -142,15 +163,13 @@ workflow PIPESNAKE {
             ch_sample_sheet_prepared
         }
 
-        ch_sample_sheet_prepared.singles
-        .mix(ch_sample_sheet_prepared.multiples)
-        .map{[it[0], it[7]]}.set{ch_lineage}
         
-        ch_sample_sheet_prepared.singles
-        .mix(ch_sample_sheet_prepared.multiples)
-        .map{it -> [it[0], [it[3], it[4], it[5], it[6]]]}.set{ch_meta}
+        ch_sample_sheet_raw
+        .groupTuple()
+        .map{[it[0], it[lineange_indx][0]]}
+        .set{ch_lineage}
         
-
+        
         ch_sample_sheet_prepared.singles
         .map{it -> [it[0], [it[1][0], it[2][0]]]}
         .set{ch_prepared_fastq_singles}
@@ -185,11 +204,7 @@ workflow PIPESNAKE {
         //println("dfdfdf");
         //ch_lineage.view()
         
-        PREPARE_ADAPTOR( ch_meta.map{[it[0], it[1][0], it[1][1], it[1][2], it[1][3]]}.toList())
-        .adaptor
-        .flatten()
-        .map{[it.getSimpleName(), it]}
-        .set{ adaptor_ch }
+       
 
 
         BBMAP_DEDUPE( ch_prepared_fastq )
@@ -201,34 +216,32 @@ workflow PIPESNAKE {
         .reformated_fastq
         .set{ reformated_ch }
         
-        TRIMMOMATIC( 
-            reformated_ch.join( adaptor_ch ) 
-        )
+        if (params.disable_adapapter_trimming){
+            reformated_ch.set{pear_input_ch} 
+        }else{
+            ch_sample_sheet_prepared.singles
+            .mix(ch_sample_sheet_prepared.multiples)
+            .map{it -> [it[0], [it[3], it[4], it[5], it[6]]]}.set{ch_meta}
+
+            PREPARE_ADAPTOR( ch_meta.map{[it[0], it[1][0], it[1][1], it[1][2], it[1][3]]}.toList())
+            .adaptor
+            .flatten()
+            .map{[it.getSimpleName(), it]}
+            .set{ adaptor_ch }
+
+            TRIMMOMATIC( 
+                reformated_ch.join( adaptor_ch ) 
+            )
+             TRIMMOMATIC.out.trimmed_paired.set{pear_input_ch}        
+        }
+     
 
         PEAR(
-            TRIMMOMATIC.out.trimmed_paired
+           pear_input_ch
         )
         .merged
         .set{ merged_ch }
         
-
-
-        TRIMMOMATIC
-                .out
-                .trimmed_unpaired
-                .join(merged_ch)
-                .map{ it -> [it[0], [it[1], it[2], it[3]]] }
-
-        CONCATENATE(
-            TRIMMOMATIC
-                .out
-                .trimmed_unpaired
-                .join(merged_ch)
-                .map{ it -> [it[0], [it[1], it[2], it[3]]] }
-            , Channel.value("trimmed_unpaired_concatenated")
-        )
-        .concatenated
-        .set{ unpaired_concatenated_ch }
 
         TRIMMOMATIC_CLEAN_PE(
             PEAR.out.unmerged
@@ -237,12 +250,6 @@ workflow PIPESNAKE {
         .set{ prepared_fastq }
 
         
-        TRIMMOMATIC_CLEAN_SE(
-            unpaired_concatenated_ch
-        )
-
-        
-
         if (params.filter){
             BBMAP_FILTER(
                 TRIMMOMATIC_CLEAN_PE
@@ -273,44 +280,67 @@ workflow PIPESNAKE {
             .out
             .contigs
         } else {
-            CONCATENATE2(
-            TRIMMOMATIC_CLEAN_PE
-            .out
-            .trimmed_cleaned_unpaired
-            .join( TRIMMOMATIC_CLEAN_SE
+            if (!params.disable_adapapter_trimming)
+            {
+                CONCATENATE(
+                    TRIMMOMATIC
                     .out
-                    .trimmed_cleaned_se
-            )
-            .map{ it -> [it[0], [it[1], it[2], it[3]]] }
-            , Channel.value("trimmed_unpaired_pe_seconcatenated")
-            )
-            
-            CONCATENATE3(
-                ch_prepared_reads
-                .join( CONCATENATE2
-                        .out
-                        .concatenated
-                )
-                .map{ it -> [it[0], [it[1], it[3]]] }
-                , Channel.value("trinity_r1_unpaired_concatenated")
-            )
+                    .trimmed_unpaired
+                    .join(merged_ch)
+                    .map{ it -> [it[0], [it[1], it[2], it[3]]] }
+                    , Channel.value("trimmed_unpaired_concatenated")
+                ).concatenated
+                .set{ unpaired_concatenated_ch }
 
-            
-            TRINITY(
+                TRIMMOMATIC_CLEAN_SE(
+                    unpaired_concatenated_ch
+                )
+                
+                CONCATENATE2(
+                    TRIMMOMATIC_CLEAN_PE
+                    .out
+                    .trimmed_cleaned_unpaired
+                    .join( TRIMMOMATIC_CLEAN_SE
+                            .out
+                            .trimmed_cleaned_se
+                    )
+                    .map{ it -> [it[0], [it[1], it[2], it[3]]]}
+                    , Channel.value("trimmed_unpaired_pe_seconcatenated")
+                )
+                CONCATENATE3(
+                    ch_prepared_reads
+                    .join( CONCATENATE2
+                            .out
+                            .concatenated
+                    )
+                    .map{ it -> [it[0], [it[1], it[3]]] }
+                    , Channel.value("trinity_r1_unpaired_concatenated")
+                )
                 ch_prepared_reads
                 .join( CONCATENATE3
                         .out
                         .concatenated
                     )
                 .map{ it -> [it[0], it[3], it[2]] }
+                .set{
+                    trinity_input_ch
+                }
+                ch_versions = ch_versions.mix(CONCATENATE2.out.versions)
+                ch_versions = ch_versions.mix(CONCATENATE3.out.versions)
+            }else{
+                ch_prepared_reads
+                .set{
+                    trinity_input_ch
+                }  
+            }
+            
+            TRINITY(
+                trinity_input_ch
             )
 
             ch_assembly_out = TRINITY
             .out
             .trinity_fasta
-            
-            ch_versions = ch_versions.mix(CONCATENATE2.out.versions)
-            ch_versions = ch_versions.mix(CONCATENATE3.out.versions)
             ch_versions = ch_versions.mix(TRINITY.out.versions)
         }
         
@@ -371,68 +401,7 @@ workflow PIPESNAKE {
             )
             .join(ch_lineage)
         )
-    }
 
-    
-    PHYLOGENY_MAKE_ALIGNMENTS(
-        ch_prg_out.map(it -> it[1]).toSortedList()
-    )
-
-
-
-    MAFFT(
-        PHYLOGENY_MAKE_ALIGNMENTS
-        .out
-        .locus_fasta.toSortedList()
-        .flatten().buffer(size: params.batching_size, remainder: true)
-    )
-
-    if (params.trim_alignment){
-        GBLOCKS(
-            MAFFT.out.aligned.map{if (params.batching_size == 1) [it] else it}
-        )
-        .trimmed_allignments
-        .set{ch_alignment}
-        
-    ch_versions = ch_versions.mix(GBLOCKS.out.versions)
-    } else{
-        ch_alignment = MAFFT.out.aligned.map{if (params.batching_size == 1) [it] else it}
-    }
-    
-    SED( ch_alignment.map{if (params.batching_size == 1) [it] else it} )
-
-    BBMAP_REFORMAT2(SED.out.seded.map{if (params.batching_size == 1) [it] else it})
-   
-    if (params.tree_method == 'raxml'){
-        RAXML(
-            BBMAP_REFORMAT2.out.reformated.map{if (params.batching_size == 1) [it] else it}
-        )
-        ch_all_trees = RAXML.out.tree_bipartitions.flatten().toSortedList()
-        
-        ch_versions = ch_versions.mix(RAXML.out.versions)
-    }else if (params.tree_method == 'iqtree'){
-        IQTREE(
-            BBMAP_REFORMAT2.out.reformated.map{if (params.batching_size == 1) [it] else it}
-        )
-        ch_all_trees = IQTREE.out.contree.flatten().toSortedList()
-        
-        ch_versions = ch_versions.mix(IQTREE.out.versions)
-    }
-
-    MERGE_TREES(
-        ch_all_trees
-    )
-
-    if (!params.no_tree_merge){
-        ASTER(
-            MERGE_TREES.out.merged_trees
-        )
-        ch_versions = ch_versions.mix(ASTER.out.versions)
-    }
-    
-
-
-     if (params.stage.toLowerCase() != "from-prg"){
         ch_versions = ch_versions.mix(BBMAP_DEDUPE.out.versions)
         ch_versions = ch_versions.mix(PREPARE_ADAPTOR.out.versions)
         ch_versions = ch_versions.mix(BBMAP_REFORMAT.out.versions)
@@ -450,23 +419,78 @@ workflow PIPESNAKE {
         ch_versions = ch_versions.mix( BLAT.out.versions)
         ch_versions = ch_versions.mix( BLAT2.out.versions)
         ch_versions = ch_versions.mix( PARSE_BLAT_RESULTS.out.versions)
-        ch_versions = ch_versions.mix( MAFFT.out.versions)
+        
         //ch_versions = ch_versions.mix( PERL_CLEANUP.out.versions)
         ch_versions = ch_versions.mix( QUALITY_2_ASSEMBLY.out.versions)
         ch_versions = ch_versions.mix( MAKE_PRG.out.versions)
-    
     }
-    ch_versions = ch_versions.mix( PHYLOGENY_MAKE_ALIGNMENTS.out.versions)
-    //ch_versions = ch_versions.mix(CONVERT_PHYML.out.versions)
-    ch_versions = ch_versions.mix(SED.out.versions)
-    ch_versions = ch_versions.mix(BBMAP_REFORMAT2.out.versions)
-    ch_versions = ch_versions.mix(MERGE_TREES.out.versions)
+
+    if (params.stage != "end-prg"){
+        PHYLOGENY_MAKE_ALIGNMENTS(
+            ch_prg_out.map(it -> it[1]).toSortedList()
+        )
+
+        MAFFT(
+            PHYLOGENY_MAKE_ALIGNMENTS
+            .out
+            .locus_fasta.toSortedList()
+            .flatten().buffer(size: params.batching_size, remainder: true)
+        )
+        ch_versions = ch_versions.mix( MAFFT.out.versions)
+        
+        if (params.trim_alignment){
+            GBLOCKS(
+                MAFFT.out.aligned.map{if (params.batching_size == 1) [it] else it}
+            )
+            .trimmed_allignments
+            .set{ch_alignment}
+            
+        ch_versions = ch_versions.mix(GBLOCKS.out.versions)
+        } else{
+            ch_alignment = MAFFT.out.aligned.map{if (params.batching_size == 1) [it] else it}
+        }
+        
+        SED( ch_alignment.map{if (params.batching_size == 1) [it] else it} )
+
+        BBMAP_REFORMAT2(SED.out.seded.map{if (params.batching_size == 1) [it] else it})
     
+        if (params.tree_method == 'raxml'){
+            RAXML(
+                BBMAP_REFORMAT2.out.reformated.map{if (params.batching_size == 1) [it] else it}
+            )
+            ch_all_trees = RAXML.out.tree_bipartitions.flatten().toSortedList()
+            
+            ch_versions = ch_versions.mix(RAXML.out.versions)
+        }else if (params.tree_method == 'iqtree'){
+            IQTREE(
+                BBMAP_REFORMAT2.out.reformated.map{if (params.batching_size == 1) [it] else it}
+            )
+            ch_all_trees = IQTREE.out.contree.flatten().toSortedList()
+            
+            ch_versions = ch_versions.mix(IQTREE.out.versions)
+        }
 
+        MERGE_TREES(
+            ch_all_trees
+        )
 
-    //CUSTOM_DUMPSOFTWAREVERSIONS (
-    //    ch_versions.unique().collectFile(name: 'collated_versions.yml')
-    //)
+        if (!params.no_tree_merge){
+            ASTER(
+                MERGE_TREES.out.merged_trees
+            )
+            ch_versions = ch_versions.mix(ASTER.out.versions)
+        }
+        
+        ch_versions = ch_versions.mix( PHYLOGENY_MAKE_ALIGNMENTS.out.versions)
+        //ch_versions = ch_versions.mix(CONVERT_PHYML.out.versions)
+        ch_versions = ch_versions.mix(SED.out.versions)
+        ch_versions = ch_versions.mix(BBMAP_REFORMAT2.out.versions)
+        ch_versions = ch_versions.mix(MERGE_TREES.out.versions)
+    }
+    
+    CUSTOM_DUMPSOFTWAREVERSIONS (
+        ch_versions.unique().collectFile(name: 'collated_versions.yml')
+    )
     
 }
 
