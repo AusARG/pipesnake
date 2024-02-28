@@ -98,12 +98,12 @@ workflow PIPESNAKE {
             }
             .set{ch_prg_out}
     }else{
-        def lineange_indx = params.disable_adapapter_trimming ? 3 : 7 
+        def lineange_indx = params.disable_adapter_trimming ? 3 : 7 
         Channel
             .fromPath(params.input, checkIfExists:true)
             .splitCsv(header:true, strip:true)
             .map {row -> 
-                if (params.disable_adapapter_trimming){
+                if (params.disable_adapter_trimming){
                     tuple(
                         row.sample_id, 
                         file(row.read1, checkIfExists: true), 
@@ -138,7 +138,7 @@ workflow PIPESNAKE {
         }
 
         ch_sample_sheet_raw.groupTuple().map{
-            if (!params.disable_adapapter_trimming){
+            if (!params.disable_adapter_trimming){
                 if (it[3].unique().size() != 1){
                     exit 1, "Adaptor1 for the sample ${it[0]} should be unique across all records for this sample!"
                 }
@@ -216,7 +216,7 @@ workflow PIPESNAKE {
         .reformated_fastq
         .set{ reformated_ch }
         
-        if (params.disable_adapapter_trimming){
+        if (params.disable_adapter_trimming){
             reformated_ch.set{pear_input_ch} 
         }else{
             ch_sample_sheet_prepared.singles
@@ -280,7 +280,7 @@ workflow PIPESNAKE {
             .out
             .contigs
         } else {
-            if (!params.disable_adapapter_trimming)
+            if (!params.disable_adapter_trimming)
             {
                 CONCATENATE(
                     TRIMMOMATIC

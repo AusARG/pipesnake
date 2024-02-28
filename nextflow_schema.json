@@ -90,7 +90,7 @@
                     "default": false,
                     "fa_icon": "fas fa-question-circle"
                 },
-                "disable_adapapter_trimming": {
+                "disable_adapter_trimming": {
                     "type": "boolean",
                     "description": "Disable trimming adapter in the input reads.",
                     "help_text": "if true, ...... ",
