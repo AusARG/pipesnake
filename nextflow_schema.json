@@ -49,7 +49,7 @@
                     "help_text": ".",
                     "fa_icon": "fas fa-question-circle",
                     "default": "from-start",
-                    "enum": ["from-start", "from-prg"]
+                    "enum": ["from-start", "from-prg", "end-prg"]
                 },
                 "filter": {
                     "type": "string",
@@ -87,6 +87,13 @@
                     "type": "boolean",
                     "description": "Trim initial MAFFT alignments.",
                     "help_text": "if true, use GBLOCKS to trim initial MAFFT alignments. May proceed slowly. If false, proceed to phylogenetic estimation using initial MAFFT alignments",
+                    "default": false,
+                    "fa_icon": "fas fa-question-circle"
+                },
+                "disable_adapter_trimming": {
+                    "type": "boolean",
+                    "description": "Disable trimming adapter in the input reads.",
+                    "help_text": "if true, ...... ",
                     "default": false,
                     "fa_icon": "fas fa-question-circle"
                 },
