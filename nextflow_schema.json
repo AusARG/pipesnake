@@ -1844,7 +1844,7 @@
             "properties": {
                 "spades_args": {
                     "type": "string",
-                    "default": null,
+                    "default": "",
                     "description": "The arguments to be passed to process (SPAdes).",
                     "help_text": "",
                     "fa_icon": "fa fa-cog",
