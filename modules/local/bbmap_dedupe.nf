@@ -29,11 +29,14 @@ process BBMAP_DEDUPE {
     }
 
     """
-    dedupe.sh -Xmx${avail_mem}M ${input}  out=${sample_id}_deduped.${task.ext.fastq_suffix}.gz outd=${sample_id}_duplicates.${task.ext.fastq_suffix}.gz ${task.ext.args} threads=auto 
-    
+    //dedupe.sh -Xmx${avail_mem}M ${input}  out=${sample_id}_deduped.${task.ext.fastq_suffix}.gz outd=${sample_id}_duplicates.${task.ext.fastq_suffix}.gz ${task.ext.args} threads=auto 
+    clumpify.sh -Xmx${avail_mem}M in=${input} out=${sample_id}_deduped.${task.ext.fastq_suffix}.gz dedupe optical spany adjacent ${task.ext.args} threads=auto
+
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        BBMAP - dedupe.sh: \$(dedupe.sh -version 2>&1 | sed -n '2 p' | sed 's/BBMap version //g')
+        //BBMAP - dedupe.sh: \$(dedupe.sh -version 2>&1 | sed -n '2 p' | sed 's/BBMap version //g')
+        BBMAP - clumpify.sh: \$(clumpify.sh -version 2>&1 | sed -n '2 p' | sed 's/BBMap version //g')
+
     END_VERSIONS
     
     """
