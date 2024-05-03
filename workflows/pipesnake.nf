@@ -26,7 +26,6 @@ for (param in checkPathParamList) { if (param) { file(param, checkIfExists: true
 include { BBMAP_DEDUPE } from '../modules/local/bbmap_dedupe'
 include { PREPARE_ADAPTOR } from '../modules/local/prepare_adaptor'
 
-include { BBMAP_REFORMAT } from '../modules/local/bbmap_reformat'
 include { TRIMMOMATIC } from '../modules/local/trimmomatic'
 include { PEAR } from '../modules/local/pear'
 include { CONCATENATE } from '../modules/local/concatenate'
@@ -54,7 +53,7 @@ include { GBLOCKS } from '../modules/local/gblocks'
 include { RAXML } from '../modules/local/raxml'
 include { IQTREE } from '../modules/local/iqtree'
 include { SED } from '../modules/local/sed'
-include { BBMAP_REFORMAT2 } from '../modules/local/bbmap_reformat2.nf'
+include { BBMAP_REFORMAT } from '../modules/local/bbmap_reformat.nf'
 include { MERGE_TREES } from '../modules/local/merge_trees.nf'
 include { ASTER } from '../modules/local/aster.nf'
 include { SPADES } from '../modules/local/spades.nf'
@@ -209,12 +208,8 @@ workflow PIPESNAKE {
 
         BBMAP_DEDUPE( ch_prepared_fastq )
         .deduplicates
-        .set{ deduplicates_ch }
-        
-        
-        BBMAP_REFORMAT( deduplicates_ch )
-        .reformated_fastq
         .set{ reformated_ch }
+        
         
         if (params.disable_adapter_trimming){
             reformated_ch.set{pear_input_ch} 
@@ -408,7 +403,6 @@ workflow PIPESNAKE {
         )
 
         ch_versions = ch_versions.mix(BBMAP_DEDUPE.out.versions)
-        ch_versions = ch_versions.mix(BBMAP_REFORMAT.out.versions)
         ch_versions = ch_versions.mix(PEAR.out.versions)
         
         ch_versions = ch_versions.mix(CONCATENATE_RAW.out.versions)
@@ -454,18 +448,18 @@ workflow PIPESNAKE {
         
         SED( ch_alignment.map{if (params.batching_size == 1) [it] else it} )
 
-        BBMAP_REFORMAT2(SED.out.seded.map{if (params.batching_size == 1) [it] else it})
+        BBMAP_REFORMAT(SED.out.seded.map{if (params.batching_size == 1) [it] else it})
     
         if (params.tree_method == 'raxml'){
             RAXML(
-                BBMAP_REFORMAT2.out.reformated.map{if (params.batching_size == 1) [it] else it}
+                BBMAP_REFORMAT.out.reformated.map{if (params.batching_size == 1) [it] else it}
             )
             ch_all_trees = RAXML.out.tree_bipartitions.flatten().toSortedList()
             
             ch_versions = ch_versions.mix(RAXML.out.versions)
         }else if (params.tree_method == 'iqtree'){
             IQTREE(
-                BBMAP_REFORMAT2.out.reformated.map{if (params.batching_size == 1) [it] else it}
+                BBMAP_REFORMAT.out.reformated.map{if (params.batching_size == 1) [it] else it}
             )
             ch_all_trees = IQTREE.out.contree.flatten().toSortedList()
             
@@ -486,7 +480,7 @@ workflow PIPESNAKE {
         ch_versions = ch_versions.mix( PHYLOGENY_MAKE_ALIGNMENTS.out.versions)
         //ch_versions = ch_versions.mix(CONVERT_PHYML.out.versions)
         ch_versions = ch_versions.mix(SED.out.versions)
-        ch_versions = ch_versions.mix(BBMAP_REFORMAT2.out.versions)
+        ch_versions = ch_versions.mix(BBMAP_REFORMAT.out.versions)
         ch_versions = ch_versions.mix(MERGE_TREES.out.versions)
     }
     
