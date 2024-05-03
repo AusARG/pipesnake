@@ -1018,7 +1018,7 @@
             "properties": {
                 "bbmap_dedupe_args": {
                     "type": "string",
-                    
+                    "default": "dedupe optical spany adjacent",      
                     "description": "",
                     "help_text": "",
                     "fa_icon": "fa fa-cog",
