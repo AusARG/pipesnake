@@ -1,5 +1,6 @@
 process BBMAP_REFORMAT {
-    tag "$sample_id"
+   tag "${ fasta_ls.size() > 1 ? 'batch of ' + fasta_ls.size() + ' fasta files' : fasta_ls[0].getSimpleName()}"
+
 
     conda "bioconda::bbmap=39.01"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
@@ -7,12 +8,12 @@ process BBMAP_REFORMAT {
         'quay.io/biocontainers/bbmap:39.01--h5c4e2a8_0' }"
 
     input:
-    tuple val(sample_id), path(fastq) //, val(meta)
+    path(fasta_ls) //, val(meta)
     
     output:
-    tuple val(sample_id), path("*_R1_reformated.${task.ext.fastq_suffix}.gz"), path("*_R2_reformated.${task.ext.fastq_suffix}.gz"), emit: reformated_fastq
+    path "*.fasta", emit: reformated
     path "versions.yml", emit: versions
-
+    
     script:
     
     def avail_mem = 3072
@@ -21,13 +22,13 @@ process BBMAP_REFORMAT {
     } else {
         avail_mem = (task.memory.mega*0.8).intValue()
     }
-
-    """
-    reformat.sh -Xmx${avail_mem}M threads=auto in=${fastq} \
-        out1=${sample_id}_R1_reformated.${task.ext.fastq_suffix}.gz \
-        out2=${sample_id}_R2_reformated.${task.ext.fastq_suffix}.gz \
-        ${task.ext.args}
     
+    """
+    for fasta in ${fasta_ls.join(' ')}; do
+        file_base_name="\$(basename -- "\$fasta")"
+        reformat.sh -Xmx${avail_mem}M in=\${fasta} out=\${file_base_name}.fasta threads=auto ${task.ext.args}
+    done
+
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         BBMAP - reformat.sh: \$(reformat.sh -version 2>&1 | sed -n '2 p' | sed 's/BBMap version //g')

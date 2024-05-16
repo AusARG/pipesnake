@@ -365,10 +365,10 @@
                     "fa_icon": "fas fa-copy",
                     "hidden": true
                 },
-                "bbmap_reformat2_keep_output": {
+                "bbmap_reformat_keep_output": {
                     "type": "boolean",
                     "default": false,
-                    "description": "If enabled, the output of process 'bbmap_reformat2' will be saved in the output directory.",
+                    "description": "If enabled, the output of process 'bbmap_reformat' will be saved in the output directory.",
                     "help_text": "",
                     "fa_icon": "fas fa-copy",
                     "hidden": true
@@ -377,14 +377,6 @@
                     "type": "boolean",
                     "default": false,
                     "description": "If enabled, the output of process 'prepare_adaptor' will be saved in the output directory.",
-                    "help_text": "",
-                    "fa_icon": "fas fa-copy",
-                    "hidden": true
-                },
-                "bbmap_reformat_keep_output": {
-                    "type": "boolean",
-                    "default": false,
-                    "description": "If enabled, the output of process 'bbmap_reformat' will be saved in the output directory.",
                     "help_text": "",
                     "fa_icon": "fas fa-copy",
                     "hidden": true
@@ -853,40 +845,40 @@
                 }
             }
         },
-        "bbmap_reformat2_options": {
-            "title": "bbmap_reformat2 options",
+        "bbmap_reformat_options": {
+            "title": "bbmap_reformat options",
             "type": "object",
             "fa_icon": "fa-solid fa-arrow-progress",
-            "description": "The configurations of the process bbmap_reformat2.",
+            "description": "The configurations of the process bbmap_reformat.",
             "help_text": "",
             "properties": {
-                "bbmap_reformat2_args": {
+                "bbmap_reformat_args": {
                     "type": "string",
                     "default": "minconsecutivebases=100 dotdashxton=true fastawrap=32000",
-                    "description": "The arguments to be passed to process (bbmap_reformat2).",
+                    "description": "The arguments to be passed to process (bbmap_reformat).",
                     "help_text": "",
                     "fa_icon": "fa fa-cog",
                     "hidden": true
                 },
-                "bbmap_reformat2_cpus": {
+                "bbmap_reformat_cpus": {
                     "type": "integer",
-                    "description": "The number of requested CPUs for the process (bbmap_reformat2).",
+                    "description": "The number of requested CPUs for the process (bbmap_reformat).",
                     "help_text": "",
                     "fa_icon": "fas fa-microchip",
                     "hidden": true,
                     "default": 1
                 },
-                "bbmap_reformat2_memory": {
+                "bbmap_reformat_memory": {
                     "type": "string",
-                    "description": "The requested memory for the process (bbmap_reformat2).",
+                    "description": "The requested memory for the process (bbmap_reformat).",
                     "help_text": "",
                     "fa_icon": "fas fa-memory",
                     "hidden": true,
                     "default": "8.GB"
                 },
-                "bbmap_reformat2_walltime": {
+                "bbmap_reformat_walltime": {
                     "type": "string",
-                    "description": "The requested walltime for the process (bbmap_reformat2).",
+                    "description": "The requested walltime for the process (bbmap_reformat).",
                     "help_text": "",
                     "fa_icon": "far fa-clock",
                     "hidden": true,
@@ -932,47 +924,6 @@
                     "fa_icon": "far fa-clock",
                     "hidden": true,
                     "default": "1.h"
-                }
-            }
-        },
-        "bbmap_reformat_options": {
-            "title": "bbmap_reformat options",
-            "type": "object",
-            "fa_icon": "fa-solid fa-arrow-progress",
-            "description": "The configurations of the process bbmap_reformat.",
-            "help_text": "",
-            "properties": {
-                "bbmap_reformat_args": {
-                    "type": "string",
-                    "default": "",
-                    "description": "The arguments to be passed to process (bbmap_reformat).",
-                    "help_text": "",
-                    "fa_icon": "fa fa-cog",
-                    "hidden": true
-                },
-                "bbmap_reformat_cpus": {
-                    "type": "integer",
-                    "description": "The number of requested CPUs for the process (bbmap_reformat).",
-                    "help_text": "",
-                    "fa_icon": "fas fa-microchip",
-                    "hidden": true,
-                    "default": 1
-                },
-                "bbmap_reformat_memory": {
-                    "type": "string",
-                    "description": "The requested memory for the process (bbmap_reformat).",
-                    "help_text": "",
-                    "fa_icon": "fas fa-memory",
-                    "hidden": true,
-                    "default": "4.GB"
-                },
-                "bbmap_reformat_walltime": {
-                    "type": "string",
-                    "description": "The requested walltime for the process (bbmap_reformat).",
-                    "help_text": "",
-                    "fa_icon": "far fa-clock",
-                    "hidden": true,
-                    "default": "4.h"
                 }
             }
         },
@@ -1067,7 +1018,7 @@
             "properties": {
                 "bbmap_dedupe_args": {
                     "type": "string",
-                    
+                    "default": "dedupe optical spany adjacent",      
                     "description": "",
                     "help_text": "",
                     "fa_icon": "fa fa-cog",
@@ -1918,13 +1869,10 @@
             "$ref": "#/definitions/samplesheet_check_options"
         },
         {
-            "$ref": "#/definitions/bbmap_reformat2_options"
+            "$ref": "#/definitions/bbmap_reformat_options"
         },
         {
             "$ref": "#/definitions/prepare_adaptor_options"
-        },
-        {
-            "$ref": "#/definitions/bbmap_reformat_options"
         },
         {
             "$ref": "#/definitions/convert_phyml_options"
