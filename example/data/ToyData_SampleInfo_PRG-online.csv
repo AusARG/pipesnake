@@ -1,5 +1,5 @@
 sample_id,prg_file
-Strophurus,https://github.com/AusARG/pipesnake/blob/main/example/data/PRG_Strophurus.fasta
-Delma,https://github.com/AusARG/pipesnake/blob/main/example/data/PRG_Delma.fasta
-Liopholis,https://github.com/AusARG/pipesnake/blob/main/example/data/PRG_Liopholis.fasta
-Tympanocryptis,https://github.com/AusARG/pipesnake/blob/main/example/data/PRG_Tympanocryptis.fasta
+Strophurus,https://raw.githubusercontent.com/AusARG/pipesnake/main/example/data/PRG_Strophurus.fasta
+Delma,https:https://raw.githubusercontent.com/AusARG/pipesnake/main/example/data/PRG_Delma.fasta
+Liopholis,https://raw.githubusercontent.com/AusARG/pipesnake/main/example/data/PRG_Liopholis.fasta
+Tympanocryptis,https://raw.githubusercontent.com/AusARG/pipesnake/main/example/data/PRG_Tympanocryptis.fasta
