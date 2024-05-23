@@ -51,13 +51,10 @@ For further information or help, don't hesitate to get in touch. Having trouble?
 
 # Citation
 
-If you use `pipesnake`, please consider citing it and its depenedencies. A preprint is available on [bioRxiv](https://www.biorxiv.org/content/10.1101/2024.02.13.580223v1.abstract), and a final version of the manuscript will hopefully be out soon.
+If you use `pipesnake`, please consider citing it and its depenedencies:
 
-> *pipesnake: Generalized software for the assembly and analysis of phylogenomic datasets from conserved genomic loci*
+>Ian G Brennan, Sonal Singhal, Ziad Al Bkhetan, *pipesnake: generalized software for the assembly and analysis of phylogenomic datasets from conserved genomic loci*, Bioinformatics, Volume 40, Issue 5, May 2024, btae195, https://doi.org/10.1093/bioinformatics/btae195
 >
-> Brennan, I.G., Singhal, S., Al Bkhetan, Z. 
->
-> doi: [https://doi.org/10.1101/2024.02.13.580223](https://doi.org/10.1101/2024.02.13.580223)
 
 <!-- TODO nf-core: Add citation for pipeline after first release. Uncomment lines below and update Zenodo doi and badge at the top of this file. -->
 <!-- If you use  ausarg/pipesnake for your analysis, please cite it using the following doi: [10.5281/zenodo.XXXXXX](https://doi.org/10.5281/zenodo.XXXXXX) -->
