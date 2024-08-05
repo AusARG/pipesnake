@@ -199,6 +199,10 @@ You can also supply a run name to resume a specific run: `-resume [run-name]`. U
 
 Specify the path to a specific config file (this is a core Nextflow command). See the [nf-core website documentation](https://nf-co.re/usage/configuration) for more information.
 
+### `-work-dir`
+
+Specify the path to your preferred working directory, instead of your current working directory. 
+
 ## Custom configuration
 
 ### Updating containers
