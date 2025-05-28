@@ -16,7 +16,7 @@ process TRIMAL {
 
     """
     for fasta in ${fasta_ls.join(' ')}; do
-        trimal -in \${fasta} -out \${fasta}.trimal -gt 0.2 ${task.ext.args} || true
+        trimal -in \${fasta} -out \${fasta}.trimal ${task.ext.args} || true
     done
 
     cat <<-END_VERSIONS > versions.yml

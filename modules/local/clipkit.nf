@@ -17,7 +17,7 @@ process CLIPKIT {
 
     """
     for fasta in ${fasta_ls.join(' ')}; do
-        clipkit \${fasta} -m gappy -g 0.8 ${task.ext.args} || true
+        clipkit \${fasta} ${task.ext.args} || true
     done
 
     cat <<-END_VERSIONS > versions.yml

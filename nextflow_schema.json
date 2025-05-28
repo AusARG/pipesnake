@@ -454,10 +454,10 @@
                     "fa_icon": "fas fa-copy",
                     "hidden": false
                 },
-                "gblocks_keep_output": {
+                "trimmer_keep_output": {
                     "type": "boolean",
                     "default": true,
-                    "description": "If enabled, the output of process 'gblocks' will be saved in the output directory.",
+                    "description": "If enabled, the output of the alignment trimming process will be saved in the output directory.",
                     "help_text": "",
                     "fa_icon": "fas fa-copy",
                     "hidden": false
@@ -1329,12 +1329,12 @@
                 }
             }
         },
-        "gblocks_options": {
-            "title": "gblocks options",
+        "trimmer_options": {
+            "title": "trimmer options",
             "type": "object",
             "fa_icon": "fa-solid fa-arrow-progress",
-            "description": "The configurations of the process gblocks.",
-            "help_text": "See the [Gblocks Manual](https://home.cc.umanitoba.ca/~psgendb/doc/Castresana/Gblocks_documentation.html) for more information",
+            "description": "The configurations of the alignment trimming process.",
+            "help_text": "See the [Gblocks Manual](https://home.cc.umanitoba.ca/~psgendb/doc/Castresana/Gblocks_documentation.html)/[ClipKIT documentation](https://jlsteenwyk.com/ClipKIT/)/[TrimAl website](https://vicfero.github.io/trimal/) for more information",
             "properties": {
                 "gblocks_b1": {
                     "type": "number",
@@ -1360,25 +1360,41 @@
                     "fa_icon": "fa fa-cog",
                     "hidden": true
                 },
-                "gblocks_cpus": {
+                "clipkit_args": {
+                    "type": "string",
+                    "default": "-m gappy -g 0.8",
+                    "description": "The arguments to be passed to process (clipkit).",
+                    "help_text": "",
+                    "fa_icon": "fa fa-cog",
+                    "hidden": true
+                },
+                "trimal_args": {
+                    "type": "string",
+                    "default": "-gt 0.2",
+                    "description": "The arguments to be passed to process (trimal).",
+                    "help_text": "",
+                    "fa_icon": "fa fa-cog",
+                    "hidden": true
+                },
+                "trimmer_cpus": {
                     "type": "integer",
-                    "description": "The number of requested CPUs for the process (gblocks).",
+                    "description": "The number of requested CPUs for the process.",
                     "help_text": "",
                     "fa_icon": "fas fa-microchip",
                     "hidden": true,
                     "default": 1
                 },
-                "gblocks_memory": {
+                "trimmer_memory": {
                     "type": "string",
-                    "description": "The requested memory for the process (gblocks).",
+                    "description": "The requested memory for the process.",
                     "help_text": "",
                     "fa_icon": "fas fa-memory",
                     "hidden": true,
                     "default": "8.GB"
                 },
-                "gblocks_walltime": {
+                "trimmer_walltime": {
                     "type": "string",
-                    "description": "The requested walltime for the process (gblocks).",
+                    "description": "The requested walltime for the process.",
                     "help_text": "",
                     "fa_icon": "far fa-clock",
                     "hidden": true,
@@ -1903,7 +1919,7 @@
             "$ref": "#/definitions/make_prg_options"
         },
         {
-            "$ref": "#/definitions/gblocks_options"
+            "$ref": "#/definitions/trimmer_options"
         },
         {
             "$ref": "#/definitions/testing_options"
