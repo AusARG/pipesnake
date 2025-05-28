@@ -48,6 +48,8 @@ include {MAKE_PRG} from '../modules/local/make_prg'
 include {QUALITY_2_ASSEMBLY} from '../modules/local/quality_2_assembly'
 include {PHYLOGENY_MAKE_ALIGNMENTS} from '../modules/local/phylogeny_make_alignments'
 include { GBLOCKS } from '../modules/local/gblocks'
+include { CLIPKIT } from '../modules/local/clipkit'
+include { TRIMAL } from '../modules/local/trimal'
 
 //include { CONVERT_PHYML } from '../modules/local/convert_phyml'
 include { RAXML } from '../modules/local/raxml'
@@ -83,44 +85,41 @@ workflow PIPESNAKE {
     //
     // SUBWORKFLOW: Read in samplesheet, validate and stage input files
     //
-    
-
-
 
     if (params.stage.toLowerCase() == "from-prg"){
          Channel
             .fromPath(params.input, checkIfExists:true)
             .splitCsv(header:true, strip:true)
             .map {row -> tuple(
-                    row.sample_id, 
+                    row.sample_id,
                     file(row.prg_file, checkIfExists: true))
             }
             .set{ch_prg_out}
     }else{
-        def lineange_indx = params.disable_adapter_trimming ? 3 : 7 
+        def lineange_indx = params.disable_adapter_trimming ? 3 : 7
         Channel
             .fromPath(params.input, checkIfExists:true)
             .splitCsv(header:true, strip:true)
-            .map {row -> 
+            .map {row ->
                 if (params.disable_adapter_trimming){
                     tuple(
-                        row.sample_id, 
-                        file(row.read1, checkIfExists: true), 
-                        file(row.read2, checkIfExists: true), 
+                        row.sample_id,
+                        file(row.read1, checkIfExists: true),
+                        file(row.read2, checkIfExists: true),
                         row.lineage
                     )
                 }else{
                     tuple(
-                        row.sample_id, 
-                        file(row.read1, checkIfExists: true), 
-                        file(row.read2, checkIfExists: true), 
+                        row.sample_id,
+                        file(row.read1, checkIfExists: true),
+                        file(row.read2, checkIfExists: true),
                         row.adaptor1, row.adaptor2, row.barcode1, row.barcode2, row.lineage
                     )
                 }
             }
             .set{ch_sample_sheet_raw}
-            
-        
+
+
         ch_sample_sheet_raw
         .groupTuple()
         .map{
@@ -154,7 +153,7 @@ workflow PIPESNAKE {
             }else{
                 [it[0], it[1], it[2], it[3][0]]
             }
-            
+
         }.branch{
             singles: it[1].size() == 1
             multiples: it[1].size() > 1
@@ -162,13 +161,13 @@ workflow PIPESNAKE {
             ch_sample_sheet_prepared
         }
 
-        
+
         ch_sample_sheet_raw
         .groupTuple()
         .map{[it[0], it[lineange_indx][0]]}
         .set{ch_lineage}
-        
-        
+
+
         ch_sample_sheet_prepared.singles
         .map{it -> [it[0], [it[1][0], it[2][0]]]}
         .set{ch_prepared_fastq_singles}
@@ -184,7 +183,7 @@ workflow PIPESNAKE {
                 .map{[it[0], [it[1], it[2]]]}
         )
         .set{ch_prepared_fastq}
-        
+
         if (params.filter){
             Channel
             .fromPath(params.filter, checkIfExists:true)
@@ -202,17 +201,17 @@ workflow PIPESNAKE {
         //ch_meta.view()
         //println("dfdfdf");
         //ch_lineage.view()
-        
-       
+
+
 
 
         BBMAP_DEDUPE( ch_prepared_fastq )
         .deduplicates
         .set{ reformated_ch }
-        
-        
+
+
         if (params.disable_adapter_trimming){
-            reformated_ch.set{pear_input_ch} 
+            reformated_ch.set{pear_input_ch}
         }else{
             ch_sample_sheet_prepared.singles
             .mix(ch_sample_sheet_prepared.multiples)
@@ -224,22 +223,22 @@ workflow PIPESNAKE {
             .map{[it.getSimpleName(), it]}
             .set{ adaptor_ch }
 
-            TRIMMOMATIC( 
-                reformated_ch.join( adaptor_ch ) 
+            TRIMMOMATIC(
+                reformated_ch.join( adaptor_ch )
             )
              TRIMMOMATIC.out.trimmed_paired.set{pear_input_ch}
 
             ch_versions = ch_versions.mix(PREPARE_ADAPTOR.out.versions)
             ch_versions = ch_versions.mix(TRIMMOMATIC.out.versions)
         }
-     
+
 
         PEAR(
            pear_input_ch
         )
         .merged
         .set{ merged_ch }
-        
+
 
         TRIMMOMATIC_CLEAN_PE(
             PEAR.out.unmerged
@@ -247,7 +246,7 @@ workflow PIPESNAKE {
         .trimmed_cleaned_paired
         .set{ prepared_fastq }
 
-        
+
         if (params.filter){
             BBMAP_FILTER(
                 TRIMMOMATIC_CLEAN_PE
@@ -260,7 +259,7 @@ workflow PIPESNAKE {
             ch_prepared_reads = BBMAP_FILTER
             .out
             .prepared_reads
-            
+
         }else{
             ch_prepared_reads = TRIMMOMATIC_CLEAN_PE
                 .out
@@ -293,7 +292,7 @@ workflow PIPESNAKE {
                 TRIMMOMATIC_CLEAN_SE(
                     unpaired_concatenated_ch
                 )
-                
+
                 CONCATENATE2(
                     TRIMMOMATIC_CLEAN_PE
                     .out
@@ -331,9 +330,9 @@ workflow PIPESNAKE {
                 ch_prepared_reads
                 .set{
                     trinity_input_ch
-                }  
+                }
             }
-            
+
             TRINITY(
                 trinity_input_ch
             )
@@ -343,12 +342,12 @@ workflow PIPESNAKE {
             .trinity_fasta
             ch_versions = ch_versions.mix(TRINITY.out.versions)
         }
-        
+
 
         ASSEMBLY_POSTPROCESSING(
             ch_assembly_out
         )
-        
+
         BLAT(
             ASSEMBLY_POSTPROCESSING
             .out
@@ -370,8 +369,8 @@ workflow PIPESNAKE {
             , Channel
             .value(true)
         )
-        
-        
+
+
         PARSE_BLAT_RESULTS(
             ASSEMBLY_POSTPROCESSING
             .out
@@ -379,7 +378,7 @@ workflow PIPESNAKE {
             .join(BLAT.out.matches)
             .join(BLAT2.out.matches)
         )
-        
+
         MAKE_PRG(
             ASSEMBLY_POSTPROCESSING
             .out
@@ -391,7 +390,7 @@ workflow PIPESNAKE {
         )
 
         MAKE_PRG.out.RGB.set{ch_prg_out}
-        
+
         QUALITY_2_ASSEMBLY(
             ASSEMBLY_POSTPROCESSING
             .out
@@ -404,18 +403,18 @@ workflow PIPESNAKE {
 
         ch_versions = ch_versions.mix(BBMAP_DEDUPE.out.versions)
         ch_versions = ch_versions.mix(PEAR.out.versions)
-        
-        ch_versions = ch_versions.mix(CONCATENATE_RAW.out.versions)
-        
-        ch_versions = ch_versions.mix( TRIMMOMATIC_CLEAN_PE.out.versions)
-        
 
-        
+        ch_versions = ch_versions.mix(CONCATENATE_RAW.out.versions)
+
+        ch_versions = ch_versions.mix( TRIMMOMATIC_CLEAN_PE.out.versions)
+
+
+
         ch_versions = ch_versions.mix( ASSEMBLY_POSTPROCESSING.out.versions)
         ch_versions = ch_versions.mix( BLAT.out.versions)
         ch_versions = ch_versions.mix( BLAT2.out.versions)
         ch_versions = ch_versions.mix( PARSE_BLAT_RESULTS.out.versions)
-        
+
         //ch_versions = ch_versions.mix( PERL_CLEANUP.out.versions)
         ch_versions = ch_versions.mix( QUALITY_2_ASSEMBLY.out.versions)
         ch_versions = ch_versions.mix( MAKE_PRG.out.versions)
@@ -433,36 +432,55 @@ workflow PIPESNAKE {
             .flatten().buffer(size: params.batching_size, remainder: true)
         )
         ch_versions = ch_versions.mix( MAFFT.out.versions)
-        
-        if (params.trim_alignment){
+
+        if (params.trim_method.toLowerCase() == "gblocks") {
             GBLOCKS(
                 MAFFT.out.aligned.map{if (params.batching_size == 1) [it] else it}
             )
             .trimmed_allignments
             .set{ch_alignment}
-            
-        ch_versions = ch_versions.mix(GBLOCKS.out.versions)
-        } else{
+
+            ch_versions = ch_versions.mix(GBLOCKS.out.versions)
+        }
+        else if (params.trim_method.toLowerCase() == "clipkit") {
+            CLIPKIT(
+                MAFFT.out.aligned.map{if (params.batching_size == 1) [it] else it}
+            )
+            .trimmed_allignments
+            .set{ch_alignment}
+
+            ch_versions = ch_versions.mix(CLIPKIT.out.versions)
+        }
+        else if (params.trim_method.toLowerCase() == "trimal") {
+            TRIMAL(
+                MAFFT.out.aligned.map{if (params.batching_size == 1) [it] else it}
+            )
+            .trimmed_allignments
+            .set{ch_alignment}
+
+            ch_versions = ch_versions.mix(TRIMAL.out.versions)
+        }
+        else{
             ch_alignment = MAFFT.out.aligned.map{if (params.batching_size == 1) [it] else it}
         }
-        
+
         SED( ch_alignment.map{if (params.batching_size == 1) [it] else it} )
 
         BBMAP_REFORMAT(SED.out.seded.map{if (params.batching_size == 1) [it] else it})
-    
+
         if (params.tree_method == 'raxml'){
             RAXML(
                 BBMAP_REFORMAT.out.reformated.map{if (params.batching_size == 1) [it] else it}
             )
             ch_all_trees = RAXML.out.tree_bipartitions.flatten().toSortedList()
-            
+
             ch_versions = ch_versions.mix(RAXML.out.versions)
         }else if (params.tree_method == 'iqtree'){
             IQTREE(
                 BBMAP_REFORMAT.out.reformated.map{if (params.batching_size == 1) [it] else it}
             )
             ch_all_trees = IQTREE.out.contree.flatten().toSortedList()
-            
+
             ch_versions = ch_versions.mix(IQTREE.out.versions)
         }
 
@@ -476,18 +494,18 @@ workflow PIPESNAKE {
             )
             ch_versions = ch_versions.mix(ASTER.out.versions)
         }
-        
+
         ch_versions = ch_versions.mix( PHYLOGENY_MAKE_ALIGNMENTS.out.versions)
         //ch_versions = ch_versions.mix(CONVERT_PHYML.out.versions)
         ch_versions = ch_versions.mix(SED.out.versions)
         ch_versions = ch_versions.mix(BBMAP_REFORMAT.out.versions)
         ch_versions = ch_versions.mix(MERGE_TREES.out.versions)
     }
-    
+
     CUSTOM_DUMPSOFTWAREVERSIONS (
         ch_versions.unique().collectFile(name: 'collated_versions.yml')
     )
-    
+
 }
 
 /*

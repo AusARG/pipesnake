@@ -83,12 +83,13 @@
                     "fa_icon": "fas fa-question-circle",
                     "enum": ["trinity", "SPAdes"]
                 },
-                "trim_alignment": {
-                    "type": "boolean",
-                    "description": "Trim initial MAFFT alignments.",
-                    "help_text": "if true, use GBLOCKS to trim initial MAFFT alignments. May proceed slowly. If false, proceed to phylogenetic estimation using initial MAFFT alignments",
-                    "default": false,
-                    "fa_icon": "fas fa-question-circle"
+                "trim_method": {
+                    "type": "string",
+                    "description": "the supported options are: 'gblocks', 'clipkit', 'trimal' or 'none'",
+                    "help_text": "Choose the preffered alignment trimming method to trim initial MAFFT alignments. If 'none', proceed to phylogenetic estimation using initial MAFFT alignments",
+                    "default": "gblocks",
+                    "fa_icon": "fas fa-question-circle",
+                    "enum": ["gblocks", "clipkit", "trimal", "none"]
                 },
                 "disable_adapter_trimming": {
                     "type": "boolean",
@@ -116,7 +117,7 @@
                     "default": false,
                     "fa_icon": "fas fa-question-circle"
                 }
-                
+
             }
         },
         "institutional_config_options": {
@@ -269,7 +270,7 @@
                     "description": "The path to store singularity containers locally to be reused later",
                     "hidden": false,
                     "fa_icon": "fas fa-bacon"
-                }, 
+                },
                 "hook_url": {
                     "type": "string",
                     "description": "Incoming hook URL for messaging service",
@@ -977,7 +978,7 @@
             "properties": {
                 "preprocessing_args": {
                     "type": "string",
-                    
+
                     "description": "",
                     "help_text": "",
                     "fa_icon": "fa fa-cog",
@@ -1018,7 +1019,7 @@
             "properties": {
                 "bbmap_dedupe_args": {
                     "type": "string",
-                    "default": "dedupe optical spany adjacent",      
+                    "default": "dedupe optical spany adjacent",
                     "description": "",
                     "help_text": "",
                     "fa_icon": "fa fa-cog",
@@ -1394,7 +1395,7 @@
             "properties": {
                 "testing_args": {
                     "type": "string",
-                    
+
                     "description": "",
                     "help_text": "",
                     "fa_icon": "fa fa-cog",
@@ -1826,7 +1827,7 @@
                     "default": "12.h"
                 }
             }
-        }      
+        }
     },
     "allOf": [
         {
