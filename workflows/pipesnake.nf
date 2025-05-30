@@ -73,54 +73,40 @@ include { CUSTOM_DUMPSOFTWAREVERSIONS } from '../modules/nf-core/custom/dumpsoft
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    RUN MAIN WORKFLOW
+    SUBPROCESSES
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-// Info required for completion email and summary
+workflow TO_PRG {
+take:
+    ch_versions
 
-workflow PIPESNAKE {
-
-    ch_versions = Channel.empty()
-    //
-    // SUBWORKFLOW: Read in samplesheet, validate and stage input files
-    //
-
-    if (params.stage.toLowerCase() == "from-prg"){
-         Channel
-            .fromPath(params.input, checkIfExists:true)
-            .splitCsv(header:true, strip:true)
-            .map {row -> tuple(
+main:
+    def lineange_indx = params.disable_adapter_trimming ? 3 : 7
+    Channel
+        .fromPath(params.input, checkIfExists:true)
+        .splitCsv(header:true, strip:true)
+        .map {row ->
+            if (params.disable_adapter_trimming){
+                tuple(
                     row.sample_id,
-                    file(row.prg_file, checkIfExists: true))
+                    file(row.read1, checkIfExists: true),
+                    file(row.read2, checkIfExists: true),
+                    row.lineage
+                )
+            }else{
+                tuple(
+                    row.sample_id,
+                    file(row.read1, checkIfExists: true),
+                    file(row.read2, checkIfExists: true),
+                    row.adaptor1, row.adaptor2, row.barcode1, row.barcode2, row.lineage
+                )
             }
-            .set{ch_prg_out}
-    }else{
-        def lineange_indx = params.disable_adapter_trimming ? 3 : 7
-        Channel
-            .fromPath(params.input, checkIfExists:true)
-            .splitCsv(header:true, strip:true)
-            .map {row ->
-                if (params.disable_adapter_trimming){
-                    tuple(
-                        row.sample_id,
-                        file(row.read1, checkIfExists: true),
-                        file(row.read2, checkIfExists: true),
-                        row.lineage
-                    )
-                }else{
-                    tuple(
-                        row.sample_id,
-                        file(row.read1, checkIfExists: true),
-                        file(row.read2, checkIfExists: true),
-                        row.adaptor1, row.adaptor2, row.barcode1, row.barcode2, row.lineage
-                    )
-                }
-            }
-            .set{ch_sample_sheet_raw}
+        }
+        .set{ch_sample_sheet_raw}
 
 
-        ch_sample_sheet_raw
+    ch_sample_sheet_raw
         .groupTuple()
         .map{
             if (it[lineange_indx].unique().size() != 1){
@@ -135,7 +121,7 @@ workflow PIPESNAKE {
             }
         }
 
-        ch_sample_sheet_raw.groupTuple().map{
+    ch_sample_sheet_raw.groupTuple().map{
             if (!params.disable_adapter_trimming){
                 if (it[3].unique().size() != 1){
                     exit 1, "Adaptor1 for the sample ${it[0]} should be unique across all records for this sample!"
@@ -162,58 +148,56 @@ workflow PIPESNAKE {
         }
 
 
-        ch_sample_sheet_raw
+    ch_sample_sheet_raw
         .groupTuple()
         .map{[it[0], it[lineange_indx][0]]}
         .set{ch_lineage}
 
 
-        ch_sample_sheet_prepared.singles
+    ch_sample_sheet_prepared.singles
         .map{it -> [it[0], [it[1][0], it[2][0]]]}
         .set{ch_prepared_fastq_singles}
 
-        CONCATENATE_RAW(
-            ch_sample_sheet_prepared.multiples
-            .map{it -> [it[0], it[1], it[2]]}
-            , Channel.value("concatenated")
-        )
+    CONCATENATE_RAW(
+        ch_sample_sheet_prepared.multiples
+            .map{it -> [it[0], it[1], it[2]]},
+        Channel.value("concatenated")
+    )
 
-        ch_prepared_fastq_singles
+    ch_prepared_fastq_singles
         .mix(CONCATENATE_RAW.out.concatenated
-                .map{[it[0], [it[1], it[2]]]}
-        )
+            .map{[it[0], [it[1], it[2]]]})
         .set{ch_prepared_fastq}
 
-        if (params.filter){
-            Channel
-            .fromPath(params.filter, checkIfExists:true)
+    if (params.filter){
+        Channel.fromPath(params.filter, checkIfExists:true)
             .collect()
             .set{ch_filter}
-        }else{
-            Channel.empty().set{ch_filter}
-        }
+    }else{
+        Channel.empty().set{ch_filter}
+    }
 
-        Channel
-            .fromPath(params.blat_db, checkIfExists:true)
-            .collect()
-            .set{ch_blat_db}
+    Channel
+        .fromPath(params.blat_db, checkIfExists:true)
+        .collect()
+        .set{ch_blat_db}
 
-        //ch_meta.view()
-        //println("dfdfdf");
-        //ch_lineage.view()
-
-
+    //ch_meta.view()
+    //println("dfdfdf");
+    //ch_lineage.view()
 
 
-        BBMAP_DEDUPE( ch_prepared_fastq )
+
+
+    BBMAP_DEDUPE( ch_prepared_fastq )
         .deduplicates
         .set{ reformated_ch }
 
 
-        if (params.disable_adapter_trimming){
-            reformated_ch.set{pear_input_ch}
-        }else{
-            ch_sample_sheet_prepared.singles
+    if (params.disable_adapter_trimming){
+        reformated_ch.set{pear_input_ch}
+    }else{
+        ch_sample_sheet_prepared.singles
             .mix(ch_sample_sheet_prepared.multiples)
             .map{it -> [it[0], [it[3], it[4], it[5], it[6]]]}.set{ch_meta}
 
@@ -223,289 +207,315 @@ workflow PIPESNAKE {
             .map{[it.getSimpleName(), it]}
             .set{ adaptor_ch }
 
-            TRIMMOMATIC(
-                reformated_ch.join( adaptor_ch )
+        TRIMMOMATIC(
+            reformated_ch.join( adaptor_ch )
+        )
+         TRIMMOMATIC.out.trimmed_paired.set{pear_input_ch}
+
+        ch_versions = ch_versions.mix(PREPARE_ADAPTOR.out.versions)
+        ch_versions = ch_versions.mix(TRIMMOMATIC.out.versions)
+    }
+
+
+    PEAR(
+       pear_input_ch
+    )
+    .merged
+    .set{ merged_ch }
+
+
+    TRIMMOMATIC_CLEAN_PE(
+        PEAR.out.unmerged
+    )
+    .trimmed_cleaned_paired
+    .set{ prepared_fastq }
+
+
+    if (params.filter){
+        BBMAP_FILTER(
+            TRIMMOMATIC_CLEAN_PE.out.trimmed_cleaned_paired,
+            ch_filter
+        )
+
+        ch_versions = ch_versions.mix(BBMAP_FILTER.out.versions)
+        ch_prepared_reads = BBMAP_FILTER.out.prepared_reads
+
+    }else{
+        ch_prepared_reads = TRIMMOMATIC_CLEAN_PE.out.trimmed_cleaned_paired
+    }
+
+
+    if (params.assembly == "SPAdes"){
+        SPADES(
+            ch_prepared_reads
+        )
+
+        ch_versions = ch_versions.mix(SPADES.out.versions)
+        ch_assembly_out = SPADES.out.contigs
+    } else {
+        if (!params.disable_adapter_trimming) {
+            CONCATENATE(
+                TRIMMOMATIC
+                .out
+                .trimmed_unpaired
+                .join(merged_ch)
+                .map{ it -> [it[0], [it[1], it[2], it[3]]] }
+                , Channel.value("trimmed_unpaired_concatenated")
+            ).concatenated
+            .set{ unpaired_concatenated_ch }
+
+            TRIMMOMATIC_CLEAN_SE(
+                unpaired_concatenated_ch
             )
-             TRIMMOMATIC.out.trimmed_paired.set{pear_input_ch}
 
-            ch_versions = ch_versions.mix(PREPARE_ADAPTOR.out.versions)
-            ch_versions = ch_versions.mix(TRIMMOMATIC.out.versions)
-        }
-
-
-        PEAR(
-           pear_input_ch
-        )
-        .merged
-        .set{ merged_ch }
-
-
-        TRIMMOMATIC_CLEAN_PE(
-            PEAR.out.unmerged
-        )
-        .trimmed_cleaned_paired
-        .set{ prepared_fastq }
-
-
-        if (params.filter){
-            BBMAP_FILTER(
+            CONCATENATE2(
                 TRIMMOMATIC_CLEAN_PE
                 .out
-                .trimmed_cleaned_paired
-                , ch_filter
+                .trimmed_cleaned_unpaired
+                .join( TRIMMOMATIC_CLEAN_SE
+                        .out
+                        .trimmed_cleaned_se
+                )
+                .map{ it -> [it[0], [it[1], it[2], it[3]]]}
+                , Channel.value("trimmed_unpaired_pe_seconcatenated")
             )
-
-            ch_versions = ch_versions.mix( BBMAP_FILTER.out.versions)
-            ch_prepared_reads = BBMAP_FILTER
-            .out
-            .prepared_reads
-
-        }else{
-            ch_prepared_reads = TRIMMOMATIC_CLEAN_PE
-                .out
-                .trimmed_cleaned_paired
-        }
-
-
-        if (params.assembly == "SPAdes"){
-            SPADES(
+            CONCATENATE3(
                 ch_prepared_reads
-            )
-
-            ch_versions = ch_versions.mix(SPADES.out.versions)
-            ch_assembly_out = SPADES
-            .out
-            .contigs
-        } else {
-            if (!params.disable_adapter_trimming)
-            {
-                CONCATENATE(
-                    TRIMMOMATIC
-                    .out
-                    .trimmed_unpaired
-                    .join(merged_ch)
-                    .map{ it -> [it[0], [it[1], it[2], it[3]]] }
-                    , Channel.value("trimmed_unpaired_concatenated")
-                ).concatenated
-                .set{ unpaired_concatenated_ch }
-
-                TRIMMOMATIC_CLEAN_SE(
-                    unpaired_concatenated_ch
-                )
-
-                CONCATENATE2(
-                    TRIMMOMATIC_CLEAN_PE
-                    .out
-                    .trimmed_cleaned_unpaired
-                    .join( TRIMMOMATIC_CLEAN_SE
-                            .out
-                            .trimmed_cleaned_se
-                    )
-                    .map{ it -> [it[0], [it[1], it[2], it[3]]]}
-                    , Channel.value("trimmed_unpaired_pe_seconcatenated")
-                )
-                CONCATENATE3(
-                    ch_prepared_reads
-                    .join( CONCATENATE2
-                            .out
-                            .concatenated
-                    )
-                    .map{ it -> [it[0], [it[1], it[3]]] }
-                    , Channel.value("trinity_r1_unpaired_concatenated")
-                )
-                ch_prepared_reads
-                .join( CONCATENATE3
+                .join( CONCATENATE2
                         .out
                         .concatenated
-                    )
-                .map{ it -> [it[0], it[3], it[2]] }
-                .set{
-                    trinity_input_ch
-                }
-                ch_versions = ch_versions.mix(CONCATENATE2.out.versions)
-                ch_versions = ch_versions.mix(CONCATENATE3.out.versions)
-                ch_versions = ch_versions.mix(CONCATENATE.out.versions)
-                ch_versions = ch_versions.mix( TRIMMOMATIC_CLEAN_SE.out.versions)
-            }else{
-                ch_prepared_reads
-                .set{
-                    trinity_input_ch
-                }
-            }
-
-            TRINITY(
-                trinity_input_ch
+                )
+                .map{ it -> [it[0], [it[1], it[3]]] }
+                , Channel.value("trinity_r1_unpaired_concatenated")
             )
-
-            ch_assembly_out = TRINITY
-            .out
-            .trinity_fasta
-            ch_versions = ch_versions.mix(TRINITY.out.versions)
+            ch_prepared_reads
+            .join( CONCATENATE3
+                    .out
+                    .concatenated
+                )
+            .map{ it -> [it[0], it[3], it[2]] }
+            .set{
+                trinity_input_ch
+            }
+            ch_versions = ch_versions.mix(CONCATENATE2.out.versions)
+            ch_versions = ch_versions.mix(CONCATENATE3.out.versions)
+            ch_versions = ch_versions.mix(CONCATENATE.out.versions)
+            ch_versions = ch_versions.mix( TRIMMOMATIC_CLEAN_SE.out.versions)
+        }else{
+            ch_prepared_reads
+            .set{
+                trinity_input_ch
+            }
         }
 
-
-        ASSEMBLY_POSTPROCESSING(
-            ch_assembly_out
+        TRINITY(
+            trinity_input_ch
         )
 
-        BLAT(
-            ASSEMBLY_POSTPROCESSING
-            .out
-            .processed
-            , ch_blat_db
-            , Channel
-            .value("to_probes")
-            , Channel
-            .value(false)
-        )
-
-        BLAT2(
-            ASSEMBLY_POSTPROCESSING
-            .out
-            .processed
-            , ch_blat_db
-            , Channel
-            .value("from_probes")
-            , Channel
-            .value(true)
-        )
+        ch_assembly_out = TRINITY.out.trinity_fasta
+        ch_versions = ch_versions.mix(TRINITY.out.versions)
+    }
 
 
-        PARSE_BLAT_RESULTS(
-            ASSEMBLY_POSTPROCESSING
-            .out
-            .processed
+    ASSEMBLY_POSTPROCESSING(
+        ch_assembly_out
+    )
+
+    BLAT(
+        ASSEMBLY_POSTPROCESSING.out.processed,
+        ch_blat_db,
+        Channel.value("to_probes"),
+        Channel.value(false)
+    )
+
+    BLAT2(
+        ASSEMBLY_POSTPROCESSING.out.processed,
+        ch_blat_db,
+        Channel.value("from_probes"),
+        Channel.value(true)
+    )
+
+
+    PARSE_BLAT_RESULTS(
+        ASSEMBLY_POSTPROCESSING.out.processed
             .join(BLAT.out.matches)
             .join(BLAT2.out.matches)
-        )
+    )
 
-        MAKE_PRG(
-            ASSEMBLY_POSTPROCESSING
-            .out
-            .processed
+    MAKE_PRG(
+        ASSEMBLY_POSTPROCESSING.out.processed
             .join(
                 PARSE_BLAT_RESULTS.out.matches
             )
             .join(ch_lineage)
-        )
+    )
 
-        MAKE_PRG.out.RGB.set{ch_prg_out}
+    MAKE_PRG.out.RGB.set{ch_prg_out}
 
-        QUALITY_2_ASSEMBLY(
-            ASSEMBLY_POSTPROCESSING
-            .out
-            .processed
+    QUALITY_2_ASSEMBLY(
+        ASSEMBLY_POSTPROCESSING.out.processed
             .join(
                 ch_prg_out
             )
             .join(ch_lineage)
+    )
+
+    ch_versions = ch_versions.mix(BBMAP_DEDUPE.out.versions)
+    ch_versions = ch_versions.mix(PEAR.out.versions)
+
+    ch_versions = ch_versions.mix(CONCATENATE_RAW.out.versions)
+
+    ch_versions = ch_versions.mix(TRIMMOMATIC_CLEAN_PE.out.versions)
+
+
+
+    ch_versions = ch_versions.mix(ASSEMBLY_POSTPROCESSING.out.versions)
+    ch_versions = ch_versions.mix(BLAT.out.versions)
+    ch_versions = ch_versions.mix(BLAT2.out.versions)
+    ch_versions = ch_versions.mix(PARSE_BLAT_RESULTS.out.versions)
+
+    //ch_versions = ch_versions.mix( PERL_CLEANUP.out.versions)
+    ch_versions = ch_versions.mix(QUALITY_2_ASSEMBLY.out.versions)
+    ch_versions = ch_versions.mix(MAKE_PRG.out.versions)
+
+emit:
+    ch_versions = ch_versions
+    ch_prg_out = ch_prg_out
+}
+
+workflow FROM_PRG {
+take:
+    ch_versions
+    ch_prg_out
+
+main:
+    PHYLOGENY_MAKE_ALIGNMENTS(
+        ch_prg_out.map(it -> it[1]).toSortedList()
+    )
+
+    MAFFT(
+        PHYLOGENY_MAKE_ALIGNMENTS.out.locus_fasta
+            .toSortedList()
+            .flatten()
+            .buffer(
+                size: params.batching_size,
+                remainder: true
+            )
+    )
+    ch_versions = ch_versions.mix(MAFFT.out.versions)
+
+    def trimmer_map = [
+        gblocks: { input -> GBLOCKS(input) },
+        clipkit: { input -> CLIPKIT(input) },
+        trimal: { input -> TRIMAL(input) }
+    ]
+
+    ch_trim_out = trimmer_map.get(
+        params.trim_method.toLowerCase()
+    )?.call(
+        MAFFT.out.aligned.map {if (params.batching_size == 1) [it] else it}
+    ) ?: [
+        trimmed_allignments: MAFFT.out.aligned,
+        versions: Channel.empty()
+    ]
+    ch_versions = ch_versions.mix(ch_trim_out.versions)
+
+    SED(
+        ch_trim_out.trimmed_allignments
+            .map{if (params.batching_size == 1) [it] else it}
+    )
+
+    BBMAP_REFORMAT(
+        SED.out.seded
+            .map{if (params.batching_size == 1) [it] else it}
+    )
+
+    if (params.tree_method == 'raxml'){
+        RAXML(
+            BBMAP_REFORMAT.out.reformated
+                .map{if (params.batching_size == 1) [it] else it}
         )
+        ch_all_trees = RAXML.out.tree_bipartitions
+            .flatten()
+            .toSortedList()
 
-        ch_versions = ch_versions.mix(BBMAP_DEDUPE.out.versions)
-        ch_versions = ch_versions.mix(PEAR.out.versions)
+        ch_versions = ch_versions.mix(RAXML.out.versions)
+    } else if (params.tree_method == 'iqtree'){
+        IQTREE(
+            BBMAP_REFORMAT.out.reformated
+                .map{if (params.batching_size == 1) [it] else it}
+        )
+        ch_all_trees = IQTREE.out.contree
+            .flatten()
+            .toSortedList()
 
-        ch_versions = ch_versions.mix(CONCATENATE_RAW.out.versions)
-
-        ch_versions = ch_versions.mix( TRIMMOMATIC_CLEAN_PE.out.versions)
-
-
-
-        ch_versions = ch_versions.mix( ASSEMBLY_POSTPROCESSING.out.versions)
-        ch_versions = ch_versions.mix( BLAT.out.versions)
-        ch_versions = ch_versions.mix( BLAT2.out.versions)
-        ch_versions = ch_versions.mix( PARSE_BLAT_RESULTS.out.versions)
-
-        //ch_versions = ch_versions.mix( PERL_CLEANUP.out.versions)
-        ch_versions = ch_versions.mix( QUALITY_2_ASSEMBLY.out.versions)
-        ch_versions = ch_versions.mix( MAKE_PRG.out.versions)
+        ch_versions = ch_versions.mix(IQTREE.out.versions)
     }
 
-    if (params.stage != "end-prg"){
-        PHYLOGENY_MAKE_ALIGNMENTS(
-            ch_prg_out.map(it -> it[1]).toSortedList()
+    MERGE_TREES(
+        ch_all_trees
+    )
+
+    if (!params.no_tree_merge){
+        ASTER(
+            MERGE_TREES.out.merged_trees
         )
+        ch_versions = ch_versions.mix(ASTER.out.versions)
+    }
 
-        MAFFT(
-            PHYLOGENY_MAKE_ALIGNMENTS
-            .out
-            .locus_fasta.toSortedList()
-            .flatten().buffer(size: params.batching_size, remainder: true)
-        )
-        ch_versions = ch_versions.mix( MAFFT.out.versions)
+    ch_versions = ch_versions.mix(PHYLOGENY_MAKE_ALIGNMENTS.out.versions)
+    //ch_versions = ch_versions.mix(CONVERT_PHYML.out.versions)
+    ch_versions = ch_versions.mix(SED.out.versions)
+    ch_versions = ch_versions.mix(BBMAP_REFORMAT.out.versions)
+    ch_versions = ch_versions.mix(MERGE_TREES.out.versions)
 
-        if (params.trim_method.toLowerCase() == "gblocks") {
-            GBLOCKS(
-                MAFFT.out.aligned.map{if (params.batching_size == 1) [it] else it}
-            )
-            .trimmed_allignments
-            .set{ch_alignment}
+emit:
+    ch_versions = ch_versions
+}
 
-            ch_versions = ch_versions.mix(GBLOCKS.out.versions)
-        }
-        else if (params.trim_method.toLowerCase() == "clipkit") {
-            CLIPKIT(
-                MAFFT.out.aligned.map{if (params.batching_size == 1) [it] else it}
-            )
-            .trimmed_allignments
-            .set{ch_alignment}
+/*
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    RUN MAIN WORKFLOW
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*/
 
-            ch_versions = ch_versions.mix(CLIPKIT.out.versions)
-        }
-        else if (params.trim_method.toLowerCase() == "trimal") {
-            TRIMAL(
-                MAFFT.out.aligned.map{if (params.batching_size == 1) [it] else it}
-            )
-            .trimmed_allignments
-            .set{ch_alignment}
+// Info required for completion email and summary
 
-            ch_versions = ch_versions.mix(TRIMAL.out.versions)
-        }
-        else{
-            ch_alignment = MAFFT.out.aligned.map{if (params.batching_size == 1) [it] else it}
-        }
+workflow PIPESNAKE {
+    //
+    // SUBWORKFLOW: Read in samplesheet, validate and stage input files
+    //
 
-        SED( ch_alignment.map{if (params.batching_size == 1) [it] else it} )
+    ch_versions = Channel.empty()
 
-        BBMAP_REFORMAT(SED.out.seded.map{if (params.batching_size == 1) [it] else it})
+    if (params.stage.toLowerCase() == "from-prg"){
+         Channel
+            .fromPath(params.input, checkIfExists:true)
+            .splitCsv(header:true, strip:true)
+            .map {
+                row -> tuple(
+                    row.sample_id,
+                    file(row.prg_file, checkIfExists: true)
+                )
+            }
+            .set{ch_prg_out}
+    }
+    else {
+        TO_PRG(ch_versions)
+        TO_PRG.out.ch_versions.set{ ch_versions }
+        TO_PRG.out.ch_prg_out.set{ ch_prg_out }
+    }
 
-        if (params.tree_method == 'raxml'){
-            RAXML(
-                BBMAP_REFORMAT.out.reformated.map{if (params.batching_size == 1) [it] else it}
-            )
-            ch_all_trees = RAXML.out.tree_bipartitions.flatten().toSortedList()
-
-            ch_versions = ch_versions.mix(RAXML.out.versions)
-        }else if (params.tree_method == 'iqtree'){
-            IQTREE(
-                BBMAP_REFORMAT.out.reformated.map{if (params.batching_size == 1) [it] else it}
-            )
-            ch_all_trees = IQTREE.out.contree.flatten().toSortedList()
-
-            ch_versions = ch_versions.mix(IQTREE.out.versions)
-        }
-
-        MERGE_TREES(
-            ch_all_trees
-        )
-
-        if (!params.no_tree_merge){
-            ASTER(
-                MERGE_TREES.out.merged_trees
-            )
-            ch_versions = ch_versions.mix(ASTER.out.versions)
-        }
-
-        ch_versions = ch_versions.mix( PHYLOGENY_MAKE_ALIGNMENTS.out.versions)
-        //ch_versions = ch_versions.mix(CONVERT_PHYML.out.versions)
-        ch_versions = ch_versions.mix(SED.out.versions)
-        ch_versions = ch_versions.mix(BBMAP_REFORMAT.out.versions)
-        ch_versions = ch_versions.mix(MERGE_TREES.out.versions)
+    if (params.stage != "end-prg") {
+        FROM_PRG(ch_versions, ch_prg_out)
+        FROM_PRG.out.ch_versions.set{ ch_versions }
     }
 
     CUSTOM_DUMPSOFTWAREVERSIONS (
-        ch_versions.unique().collectFile(name: 'collated_versions.yml')
+        ch_versions
+            .unique()
+            .collectFile(name: 'collated_versions.yml')
     )
-
 }
 
 /*

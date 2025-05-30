@@ -1,6 +1,7 @@
 process TRIMAL {
     tag "${ fasta_ls.size() > 1 ? 'batch of ' + fasta_ls.size() + ' fasta files' : fasta_ls[0].getSimpleName()}"
 
+    conda "bioconda::trimal=1.5.0"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/trimal%3A1.5.0--h9948957_2' :
         'quay.io/biocontainers/trimal:1.5.0--h9948957_2' }"
