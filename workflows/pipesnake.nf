@@ -82,6 +82,7 @@ take:
     ch_versions
 
 main:
+    // Parse input file
     def lineange_indx = params.disable_adapter_trimming ? 3 : 7
     Channel
         .fromPath(params.input, checkIfExists:true)
@@ -94,7 +95,8 @@ main:
                     file(row.read2, checkIfExists: true),
                     row.lineage
                 )
-            }else{
+            }
+            else{
                 tuple(
                     row.sample_id,
                     file(row.read1, checkIfExists: true),
@@ -106,6 +108,7 @@ main:
         .set{ch_sample_sheet_raw}
 
 
+    // Check if lineages for a sample is unique and all lineages corresponding to different samples are different
     ch_sample_sheet_raw
         .groupTuple()
         .map{
@@ -121,6 +124,7 @@ main:
             }
         }
 
+    // Check if adaptor and barcode for each sample is unique and map to lists
     ch_sample_sheet_raw.groupTuple().map{
             if (!params.disable_adapter_trimming){
                 if (it[3].unique().size() != 1){
@@ -147,13 +151,13 @@ main:
             ch_sample_sheet_prepared
         }
 
-
+    // Create channel of sample and lineage
     ch_sample_sheet_raw
         .groupTuple()
         .map{[it[0], it[lineange_indx][0]]}
         .set{ch_lineage}
 
-
+    // Prepare simple and  multiple samples and merge
     ch_sample_sheet_prepared.singles
         .map{it -> [it[0], [it[1][0], it[2][0]]]}
         .set{ch_prepared_fastq_singles}
@@ -169,6 +173,7 @@ main:
             .map{[it[0], [it[1], it[2]]]})
         .set{ch_prepared_fastq}
 
+    // Read filter file if filtering enabled
     if (params.filter){
         Channel.fromPath(params.filter, checkIfExists:true)
             .collect()
@@ -177,32 +182,28 @@ main:
         Channel.empty().set{ch_filter}
     }
 
+    // Read blat db
     Channel
         .fromPath(params.blat_db, checkIfExists:true)
         .collect()
         .set{ch_blat_db}
 
-    //ch_meta.view()
-    //println("dfdfdf");
-    //ch_lineage.view()
-
-
-
-
+    // Deduplicate reads
     BBMAP_DEDUPE( ch_prepared_fastq )
         .deduplicates
         .set{ reformated_ch }
 
-
-    if (params.disable_adapter_trimming){
-        reformated_ch.set{pear_input_ch}
-    }else{
+    // Perform adapter trimming if enabled
+    if (!params.disable_adapter_trimming){
         ch_sample_sheet_prepared.singles
             .mix(ch_sample_sheet_prepared.multiples)
             .map{it -> [it[0], [it[3], it[4], it[5], it[6]]]}.set{ch_meta}
 
-            PREPARE_ADAPTOR( ch_meta.map{[it[0], it[1][0], it[1][1], it[1][2], it[1][3]]}.toList())
-            .adaptor
+        PREPARE_ADAPTOR(
+            ch_meta.map{
+                [it[0], it[1][0], it[1][1], it[1][2], it[1][3]]
+            }.toList()
+        ).adaptor
             .flatten()
             .map{[it.getSimpleName(), it]}
             .set{ adaptor_ch }
@@ -210,27 +211,25 @@ main:
         TRIMMOMATIC(
             reformated_ch.join( adaptor_ch )
         )
-         TRIMMOMATIC.out.trimmed_paired.set{pear_input_ch}
+        TRIMMOMATIC.out.trimmed_paired.set{pear_input_ch}
 
         ch_versions = ch_versions.mix(PREPARE_ADAPTOR.out.versions)
         ch_versions = ch_versions.mix(TRIMMOMATIC.out.versions)
+    }else{
+        reformated_ch.set{pear_input_ch}
     }
 
-
+    // Merge reads
     PEAR(
        pear_input_ch
-    )
-    .merged
-    .set{ merged_ch }
+    ).merged.set{ merged_ch }
 
-
+    // Clean merged reads
     TRIMMOMATIC_CLEAN_PE(
         PEAR.out.unmerged
-    )
-    .trimmed_cleaned_paired
-    .set{ prepared_fastq }
+    ).trimmed_cleaned_paired.set{ prepared_fastq }
 
-
+    // Filter reads if enabled
     if (params.filter){
         BBMAP_FILTER(
             TRIMMOMATIC_CLEAN_PE.out.trimmed_cleaned_paired,
@@ -244,7 +243,7 @@ main:
         ch_prepared_reads = TRIMMOMATIC_CLEAN_PE.out.trimmed_cleaned_paired
     }
 
-
+    // Assemble reads using SPAdes or Trinity
     if (params.assembly == "SPAdes"){
         SPADES(
             ch_prepared_reads
@@ -255,57 +254,42 @@ main:
     } else {
         if (!params.disable_adapter_trimming) {
             CONCATENATE(
-                TRIMMOMATIC
-                .out
-                .trimmed_unpaired
-                .join(merged_ch)
-                .map{ it -> [it[0], [it[1], it[2], it[3]]] }
+                TRIMMOMATIC.out.trimmed_unpaired
+                    .join(merged_ch)
+                    .map{ it -> [it[0], [it[1], it[2], it[3]]] }
                 , Channel.value("trimmed_unpaired_concatenated")
-            ).concatenated
-            .set{ unpaired_concatenated_ch }
+            ).concatenated.set{ unpaired_concatenated_ch }
 
             TRIMMOMATIC_CLEAN_SE(
                 unpaired_concatenated_ch
             )
 
             CONCATENATE2(
-                TRIMMOMATIC_CLEAN_PE
-                .out
-                .trimmed_cleaned_unpaired
-                .join( TRIMMOMATIC_CLEAN_SE
+                TRIMMOMATIC_CLEAN_PE.out.trimmed_cleaned_unpaired
+                    .join( TRIMMOMATIC_CLEAN_SE
                         .out
                         .trimmed_cleaned_se
-                )
-                .map{ it -> [it[0], [it[1], it[2], it[3]]]}
+                    )
+                    .map{ it -> [it[0], [it[1], it[2], it[3]]]}
                 , Channel.value("trimmed_unpaired_pe_seconcatenated")
             )
             CONCATENATE3(
                 ch_prepared_reads
-                .join( CONCATENATE2
-                        .out
-                        .concatenated
-                )
-                .map{ it -> [it[0], [it[1], it[3]]] }
+                    .join(CONCATENATE2.out.concatenated)
+                    .map{ it -> [it[0], [it[1], it[3]]] }
                 , Channel.value("trinity_r1_unpaired_concatenated")
             )
             ch_prepared_reads
-            .join( CONCATENATE3
-                    .out
-                    .concatenated
-                )
-            .map{ it -> [it[0], it[3], it[2]] }
-            .set{
-                trinity_input_ch
-            }
+                .join(CONCATENATE3.out.concatenated)
+                .map{ it -> [it[0], it[3], it[2]] }
+                .set{trinity_input_ch}
+
             ch_versions = ch_versions.mix(CONCATENATE2.out.versions)
             ch_versions = ch_versions.mix(CONCATENATE3.out.versions)
             ch_versions = ch_versions.mix(CONCATENATE.out.versions)
             ch_versions = ch_versions.mix( TRIMMOMATIC_CLEAN_SE.out.versions)
         }else{
-            ch_prepared_reads
-            .set{
-                trinity_input_ch
-            }
+            ch_prepared_reads.set{trinity_input_ch}
         }
 
         TRINITY(
@@ -316,7 +300,7 @@ main:
         ch_versions = ch_versions.mix(TRINITY.out.versions)
     }
 
-
+    // Perform assembly posprocessing
     ASSEMBLY_POSTPROCESSING(
         ch_assembly_out
     )
@@ -335,46 +319,36 @@ main:
         Channel.value(true)
     )
 
-
+    // Parse blat results
     PARSE_BLAT_RESULTS(
         ASSEMBLY_POSTPROCESSING.out.processed
             .join(BLAT.out.matches)
             .join(BLAT2.out.matches)
     )
 
+    // Construct PRG from the assembly
     MAKE_PRG(
         ASSEMBLY_POSTPROCESSING.out.processed
-            .join(
-                PARSE_BLAT_RESULTS.out.matches
-            )
+            .join(PARSE_BLAT_RESULTS.out.matches)
             .join(ch_lineage)
-    )
+    ).RGB.set{ch_prg_out}
 
-    MAKE_PRG.out.RGB.set{ch_prg_out}
-
+    // Find the quality of the assembly
     QUALITY_2_ASSEMBLY(
         ASSEMBLY_POSTPROCESSING.out.processed
-            .join(
-                ch_prg_out
-            )
+            .join(ch_prg_out)
             .join(ch_lineage)
     )
 
+    // Log software versions used
     ch_versions = ch_versions.mix(BBMAP_DEDUPE.out.versions)
     ch_versions = ch_versions.mix(PEAR.out.versions)
-
     ch_versions = ch_versions.mix(CONCATENATE_RAW.out.versions)
-
     ch_versions = ch_versions.mix(TRIMMOMATIC_CLEAN_PE.out.versions)
-
-
-
     ch_versions = ch_versions.mix(ASSEMBLY_POSTPROCESSING.out.versions)
     ch_versions = ch_versions.mix(BLAT.out.versions)
     ch_versions = ch_versions.mix(BLAT2.out.versions)
     ch_versions = ch_versions.mix(PARSE_BLAT_RESULTS.out.versions)
-
-    //ch_versions = ch_versions.mix( PERL_CLEANUP.out.versions)
     ch_versions = ch_versions.mix(QUALITY_2_ASSEMBLY.out.versions)
     ch_versions = ch_versions.mix(MAKE_PRG.out.versions)
 
@@ -389,10 +363,12 @@ take:
     ch_prg_out
 
 main:
+    // Create fasta file for alignment
     PHYLOGENY_MAKE_ALIGNMENTS(
         ch_prg_out.map(it -> it[1]).toSortedList()
     )
 
+    // Perform alignment using MAFFT
     MAFFT(
         PHYLOGENY_MAKE_ALIGNMENTS.out.locus_fasta
             .toSortedList()
@@ -404,6 +380,7 @@ main:
     )
     ch_versions = ch_versions.mix(MAFFT.out.versions)
 
+    // Perform alignment trimming if enabled
     def trimmer_map = [
         gblocks: { input -> GBLOCKS(input) },
         clipkit: { input -> CLIPKIT(input) },
@@ -420,16 +397,19 @@ main:
     ]
     ch_versions = ch_versions.mix(ch_trim_out.versions)
 
+    // Remove specific characters from the alignment
     SED(
         ch_trim_out.trimmed_allignments
             .map{if (params.batching_size == 1) [it] else it}
     )
 
+    // Covert format of sed output file
     BBMAP_REFORMAT(
         SED.out.seded
             .map{if (params.batching_size == 1) [it] else it}
     )
 
+    // Construct phylogenetic tree
     if (params.tree_method == 'raxml'){
         RAXML(
             BBMAP_REFORMAT.out.reformated
@@ -452,10 +432,12 @@ main:
         ch_versions = ch_versions.mix(IQTREE.out.versions)
     }
 
+    // Merge trees
     MERGE_TREES(
         ch_all_trees
     )
 
+    // Estimate species tree using aster
     if (!params.no_tree_merge){
         ASTER(
             MERGE_TREES.out.merged_trees
@@ -463,6 +445,7 @@ main:
         ch_versions = ch_versions.mix(ASTER.out.versions)
     }
 
+    // Log software versions
     ch_versions = ch_versions.mix(PHYLOGENY_MAKE_ALIGNMENTS.out.versions)
     //ch_versions = ch_versions.mix(CONVERT_PHYML.out.versions)
     ch_versions = ch_versions.mix(SED.out.versions)
@@ -525,6 +508,7 @@ workflow PIPESNAKE {
 */
 
 workflow.onComplete {
+    // Send summary email once workflow is complete
     if (params.email || params.email_on_fail) {
         NfcoreTemplate.email(workflow, params, summary_params, projectDir, log, multiqc_report)
     }
