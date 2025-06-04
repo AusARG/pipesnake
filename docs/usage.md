@@ -23,17 +23,17 @@ e.g. `--input /scratch/testdata/sample_sheet.csv --disable_filter true`.
 |---------------|:---------------:|---------------------|
 | --input  | string |   Path to comma-separated file containing information about the samples in the experiment.
 | --outdir  | string |   The output directory where the results will be saved. <br/> You have to use absolute paths to storage on Cloud infrastructure. |
---disable_filter  | boolean | Default is `true`.<br />Disable bbmap filtration process. <br/>This speed up the performance. When enabled, the reference genome parameter is required. | 
+--disable_filter  | boolean | Default is `true`.<br />Disable bbmap filtration process. <br/>This speed up the performance. When enabled, the reference genome parameter is required. |
 |--reference_genome | string | Path to the filter sequences FASTA file.|
 | --blat_db  | string | Path to the target sequences FASTA file.|
-| --tree_method  | string | Default is `iqtree`.<br /> The supported options are: `iqtree` or `raxml`. | 
+| --tree_method  | string | Default is `iqtree`.<br /> The supported options are: `iqtree` or `raxml`. |
 | --trim_alignment  | boolean | Default is `false`.<br />Trim initial MAFFT alignments. |
-| --batching_size  | integer |  Default is `250`.<br /> Number of alignment files to be processed sequentially in batches <br/> to avoid submitting a large number of jobs when using HPCs. | 
-| --trinity_scratch_tmp  | boolean |  Default is `true`.<br /> Trinity generates large number of intermediate files. <br/>This can be an issue for some HPCs that limits the file number for each user.<br/> This option will make trinity writes to the `/tmp` directory on the compute node <br/> then copy the compressed output directory (not the fasta) to the working directory to avoid this issue. |  
+| --batching_size  | integer |  Default is `250`.<br /> Number of alignment files to be processed sequentially in batches <br/> to avoid submitting a large number of jobs when using HPCs. |
+| --trinity_scratch_tmp  | boolean |  Default is `true`.<br /> Trinity generates large number of intermediate files. <br/>This can be an issue for some HPCs that limits the file number for each user.<br/> This option will make trinity writes to the `/tmp` directory on the compute node <br/> then copy the compressed output directory (not the fasta) to the working directory to avoid this issue. |
 
 
 ### Tools arguments for each stage of the pipeline
-italic variables in the default values represent other parameters. 
+italic variables in the default values represent other parameters.
 
 | Parameter       | Type |  Description           |
 |-----------------|------|------------------------|
@@ -72,9 +72,9 @@ italic variables in the default values represent other parameters.
 |--make_prg_args|`string`|Default is `--kept-tags` *`make_rgb_kept_tags`*  <br/> The arguments to be passed to process (make_prg). |
 |--gblocks_b1|`number`|Default is `0.5` <br/>Minimum number of sequences to be identified as a conserved site This establishes the minimum threshold for identifying a conserved site. The value must be greater than half the number of sequences, e.g. min value is 0.5 and we'll round that up|
 |--gblocks_b2|`number`|Default is `0.85` <br/>Minimum number of sequences to be identified as a flanking site Flanking sites are assessed until they make a series of conserved positions at both flanks relative to the contiguous nonconserved sites. This value must be equal to or greater than the value of b1|
-|--gblocks_b3|`integer`|Default is `8` <br/>Maximum number of contiguous nonconserved sites allowed Stretches of contiguous nonconserved sites greater than b3 are rejected. Greater b3 values increase the selected number of positions|
-|--gblocks_b4|`number`|Default is `10` <br/>Minimum length of a sequence block after gap cleaning After gap cleaning, sequence blocks less than the indicated value are rejected|
-|--gblocks_args|`string`|Default is `-t=DNA` <br /> `-b3=`*`gblocks_b3`* <br /> `-b4=`*`gblocks_b4`* <br /> `-b5=h -p=n` <br/> The arguments to be passed to process (gblocks). |
+|--gblocks_args|`string`|Default is `-t=DNA -b1=$gblocks_b1 -b2=gblocks_b2 -b3=8 -b4=10 -b5=h -p=n` <br /> The arguments to be passed to process (gblocks). |
+|--clipkit_args|`string`|Default is `-m gappy -g 0.8` <br /> The arguments to be passed to process (clipkit). |
+|--trimal_args|`string`|Default is `-gt 0.2` <br /> The arguments to be passed to process (trimal). |
 |--testing_args|`string`|Default is `None` <br/> |
 |--trinity_normalize_reads|`boolean`|Default is `False` <br/>Normalize the read pool, discarding excess coverage Depending on the sequencing effort, there may be excess reads (above desired coverage) that will slow down computation by requiring additional memory. New versions of trinity normalize reads do this by default, and it's highly recommended here.|
 |--trinity_processed_header|`string`|Default is `contig` <br/>Prefix for a contig of assembled reads Naming convention for assembled contigs. Suggested Usage: contig|
@@ -108,7 +108,7 @@ You can customise the resources requested for each stage of the pipeline includi
 
 *`process-name`* can be any one of the following processes:
 
-`perl_cleanup`, `phylogeny_make_alignments`, `preprocessing`, `trimmomatic_clean_pe`, `trinity_postprocessing`, `blat`, `bbmap_reformat`, `gblocks`, `parse_blat_results`, `aster`, `bbmap_reformat2`, `convert_phyml`, `trimmomatic`, `iqtree`, `concatenate`, `trinity`, `saved_output`, `bbmap_filter`, `bbmap_dedupe`, `prepare_adaptor`, `mafft`, `sed`, `pear`, `merge_trees`, `raxml`, `trimmomatic_clean_se`, `make_prg`, `macse`, `quality_2_assembly`
+`perl_cleanup`, `phylogeny_make_alignments`, `preprocessing`, `trimmomatic_clean_pe`, `trinity_postprocessing`, `blat`, `bbmap_reformat`, `trimmer`, `parse_blat_results`, `aster`, `bbmap_reformat2`, `convert_phyml`, `trimmomatic`, `iqtree`, `concatenate`, `trinity`, `saved_output`, `bbmap_filter`, `bbmap_dedupe`, `prepare_adaptor`, `mafft`, `sed`, `pear`, `merge_trees`, `raxml`, `trimmomatic_clean_se`, `make_prg`, `macse`, `quality_2_assembly`
 
 
 Examples:
@@ -201,7 +201,7 @@ Specify the path to a specific config file (this is a core Nextflow command). Se
 
 ### `-work-dir`
 
-Specify the path to your preferred working directory, instead of your current working directory. 
+Specify the path to your preferred working directory, instead of your current working directory.
 
 ## Custom configuration
 
