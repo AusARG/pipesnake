@@ -350,6 +350,14 @@
                     "fa_icon": "fas fa-copy",
                     "hidden": true
                 },
+                "segul_keep_output": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "If enabled, the output of process 'segul' will be saved in the output directory.",
+                    "help_text": "",
+                    "fa_icon": "fas fa-copy",
+                    "hidden": true
+                },
                 "quality_2_assembly_keep_output": {
                     "type": "boolean",
                     "default": false,
@@ -757,6 +765,47 @@
                 "parse_blat_results_walltime": {
                     "type": "string",
                     "description": "The requested walltime for the process (parse_blat_results).",
+                    "help_text": "",
+                    "fa_icon": "far fa-clock",
+                    "hidden": true,
+                    "default": "12.h"
+                }
+            }
+        },
+        "segul_options": {
+            "title": "segul options",
+            "type": "object",
+            "fa_icon": "fa-solid fa-arrow-progress",
+            "description": "The configurations of the process segul.",
+            "help_text": "",
+            "properties": {
+                "segul_args": {
+                    "type": "string",
+                    "default": "",
+                    "description": "The arguments to be passed to process (segul).",
+                    "help_text": "",
+                    "fa_icon": "fa fa-cog",
+                    "hidden": true
+                },
+                "segul_cpus": {
+                    "type": "integer",
+                    "description": "The number of requested CPUs for the process (segul).",
+                    "help_text": "",
+                    "fa_icon": "fas fa-microchip",
+                    "hidden": true,
+                    "default": 1
+                },
+                "segul_memory": {
+                    "type": "string",
+                    "description": "The requested memory for the process (segul).",
+                    "help_text": "",
+                    "fa_icon": "fas fa-memory",
+                    "hidden": true,
+                    "default": "8.GB"
+                },
+                "segul_walltime": {
+                    "type": "string",
+                    "description": "The requested walltime for the process (segul).",
                     "help_text": "",
                     "fa_icon": "far fa-clock",
                     "hidden": true,

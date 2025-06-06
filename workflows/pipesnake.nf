@@ -41,6 +41,7 @@ include {ASSEMBLY_POSTPROCESSING} from '../modules/local/assembly_postprocessing
 include {BLAT} from '../modules/local/blat'
 include {BLAT as BLAT2} from '../modules/local/blat'
 include {PARSE_BLAT_RESULTS} from '../modules/local/parse_blat_results'
+include {SEGUL} from '../modules/local/segul'
 include {MAFFT} from '../modules/local/mafft'
 include {PERL_CLEANUP} from '../modules/local/perl_cleanup'
 
@@ -379,6 +380,11 @@ main:
             )
     )
     ch_versions = ch_versions.mix(MAFFT.out.versions)
+
+    // Get alignment summary (pre-trimming)
+    SEGUL(
+        MAFFT.out.aligned.flatten().toList()
+    ).locus_summary.set{ ch_align_pre_trim }
 
     // Perform alignment trimming if enabled
     def trimmer_map = [
