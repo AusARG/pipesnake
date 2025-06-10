@@ -42,6 +42,8 @@ include {BLAT} from '../modules/local/blat'
 include {BLAT as BLAT2} from '../modules/local/blat'
 include {PARSE_BLAT_RESULTS} from '../modules/local/parse_blat_results'
 include {SEGUL} from '../modules/local/segul'
+include {SEGUL as SEGUL2} from '../modules/local/segul'
+include {COMBINE_ALIGN_SUMMARY} from '../modules/local/combine_align_summary'
 include {MAFFT} from '../modules/local/mafft'
 include {PERL_CLEANUP} from '../modules/local/perl_cleanup'
 
@@ -383,8 +385,11 @@ main:
 
     // Get alignment summary (pre-trimming)
     SEGUL(
-        MAFFT.out.aligned.flatten().toList()
-    ).locus_summary.set{ ch_align_pre_trim }
+        MAFFT.out.aligned
+            .flatten()
+            .toList(),
+        'pre_trim'
+    )
 
     // Perform alignment trimming if enabled
     def trimmer_map = [
@@ -413,6 +418,20 @@ main:
     BBMAP_REFORMAT(
         SED.out.seded
             .map{if (params.batching_size == 1) [it] else it}
+    )
+
+    // Get alignment summary (post-trimming)
+    SEGUL2(
+        BBMAP_REFORMAT.out.reformated
+            .flatten()
+            .toList(),
+        'post_trim'
+    )
+
+    // Combine the results of alignment summary before and after trimming
+    COMBINE_ALIGN_SUMMARY(
+        SEGUL.out.locus_summary,
+        SEGUL2.out.locus_summary
     )
 
     // Construct phylogenetic tree
