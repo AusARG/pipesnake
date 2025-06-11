@@ -83,12 +83,13 @@
                     "fa_icon": "fas fa-question-circle",
                     "enum": ["trinity", "SPAdes"]
                 },
-                "trim_alignment": {
-                    "type": "boolean",
-                    "description": "Trim initial MAFFT alignments.",
-                    "help_text": "if true, use GBLOCKS to trim initial MAFFT alignments. May proceed slowly. If false, proceed to phylogenetic estimation using initial MAFFT alignments",
-                    "default": false,
-                    "fa_icon": "fas fa-question-circle"
+                "trim_method": {
+                    "type": "string",
+                    "description": "the supported options are: 'gblocks', 'clipkit', 'trimal' or 'none'",
+                    "help_text": "Choose the preffered alignment trimming method to trim initial MAFFT alignments. If 'none', proceed to phylogenetic estimation using initial MAFFT alignments",
+                    "default": "gblocks",
+                    "fa_icon": "fas fa-question-circle",
+                    "enum": ["gblocks", "clipkit", "trimal", "none"]
                 },
                 "disable_adapter_trimming": {
                     "type": "boolean",
@@ -116,7 +117,7 @@
                     "default": false,
                     "fa_icon": "fas fa-question-circle"
                 }
-                
+
             }
         },
         "institutional_config_options": {
@@ -269,7 +270,7 @@
                     "description": "The path to store singularity containers locally to be reused later",
                     "hidden": false,
                     "fa_icon": "fas fa-bacon"
-                }, 
+                },
                 "hook_url": {
                     "type": "string",
                     "description": "Incoming hook URL for messaging service",
@@ -345,6 +346,22 @@
                     "type": "boolean",
                     "default": false,
                     "description": "If enabled, the output of process 'parse_blat_results' will be saved in the output directory.",
+                    "help_text": "",
+                    "fa_icon": "fas fa-copy",
+                    "hidden": true
+                },
+                "segul_keep_output": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "If enabled, the output of process 'segul' will be saved in the output directory.",
+                    "help_text": "",
+                    "fa_icon": "fas fa-copy",
+                    "hidden": true
+                },
+                "combine_align_summary_keep_output": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "If enabled, the output of process 'combine_align_summary' will be saved in the output directory.",
                     "help_text": "",
                     "fa_icon": "fas fa-copy",
                     "hidden": true
@@ -453,10 +470,10 @@
                     "fa_icon": "fas fa-copy",
                     "hidden": false
                 },
-                "gblocks_keep_output": {
+                "trimmer_keep_output": {
                     "type": "boolean",
                     "default": true,
-                    "description": "If enabled, the output of process 'gblocks' will be saved in the output directory.",
+                    "description": "If enabled, the output of the alignment trimming process will be saved in the output directory.",
                     "help_text": "",
                     "fa_icon": "fas fa-copy",
                     "hidden": false
@@ -763,6 +780,88 @@
                 }
             }
         },
+        "segul_options": {
+            "title": "segul options",
+            "type": "object",
+            "fa_icon": "fa-solid fa-arrow-progress",
+            "description": "The configurations of the process segul.",
+            "help_text": "",
+            "properties": {
+                "segul_args": {
+                    "type": "string",
+                    "default": "",
+                    "description": "The arguments to be passed to process (segul).",
+                    "help_text": "",
+                    "fa_icon": "fa fa-cog",
+                    "hidden": true
+                },
+                "segul_cpus": {
+                    "type": "integer",
+                    "description": "The number of requested CPUs for the process (segul).",
+                    "help_text": "",
+                    "fa_icon": "fas fa-microchip",
+                    "hidden": true,
+                    "default": 1
+                },
+                "segul_memory": {
+                    "type": "string",
+                    "description": "The requested memory for the process (segul).",
+                    "help_text": "",
+                    "fa_icon": "fas fa-memory",
+                    "hidden": true,
+                    "default": "8.GB"
+                },
+                "segul_walltime": {
+                    "type": "string",
+                    "description": "The requested walltime for the process (segul).",
+                    "help_text": "",
+                    "fa_icon": "far fa-clock",
+                    "hidden": true,
+                    "default": "12.h"
+                }
+            }
+        },
+        "combine_align_summary_options": {
+            "title": "combine_align_summary options",
+            "type": "object",
+            "fa_icon": "fa-solid fa-arrow-progress",
+            "description": "The configurations of the process combine_align_summary.",
+            "help_text": "",
+            "properties": {
+                "combine_align_summary_args": {
+                    "type": "string",
+                    "default": "",
+                    "description": "The arguments to be passed to process (combine_align_summary).",
+                    "help_text": "",
+                    "fa_icon": "fa fa-cog",
+                    "hidden": true
+                },
+                "combine_align_summary_cpus": {
+                    "type": "integer",
+                    "description": "The number of requested CPUs for the process (combine_align_summary).",
+                    "help_text": "",
+                    "fa_icon": "fas fa-microchip",
+                    "hidden": true,
+                    "default": 1
+                },
+                "combine_align_summary_memory": {
+                    "type": "string",
+                    "description": "The requested memory for the process (combine_align_summary).",
+                    "help_text": "",
+                    "fa_icon": "fas fa-memory",
+                    "hidden": true,
+                    "default": "8.GB"
+                },
+                "combine_align_summary_walltime": {
+                    "type": "string",
+                    "description": "The requested walltime for the process (combine_align_summary).",
+                    "help_text": "",
+                    "fa_icon": "far fa-clock",
+                    "hidden": true,
+                    "default": "12.h"
+                }
+            }
+        },
         "quality_2_assembly_options": {
             "title": "quality_2_assembly options",
             "type": "object",
@@ -977,7 +1076,7 @@
             "properties": {
                 "preprocessing_args": {
                     "type": "string",
-                    
+
                     "description": "",
                     "help_text": "",
                     "fa_icon": "fa fa-cog",
@@ -1018,7 +1117,7 @@
             "properties": {
                 "bbmap_dedupe_args": {
                     "type": "string",
-                    "default": "dedupe optical spany adjacent",      
+                    "default": "dedupe optical spany adjacent",
                     "description": "",
                     "help_text": "",
                     "fa_icon": "fa fa-cog",
@@ -1328,12 +1427,12 @@
                 }
             }
         },
-        "gblocks_options": {
-            "title": "gblocks options",
+        "trimmer_options": {
+            "title": "trimmer options",
             "type": "object",
             "fa_icon": "fa-solid fa-arrow-progress",
-            "description": "The configurations of the process gblocks.",
-            "help_text": "See the [Gblocks Manual](https://home.cc.umanitoba.ca/~psgendb/doc/Castresana/Gblocks_documentation.html) for more information",
+            "description": "The configurations of the alignment trimming process.",
+            "help_text": "See the [Gblocks Manual](https://home.cc.umanitoba.ca/~psgendb/doc/Castresana/Gblocks_documentation.html)/[ClipKIT documentation](https://jlsteenwyk.com/ClipKIT/)/[TrimAl website](https://vicfero.github.io/trimal/) for more information",
             "properties": {
                 "gblocks_b1": {
                     "type": "number",
@@ -1359,25 +1458,41 @@
                     "fa_icon": "fa fa-cog",
                     "hidden": true
                 },
-                "gblocks_cpus": {
+                "clipkit_args": {
+                    "type": "string",
+                    "default": "-m gappy -g 0.8",
+                    "description": "The arguments to be passed to process (clipkit).",
+                    "help_text": "",
+                    "fa_icon": "fa fa-cog",
+                    "hidden": true
+                },
+                "trimal_args": {
+                    "type": "string",
+                    "default": "-gt 0.2",
+                    "description": "The arguments to be passed to process (trimal).",
+                    "help_text": "",
+                    "fa_icon": "fa fa-cog",
+                    "hidden": true
+                },
+                "trimmer_cpus": {
                     "type": "integer",
-                    "description": "The number of requested CPUs for the process (gblocks).",
+                    "description": "The number of requested CPUs for the process.",
                     "help_text": "",
                     "fa_icon": "fas fa-microchip",
                     "hidden": true,
                     "default": 1
                 },
-                "gblocks_memory": {
+                "trimmer_memory": {
                     "type": "string",
-                    "description": "The requested memory for the process (gblocks).",
+                    "description": "The requested memory for the process.",
                     "help_text": "",
                     "fa_icon": "fas fa-memory",
                     "hidden": true,
                     "default": "8.GB"
                 },
-                "gblocks_walltime": {
+                "trimmer_walltime": {
                     "type": "string",
-                    "description": "The requested walltime for the process (gblocks).",
+                    "description": "The requested walltime for the process.",
                     "help_text": "",
                     "fa_icon": "far fa-clock",
                     "hidden": true,
@@ -1394,7 +1509,7 @@
             "properties": {
                 "testing_args": {
                     "type": "string",
-                    
+
                     "description": "",
                     "help_text": "",
                     "fa_icon": "fa fa-cog",
@@ -1826,7 +1941,7 @@
                     "default": "12.h"
                 }
             }
-        }      
+        }
     },
     "allOf": [
         {
@@ -1902,7 +2017,7 @@
             "$ref": "#/definitions/make_prg_options"
         },
         {
-            "$ref": "#/definitions/gblocks_options"
+            "$ref": "#/definitions/trimmer_options"
         },
         {
             "$ref": "#/definitions/testing_options"

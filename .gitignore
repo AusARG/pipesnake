@@ -6,3 +6,6 @@ results/
 testing/
 testing*
 *.pyc
+tests/data
+output_test
+tracing
