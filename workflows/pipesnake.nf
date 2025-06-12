@@ -360,7 +360,7 @@ emit:
     ch_prg_out = ch_prg_out
 }
 
-workflow FROM_PRG {
+workflow ALIGNMENT {
 take:
     ch_versions
     ch_prg_out
@@ -418,7 +418,7 @@ main:
     BBMAP_REFORMAT(
         SED.out.seded
             .map{if (params.batching_size == 1) [it] else it}
-    )
+    ).reformated.set{ ch_alignment }
 
     // Get alignment summary (post-trimming)
     SEGUL2(
@@ -434,10 +434,28 @@ main:
         SEGUL2.out.locus_summary
     )
 
+    // Log software versions
+    ch_versions = ch_versions.mix(PHYLOGENY_MAKE_ALIGNMENTS.out.versions)
+    ch_versions = ch_versions.mix(SED.out.versions)
+    ch_versions = ch_versions.mix(SEGUL.out.versions)
+    ch_versions = ch_versions.mix(COMBINE_ALIGN_SUMMARY.out.versions)
+    ch_versions = ch_versions.mix(BBMAP_REFORMAT.out.versions)
+
+emit:
+    ch_versions = ch_versions
+    ch_alignment = ch_alignment
+}
+
+workflow FROM_PRG {
+take:
+    ch_versions
+    ch_alignment
+
+main:
     // Construct phylogenetic tree
     if (params.tree_method == 'raxml'){
         RAXML(
-            BBMAP_REFORMAT.out.reformated
+            ch_alignment
                 .map{if (params.batching_size == 1) [it] else it}
         )
         ch_all_trees = RAXML.out.tree_bipartitions
@@ -447,7 +465,7 @@ main:
         ch_versions = ch_versions.mix(RAXML.out.versions)
     } else if (params.tree_method == 'iqtree'){
         IQTREE(
-            BBMAP_REFORMAT.out.reformated
+            ch_alignment
                 .map{if (params.batching_size == 1) [it] else it}
         )
         ch_all_trees = IQTREE.out.contree
@@ -471,10 +489,6 @@ main:
     }
 
     // Log software versions
-    ch_versions = ch_versions.mix(PHYLOGENY_MAKE_ALIGNMENTS.out.versions)
-    //ch_versions = ch_versions.mix(CONVERT_PHYML.out.versions)
-    ch_versions = ch_versions.mix(SED.out.versions)
-    ch_versions = ch_versions.mix(BBMAP_REFORMAT.out.versions)
     ch_versions = ch_versions.mix(MERGE_TREES.out.versions)
 
 emit:
@@ -508,14 +522,37 @@ workflow PIPESNAKE {
             }
             .set{ch_prg_out}
     }
-    else {
+    else if (params.stage.toLowerCase() != "from-alignment") {
         TO_PRG(ch_versions)
         TO_PRG.out.ch_versions.set{ ch_versions }
         TO_PRG.out.ch_prg_out.set{ ch_prg_out }
     }
 
-    if (params.stage != "end-prg") {
-        FROM_PRG(ch_versions, ch_prg_out)
+    if (params.stage == "end-prg") {
+        exit 0
+    }
+
+    if (params.stage.toLowerCase() == "from-alignment") {
+         Channel
+            .fromPath(params.input, checkIfExists:true)
+            .splitCsv(header:true, strip:true)
+            .map {
+                row -> file(row.alignment_file, checkIfExists: true)
+            }
+            .buffer(
+                size: params.batching_size,
+                remainder: true
+            )
+            .set{ch_alignment}
+    }
+    else {
+        ALIGNMENT(ch_versions, ch_prg_out)
+        ALIGNMENT.out.ch_versions.set{ ch_versions }
+        ALIGNMENT.out.ch_alignment.set{ ch_alignment }
+    }
+
+    if (params.stage.toLowerCase() != "end-alignment") {
+        FROM_PRG(ch_versions, ch_alignment)
         FROM_PRG.out.ch_versions.set{ ch_versions }
     }
 
