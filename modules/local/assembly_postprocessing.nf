@@ -8,7 +8,7 @@ process ASSEMBLY_POSTPROCESSING {
 
     input:
     tuple val(sample_id), path(assembly_input)
-    
+
     output:
     tuple val(sample_id), path ("${sample_id}_assembly_processed.fasta"), emit: processed
     path "versions.yml", emit: versions
@@ -16,7 +16,7 @@ process ASSEMBLY_POSTPROCESSING {
 
     script:
     """
-    assembly_rename_contigs.py ${assembly_input} ${sample_id} ${task.ext.assembly_header}
+    assembly_postprocessing.py ${assembly_input} ${sample_id} ${task.ext.assembly_header} ${task.ext.read_depth_threshold}
 
     echo "${task.process}:
       python: \$(python -c 'import sys; print(sys.version.split()[0])')" > versions.yml

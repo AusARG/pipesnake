@@ -632,6 +632,14 @@
                     "fa_icon": "fa fa-cog",
                     "hidden": true
                 },
+                "assembly_processed_threshold": {
+                    "type": "number",
+                    "default": 0,
+                    "description": "Threshold value for dropping contigs",
+                    "help_text": "",
+                    "fa_icon": "fa fa-cog",
+                    "hidden": true
+                },
                 "assembly_postprocessing_args": {
                     "type": "string",
                     "description": "",
