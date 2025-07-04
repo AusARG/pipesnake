@@ -2105,6 +2105,15 @@
         },
         {
             "$ref": "#/definitions/spades_options"
+        },
+        {
+            "$ref": "#/definitions/segul_options"
+        },
+        {
+            "$ref": "#/definitions/read_depth_statistics_options"
+        },
+        {
+            "$ref": "#/definitions/combine_align_summary_options"
         }
     ]
 }

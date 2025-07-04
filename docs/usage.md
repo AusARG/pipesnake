@@ -30,6 +30,7 @@ e.g. `--input /scratch/testdata/sample_sheet.csv --disable_filter true`.
 | --trim_alignment  | boolean | Default is `false`.<br />Trim initial MAFFT alignments. |
 | --batching_size  | integer |  Default is `250`.<br /> Number of alignment files to be processed sequentially in batches <br/> to avoid submitting a large number of jobs when using HPCs. |
 | --trinity_scratch_tmp  | boolean |  Default is `true`.<br /> Trinity generates large number of intermediate files. <br/>This can be an issue for some HPCs that limits the file number for each user.<br/> This option will make trinity writes to the `/tmp` directory on the compute node <br/> then copy the compressed output directory (not the fasta) to the working directory to avoid this issue. |
+| --stage  | string |  Default is `from-start`.<br /> The stage to start the workflow from (supported options are `from-start`, `from-prg`, `end-prg`, `from-alignment`, `end-alignment`).  |
 
 
 ### Tools arguments for each stage of the pipeline
@@ -77,7 +78,6 @@ italic variables in the default values represent other parameters.
 |--trimal_args|`string`|Default is `-gt 0.2` <br /> The arguments to be passed to process (trimal). |
 |--testing_args|`string`|Default is `None` <br/> |
 |--trinity_normalize_reads|`boolean`|Default is `False` <br/>Normalize the read pool, discarding excess coverage Depending on the sequencing effort, there may be excess reads (above desired coverage) that will slow down computation by requiring additional memory. New versions of trinity normalize reads do this by default, and it's highly recommended here.|
-|--trinity_processed_header|`string`|Default is `contig` <br/>Prefix for a contig of assembled reads Naming convention for assembled contigs. Suggested Usage: contig|
 |--trinity_args|`string`|Default is `--seqType fq --NO_SEQTK` <br/>The arguments to be passed to process (trinity). [check the wiki](https://github.com/trinityrnaseq/trinityrnaseq/wiki)|
 |--iqtree_args|`string`|Default is `--quiet -B 1000` <br/>The arguments to be passed to process (iqtree). |
 |--aster_args|`string`|The arguments to be passed to process (aster). |
@@ -100,6 +100,8 @@ italic variables in the default values represent other parameters.
 |--blat_args|`string`|Default is `-out=blast8` <br/>The arguments to be passed to process (blat). |
 |--pear_args|`string`|The arguments to be passed to process (pear). |
 |--sed_args|`string`|The arguments to be passed to process (sed). |
+|--assembly_processed_header|`string`|Default is `contig` <br/>Prefix for a contig of assembled reads Naming convention for assembled contigs. Suggested Usage: contig|
+|--assembly_processed_threshold|`string`|Default is `0` <br/> The minimum avg. read depth for a contig to be included in the processed PRG. |
 
 
 ### Resources for each stage of the pipeline
@@ -108,7 +110,7 @@ You can customise the resources requested for each stage of the pipeline includi
 
 *`process-name`* can be any one of the following processes:
 
-`perl_cleanup`, `phylogeny_make_alignments`, `preprocessing`, `trimmomatic_clean_pe`, `trinity_postprocessing`, `blat`, `bbmap_reformat`, `trimmer`, `parse_blat_results`, `aster`, `bbmap_reformat2`, `convert_phyml`, `trimmomatic`, `iqtree`, `concatenate`, `trinity`, `saved_output`, `bbmap_filter`, `bbmap_dedupe`, `prepare_adaptor`, `mafft`, `sed`, `pear`, `merge_trees`, `raxml`, `trimmomatic_clean_se`, `make_prg`, `macse`, `quality_2_assembly`
+`perl_cleanup`, `phylogeny_make_alignments`, `preprocessing`, `trimmomatic_clean_pe`, `trinity_postprocessing`, `blat`, `bbmap_reformat`, `trimmer`, `parse_blat_results`, `aster`, `bbmap_reformat2`, `convert_phyml`, `trimmomatic`, `iqtree`, `concatenate`, `trinity`, `saved_output`, `bbmap_filter`, `bbmap_dedupe`, `prepare_adaptor`, `mafft`, `sed`, `pear`, `merge_trees`, `raxml`, `trimmomatic_clean_se`, `make_prg`, `macse`, `quality_2_assembly`, `read_depth_statistics`, `segul`, `combine_align_summary`
 
 
 Examples:
