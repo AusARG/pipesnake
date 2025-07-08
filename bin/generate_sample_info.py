@@ -5,6 +5,7 @@ import argparse
 import logging
 import sys
 from pathlib import Path
+import os
 
 logger = logging.getLogger()
 
@@ -16,9 +17,12 @@ def from_start(args):
 
 def from_prg(args):
     """Create a sample info csv file for running from PRG files"""
-    csv_data = [f"{path.name[4:].rstrip('.fasta')},{path.resolve()}\n"
-                for path in args.prg_dir.rglob("*.fasta")
-                if path.name[:4] == 'PRG_']
+    csv_data = []
+    for path in args.prg_dir.rglob("*.fasta"):
+        if path.name.startswith(args.prg_prefix):
+            path_name = os.path.splitext(path.name)[0].lstrip(args.prg_prefix)
+            csv_data.append(f"{path_name},{path.resolve()}\n")
+
     with open(args.output_file, 'w') as out_file:
         out_file.write("sample_id,prg_file\n")
         out_file.writelines(csv_data)
@@ -62,6 +66,12 @@ def parse_args(argv=None):
         "--prg_dir",
         type=Path,
         help="Directory containing all PRG fasta files"
+    )
+    parser_from_prg.add_argument(
+        "--prg_prefix",
+        type=str,
+        default="",
+        help="Prefix for files to be removed while creating sample IDs"
     )
     parser_from_prg.set_defaults(func=from_prg)
 
