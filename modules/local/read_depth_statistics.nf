@@ -1,5 +1,5 @@
-process ASSEMBLY_POSTPROCESSING {
-    tag "$sample_id"
+process READ_DEPTH_STATISTICS {
+    tag "Statistics for ${prg_files.size()} samples"
 
     conda "conda-forge::python=3.8.3"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
@@ -7,16 +7,16 @@ process ASSEMBLY_POSTPROCESSING {
         'quay.io/biocontainers/python:3.8.3' }"
 
     input:
-    tuple val(sample_id), path(assembly_input)
+    val sample_ids
+    path prg_files
 
     output:
-    tuple val(sample_id), path ("${sample_id}_assembly_processed.fasta"), emit: processed
+    path 'read_depth_statistics.csv'
     path "versions.yml", emit: versions
-
 
     script:
     """
-    assembly_postprocessing.py ${assembly_input} ${sample_id} ${task.ext.assembly_header} ${task.ext.read_depth_threshold}
+    read_depth_statistics.py "${sample_ids}" ${prg_files.join(' ')}
 
     echo "${task.process}:
       python: \$(python -c 'import sys; print(sys.version.split()[0])')" > versions.yml

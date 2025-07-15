@@ -374,6 +374,14 @@
                     "fa_icon": "fas fa-copy",
                     "hidden": true
                 },
+                "read_depth_statistics_keep_output": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "If enabled, the output of process 'read_depth_statistics' will be saved in the output directory.",
+                    "help_text": "process output for each sample is a csv file summarizing read depth coverage for all samples and targets",
+                    "fa_icon": "fas fa-copy",
+                    "hidden": true
+                },
                 "samplesheet_check_keep_output": {
                     "type": "boolean",
                     "default": false,
@@ -621,6 +629,14 @@
                     "default": "contig",
                     "description": "Prefix for a contig of assembled reads",
                     "help_text": "Naming convention for assembled contigs. Suggested Usage: contig",
+                    "fa_icon": "fa fa-cog",
+                    "hidden": true
+                },
+                "assembly_processed_threshold": {
+                    "type": "number",
+                    "default": 0,
+                    "description": "Threshold value for dropping contigs",
+                    "help_text": "",
                     "fa_icon": "fa fa-cog",
                     "hidden": true
                 },
@@ -896,6 +912,47 @@
                 "quality_2_assembly_walltime": {
                     "type": "string",
                     "description": "The requested walltime for the process (quality_2_assembly).",
+                    "help_text": "",
+                    "fa_icon": "far fa-clock",
+                    "hidden": true,
+                    "default": "12.h"
+                }
+            }
+        },
+        "read_depth_statistics_options": {
+            "title": "read_depth_statistics options",
+            "type": "object",
+            "fa_icon": "fa-solid fa-arrow-progress",
+            "description": "The configurations of the process read_depth_statistics.",
+            "help_text": "",
+            "properties": {
+                "read_depth_statistics_args": {
+                    "type": "string",
+                    "default": "",
+                    "description": "The arguments to be passed to process (read_depth_statistics).",
+                    "help_text": "",
+                    "fa_icon": "fa fa-cog",
+                    "hidden": true
+                },
+                "read_depth_statistics_cpus": {
+                    "type": "integer",
+                    "description": "The number of requested CPUs for the process (read_depth_statistics).",
+                    "help_text": "",
+                    "fa_icon": "fas fa-microchip",
+                    "hidden": true,
+                    "default": 1
+                },
+                "read_depth_statistics_memory": {
+                    "type": "string",
+                    "description": "The requested memory for the process (read_depth_statistics).",
+                    "help_text": "",
+                    "fa_icon": "fas fa-memory",
+                    "hidden": true,
+                    "default": "8.GB"
+                },
+                "read_depth_statistics_walltime": {
+                    "type": "string",
+                    "description": "The requested walltime for the process (read_depth_statistics).",
                     "help_text": "",
                     "fa_icon": "far fa-clock",
                     "hidden": true,
@@ -2048,6 +2105,15 @@
         },
         {
             "$ref": "#/definitions/spades_options"
+        },
+        {
+            "$ref": "#/definitions/segul_options"
+        },
+        {
+            "$ref": "#/definitions/read_depth_statistics_options"
+        },
+        {
+            "$ref": "#/definitions/combine_align_summary_options"
         }
     ]
 }

@@ -49,6 +49,7 @@ include {PERL_CLEANUP} from '../modules/local/perl_cleanup'
 
 include {MAKE_PRG} from '../modules/local/make_prg'
 include {QUALITY_2_ASSEMBLY} from '../modules/local/quality_2_assembly'
+include {READ_DEPTH_STATISTICS} from '../modules/local/read_depth_statistics'
 include {PHYLOGENY_MAKE_ALIGNMENTS} from '../modules/local/phylogeny_make_alignments'
 include { GBLOCKS } from '../modules/local/gblocks'
 include { CLIPKIT } from '../modules/local/clipkit'
@@ -343,6 +344,18 @@ main:
             .join(ch_lineage)
     )
 
+    // Read depth statistics
+    if (params.assembly == "SPAdes") {
+        ch_prg_out.multiMap { val ->
+            sample_id: val[0]
+            prg: val[1]
+        }.set {ch_processed_assembly}
+        READ_DEPTH_STATISTICS(
+            ch_processed_assembly.sample_id.reduce {a, b -> "$a,$b"},
+            ch_processed_assembly.prg.collect()
+        )
+    }
+
     // Log software versions used
     ch_versions = ch_versions.mix(BBMAP_DEDUPE.out.versions)
     ch_versions = ch_versions.mix(PEAR.out.versions)
@@ -446,7 +459,7 @@ emit:
     ch_alignment = ch_alignment
 }
 
-workflow FROM_PRG {
+workflow FROM_ALIGNMENT {
 take:
     ch_versions
     ch_alignment
@@ -552,8 +565,8 @@ workflow PIPESNAKE {
     }
 
     if (params.stage.toLowerCase() != "end-alignment") {
-        FROM_PRG(ch_versions, ch_alignment)
-        FROM_PRG.out.ch_versions.set{ ch_versions }
+        FROM_ALIGNMENT(ch_versions, ch_alignment)
+        FROM_ALIGNMENT.out.ch_versions.set{ ch_versions }
     }
 
     CUSTOM_DUMPSOFTWAREVERSIONS (
