@@ -1,5 +1,11 @@
 # ausarg/pipesnake: Citations
 
+## pipesnake
+
+- [pipesnake](https://academic.oup.com/bioinformatics/article/40/5/btae195/7643509?login=true)
+  > Brennan, I.G., Singhal, S., Al Bkhetan, Z. (2024). pipesnake: Generalized software for the assembly and analysis of phylogenomic datasets from conserved genomic loci. Bioinformatics, 40(5), btae195. 
+
+
 ## Nextflow
 
 - [nf-core](https://pubmed.ncbi.nlm.nih.gov/32055031/)

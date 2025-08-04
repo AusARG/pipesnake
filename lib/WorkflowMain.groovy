@@ -14,6 +14,8 @@ class WorkflowMain {
             //"  https://doi.org/10.5281/zenodo.XXXXXXX\n\n" +
             "* The nf-core framework\n" +
             "  https://doi.org/10.1038/s41587-020-0439-x\n\n" +
+            "* pipesnake\n" +
+            "  https://doi.org/10.1093/bioinformatics/btae195\n\n" +
             "* Software dependencies\n" +
             "  https://github.com/${workflow.manifest.name}/blob/master/CITATIONS.md"
     }

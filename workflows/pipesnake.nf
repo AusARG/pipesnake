@@ -542,7 +542,7 @@ workflow PIPESNAKE {
     }
 
     if (params.stage == "end-prg") {
-        exit 0
+        return
     }
 
     if (params.stage.toLowerCase() == "from-alignment") {
