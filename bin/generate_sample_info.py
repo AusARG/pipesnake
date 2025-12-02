@@ -40,7 +40,8 @@ def parse_args(argv=None):
     """Define and immediately parse command line arguments."""
     parser = argparse.ArgumentParser(
         description="Create sample info input csv files",
-        epilog="Example: python generate_sample_info.py output.csv from-start",
+#        epilog="Example: python generate_sample_info.py <output>.csv from-start",
+        epilog="Example: python generate_sample_info.py <output>.csv from-prg --prg_directory <dir>",
     )
 
     parser.add_argument(

@@ -22,9 +22,11 @@ The pipeline is built using [Nextflow](https://www.nextflow.io), a workflow tool
 
 # Wiki + Quick Start
 
-All of `pipesnake`'s documentation is covered in this lovingly crafted [Wiki](https://github.com/AusARG/pipesnake/wiki). 
+All of `pipesnake`'s documentation is covered in this lovingly crafted [Wiki](https://iangbrennan.github.io/pipesnake2/). <!--(https://github.com/AusARG/pipesnake/wiki)--> 
 
-Antsy? Follow our [Quick Start](https://github.com/AusARG/pipesnake/wiki/2.-Quick-Start) guide to get up and running (slithering?).
+Antsy? Follow our [Quick Start](https://iangbrennan.github.io/pipesnake2/docs/tutorials/) <!--(https://github.com/AusARG/pipesnake/wiki/2.-Quick-Start)--> guide to get up and running (slithering?).
+
+Tips and tricks for troubleshooting are available in our [FAQ](https://github.com/AusARG/pipesnake/wiki).
 
 &nbsp;
 &nbsp;
